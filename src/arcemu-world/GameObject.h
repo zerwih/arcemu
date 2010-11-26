@@ -93,7 +93,7 @@ struct GameObjectInfo
 	char * Category;
 	char * Castbartext;
 	char * Unkstr;
-	uint32 SpellFocus;
+	uint32 sound0;
 	uint32 sound1;
 	uint32 sound2;
 	uint32 sound3;
@@ -197,13 +197,11 @@ public:
 	void Spawn(MapMgr * m);
 	void Despawn(uint32 delay, uint32 respawntime);
 	Loot loot;
-	//void _EnvironmentalDamageUpdate();
+
 	// Serialization
 	void SaveToDB();
-	void SaveToFile(std::stringstream & name);
-	//bool LoadFromDB(uint32 guid);
-	//void LoadFromDB(GameObjectTemplate *t);
 	void DeleteFromDB();
+
 	void EventCloseDoor();
 	void EventCastSpell(uint32 guid, uint32 sp, bool triggered);
 	void SetRotation(float rad);
@@ -255,7 +253,7 @@ public:
 	uint32 m_ritualcaster,m_ritualtarget;
 	uint16 m_ritualspell;
 
-	void InitAI();
+	virtual void InitAI();
 	SpellEntry* spell;
 	
 	float range;
