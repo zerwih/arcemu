@@ -239,8 +239,8 @@ public:
 
 	bool isQuestGiver()
 	{
-		//from GameObject::CreateFromProto - SetByte( GAMEOBJECT_BYTES_1, 1, pInfo->Type );
-		if(GetByte(GAMEOBJECT_BYTES_1, 1) == 2) 
+
+		if( GetType() == GAMEOBJECT_TYPE_QUESTGIVER ) 
 			return true;
 		else
 			return false;
@@ -296,9 +296,18 @@ public:
 	bool HasLoot();
 	uint32 GetGOReqSkill();
 	MapCell * m_respawnCell;
+	
+	void SetState(uint8 state){ SetByte( GAMEOBJECT_BYTES_1, 0, state); }
+	uint8 GetState(){ return GetByte( GAMEOBJECT_BYTES_1, 0); }
 
-	void SetState(uint8 state);
-	uint8 GetState();
+	void SetType( uint8 type ){ SetByte( GAMEOBJECT_BYTES_1, 1, type ); }
+	uint32 GetType(){ return this->GetInfo()->Type; }
+
+	void SetArtKit( uint8 artkit ){ SetByte( GAMEOBJECT_BYTES_1, 2, artkit ); }
+	uint8 GetArtkKit(){ return GetByte( GAMEOBJECT_BYTES_1, 2 ); }
+
+	void SetAnimProgress( uint8 progress ){ SetByte( GAMEOBJECT_BYTES_1, 3, progress ); }
+	uint8 GetAnimProgress(){ return GetByte( GAMEOBJECT_BYTES_1, 3 ); }
 
 	uint32 GetOverrides() { return m_overrides; }
 

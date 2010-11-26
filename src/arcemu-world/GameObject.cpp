@@ -28,10 +28,9 @@ GameObject::GameObject(uint64 guid)
 	m_updateMask.SetCount(GAMEOBJECT_END);
 	SetUInt32Value( OBJECT_FIELD_TYPE,TYPE_GAMEOBJECT|TYPE_OBJECT);
 	SetGUID( guid );
-	SetByte(GAMEOBJECT_BYTES_1, 3, 100);
+	SetAnimProgress( 100 );
 	m_wowGuid.Init(GetGUID());
 	SetScale(  1);//info->Size  );
-	SetByte(GAMEOBJECT_BYTES_1, 3, 100);
 	counter= 0;//not needed at all but to prevent errors that var was not initialized, can be removed in release
 	bannerslot = bannerauraslot = -1;
 	m_summonedGo = false;
@@ -109,10 +108,10 @@ bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, fl
 	SetParentRotation(2, r2);
 	SetParentRotation(3, r3);
 	UpdateRotation();
-    SetByte( GAMEOBJECT_BYTES_1, 3, 0 );
-	SetByte( GAMEOBJECT_BYTES_1, 0, 1 );
+    SetAnimProgress( 0 );
+	SetState( 1 );
 	SetDisplayId(pInfo->DisplayID );
-	SetByte( GAMEOBJECT_BYTES_1, 1, static_cast<uint8>( pInfo->Type ));
+	SetType( static_cast<uint8>( pInfo->Type ));
 	InitAI();
 	
 	return true;
@@ -144,7 +143,7 @@ void GameObject::Update(uint32 p_time)
 	if(m_deleted)
 		return;
 
-	if(spell && (GetByte(GAMEOBJECT_BYTES_1, 0) == 1))
+	if(spell && ( GetState() == 1))
 	{
 		if(checkrate > 1)
 		{
@@ -225,7 +224,7 @@ void GameObject::Despawn(uint32 delay, uint32 respawntime)
 	//This is for go get deleted while looting
 	if(m_spawn)
 	{
-		SetByte(GAMEOBJECT_BYTES_1, 0, static_cast<uint8>( m_spawn->state ));
+		SetState( static_cast<uint8>( m_spawn->state ));
 		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
 	}
 
@@ -274,12 +273,11 @@ void GameObject::SaveToDB()
 		<< GetPositionY() << ","
 		<< GetPositionZ() << ","
 		<< GetOrientation() << ","
-//		<< GetUInt64Value(GAMEOBJECT_ROTATION) << ","
 		<< uint64(0) << ","
 		<< GetParentRotation(0) << ","
 		<< GetParentRotation(2) << ","
 		<< GetParentRotation(3) << ","
-		<< GetUInt32Value(GAMEOBJECT_BYTES_1) << ","
+		<< uint32( GetState() ) << ","
 		<< GetUInt32Value(GAMEOBJECT_FLAGS) << ","
 		<< GetFaction() << ","
 		<< GetScale() << ","
@@ -395,7 +393,7 @@ bool GameObject::Load(GOSpawn *spawn)
 	//SetRotation(spawn->o);
 	SetUInt32Value(GAMEOBJECT_FLAGS,spawn->flags);
 //	SetLevel(spawn->level);
-	SetByte(GAMEOBJECT_BYTES_1, 0, static_cast<uint8>( spawn->state ));	
+	SetState( static_cast<uint8>( spawn->state ));	
 	if(spawn->faction)
 	{
 		SetFaction(spawn->faction);
@@ -412,12 +410,9 @@ void GameObject::DeleteFromDB()
 		WorldDatabase.Execute("DELETE FROM gameobject_spawns WHERE id=%u", m_spawn->id);
 }
 
-void GameObject::EventCloseDoor()
-{
-// gameobject_flags +1 closedoor animate restore the pointer flag.
-// by cebernic
-	SetByte(GAMEOBJECT_BYTES_1, 0, 1);
-  SetUInt32Value(GAMEOBJECT_FLAGS, GetUInt32Value( GAMEOBJECT_FLAGS ) & ~1);
+void GameObject::EventCloseDoor(){
+	SetState( 1 );
+	SetUInt32Value(GAMEOBJECT_FLAGS, GetUInt32Value( GAMEOBJECT_FLAGS ) & ~1);
 }
 
 void GameObject::UseFishingNode(Player *player)
@@ -451,9 +446,14 @@ void GameObject::UseFishingNode(Player *player)
 	GameObject * school = NULL;
 	for ( InRangeSet::iterator it = GetInRangeSetBegin(); it != GetInRangeSetEnd(); ++it )
 	{
-		if ( (*it) == NULL || (*it)->GetTypeId() != TYPEID_GAMEOBJECT || (*it)->GetByte(GAMEOBJECT_BYTES_1, 1) != GAMEOBJECT_TYPE_FISHINGHOLE)
+		if ( (*it)->IsGameObject() )
 			continue;
-		school = static_cast<GameObject *>( *it );
+
+		school = static_cast< GameObject* >( *it );
+
+		if(  school->GetType() != GAMEOBJECT_TYPE_FISHINGHOLE )
+			continue;
+
 		if ( !isInRange( school, (float)school->GetInfo()->sound1 ) )
 		{
 			school = NULL;
@@ -525,8 +525,6 @@ void GameObject::FishHooked(Player * player)
 	data << GetGUID();
 	data << (uint32)(0); // value < 4
 	player->GetSession()->SendPacket(&data);
-	//SetByte(GAMEOBJECT_BYTES_1, 0, 0);
-	//BuildFieldUpdatePacket(player, GAMEOBJECT_FLAGS, 32);
 	SetUInt32Value(GAMEOBJECT_FLAGS, 32);
  }
 
@@ -744,14 +742,3 @@ void GameObject::UpdateRotation()
 		SetParentRotation(3, r3);
 	}
 }
-
-void GameObject::SetState(uint8 state)
-{
-	SetByte(GAMEOBJECT_BYTES_1, 0, state);
-}
-
-uint8 GameObject::GetState()
-{
-	return GetByte(GAMEOBJECT_BYTES_1, 0);
-}
-

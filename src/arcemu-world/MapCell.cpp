@@ -243,21 +243,10 @@ void MapCell::LoadObjects(CellSpawns * sp)
 		{
 			GameObject * go=_mapmgr->CreateGameObject((*i)->entry);
 			go->SetInstanceID(_mapmgr->GetInstanceID());
-			if(go->Load(*i))
-			{
-				//uint32 state = go->GetByte(GAMEOBJECT_BYTES_1, 0);
-
-				// FIX ME - burlex
-				/*
-				if(pInstance && pInstance->FindObject((*i)->stateNpcLink))
-				{
-					go->SetByte(GAMEOBJECT_BYTES_1, 0, (state ? 0 : 1));
-				}*/			   
-
+			if( go->Load(*i) ){
 				go->m_loadedFromDB = true;
 				go->PushToWorld(_mapmgr);
-			}
-			else
+			}else
 				delete go;//missing proto or something of that kind
 		}
 	}

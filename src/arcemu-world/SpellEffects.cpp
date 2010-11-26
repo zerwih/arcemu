@@ -2501,7 +2501,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			else if(gameObjTarget)
 			{
 				GameObjectInfo *info = gameObjTarget->GetInfo();
-				if( gameObjTarget->GetByte(GAMEOBJECT_BYTES_1, 0) == 0)
+				if( gameObjTarget->GetState() == 0)
 					return;
 
 				Lock *lock = dbcLock.LookupEntry( info->sound0 );
@@ -2514,7 +2514,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					{
 						v = lock->minlockskill[j];
 						gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
-						gameObjTarget->SetByte(GAMEOBJECT_BYTES_1, 0, 1);
+						gameObjTarget->SetState(  1);
 						//Add Fill GO loot here
 						if(gameObjTarget->loot.items.size() == 0)
 						{
@@ -2656,7 +2656,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		}
 		break;
 	};
-	if( gameObjTarget && gameObjTarget->GetByte( GAMEOBJECT_BYTES_1, 1 ) == GAMEOBJECT_TYPE_CHEST)
+	if( gameObjTarget && gameObjTarget->GetType() == GAMEOBJECT_TYPE_CHEST)
 		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), loottype, gameObjTarget->GetMapId() );
 }
 
@@ -3224,7 +3224,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 
 		go->CreateFromProto( GO_FISHING_BOBBER, mapid, posx, posy, posz, orient );
 		go->SetUInt32Value( GAMEOBJECT_FLAGS, 0 );
-		go->SetByte( GAMEOBJECT_BYTES_1, 0, 0 );
+		go->SetState( 0 );
 		go->SetUInt64Value( OBJECT_FIELD_CREATED_BY, m_caster->GetGUID() );
         u_caster->SetChannelSpellTargetGUID( go->GetGUID() );
 		go->Phase(PHASE_SET, u_caster->GetPhase());
@@ -3263,7 +3263,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 
 		go->SetInstanceID(m_caster->GetInstanceID());
 		go->CreateFromProto(entry,mapid,posx,posy,pz,orient);
-		go->SetByte(GAMEOBJECT_BYTES_1, 0, 1);
+		go->SetState(  1);
 		go->SetUInt64Value(OBJECT_FIELD_CREATED_BY,m_caster->GetGUID());
 		go->Phase(PHASE_SET, u_caster->GetPhase());
 		go->PushToWorld(m_caster->GetMapMgr());
@@ -3271,7 +3271,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		if ( entry == 17032 && p_caster) // this is a portal
 		{
 			// enable it for party only
-			go->SetByte( GAMEOBJECT_BYTES_1, 0, 0 );
+			go->SetState( 0 );
 			//disable by default
 			WorldPacket * pkt = go->BuildFieldUpdatePacket(GAMEOBJECT_BYTES_1, 1 << 24);
 			SubGroup * pGroup = p_caster->GetGroup() ? p_caster->GetGroup()->GetSubGroup(p_caster->GetSubGroup()) : NULL;
@@ -3566,7 +3566,7 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 
 	CALL_GO_SCRIPT_EVENT(gameObjTarget, OnActivate)(static_cast<Player*>(caster));
 	CALL_INSTANCE_SCRIPT_EVENT( gameObjTarget->GetMapMgr(), OnGameObjectActivate )( gameObjTarget, TO_PLAYER( caster ) ); 
-	gameObjTarget->SetByte(GAMEOBJECT_BYTES_1, 0, 0);
+	gameObjTarget->SetState(  0);
 
 	if( gameObjTarget->GetEntry() == 183146 )
 	{
@@ -3574,7 +3574,7 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 		return;
 	}
 
-	if( gameObjTarget->GetByte( GAMEOBJECT_BYTES_1, 1 ) == GAMEOBJECT_TYPE_CHEST)
+	if( gameObjTarget->GetType() == GAMEOBJECT_TYPE_CHEST)
 	{
 
 		if( gameObjTarget->GetMapMgr() != NULL )
@@ -3589,8 +3589,8 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	}
 
 	// cebernic: atm doors works fine.
-	if( gameObjTarget->GetByte( GAMEOBJECT_BYTES_1, 1 ) == GAMEOBJECT_TYPE_DOOR
-		|| gameObjTarget->GetByte( GAMEOBJECT_BYTES_1, 1 ) == GAMEOBJECT_TYPE_GOOBER )
+	if( gameObjTarget->GetType() == GAMEOBJECT_TYPE_DOOR
+		|| gameObjTarget->GetType() == GAMEOBJECT_TYPE_GOOBER )
 		gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, gameObjTarget->GetUInt32Value( GAMEOBJECT_FLAGS ) | 1);
 
 	if(gameObjTarget->GetMapMgr()->GetMapInfo()->type==INSTANCE_NULL)//don't close doors for instances
@@ -4861,7 +4861,7 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 
     GoSummon->PushToWorld(m_caster->GetMapMgr());
 
-	if(GoSummon->GetByte(GAMEOBJECT_BYTES_1, 1) == GAMEOBJECT_TYPE_TRAP)
+	if(GoSummon->GetType() == GAMEOBJECT_TYPE_TRAP)
 	{
 		GoSummon->invisible = true;
 		GoSummon->invisibilityFlag = INVIS_FLAG_TRAP;

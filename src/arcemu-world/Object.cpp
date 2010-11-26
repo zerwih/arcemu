@@ -173,10 +173,10 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	}
 
 	// gameobject stuff
-	if(m_objectTypeId == TYPEID_GAMEOBJECT)
+	if( IsGameObject() )
 	{
-//		switch( GetByte(GAMEOBJECT_BYTES_1,GAMEOBJECT_BYTES_TYPEID) )
-		switch(m_uint32Values[GAMEOBJECT_BYTES_1])
+
+		switch( TO_GAMEOBJECT( this )->GetType() )
 		{
 			case GAMEOBJECT_TYPE_MO_TRANSPORT:  
 				{
@@ -507,7 +507,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 		}
 		else if (flags & UPDATEFLAG_HAS_POSITION) //0x40
 		{
-			if(flags & UPDATEFLAG_TRANSPORT && m_uint32Values[GAMEOBJECT_BYTES_1]==GAMEOBJECT_TYPE_MO_TRANSPORT)
+			if(flags & UPDATEFLAG_TRANSPORT && TO_GAMEOBJECT( this )->GetType() == GAMEOBJECT_TYPE_MO_TRANSPORT )
 			{
 				*data << (float)0;
 				*data << (float)0;
@@ -2004,7 +2004,7 @@ bool Object::CanActivate()
 
 	case TYPEID_GAMEOBJECT:
 		{
-			if(static_cast<GameObject*>(this)->HasAI() && GetByte(GAMEOBJECT_BYTES_1, 1) != GAMEOBJECT_TYPE_TRAP)
+			if( TO_GAMEOBJECT(this)->HasAI() && TO_GAMEOBJECT( this )->GetType() != GAMEOBJECT_TYPE_TRAP)
 				return true;
 		}break;
 	}
