@@ -92,7 +92,8 @@ GameObject::~GameObject()
 bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, float z, float ang, float r0, float r1, float r2, float r3, uint32 overrides)
 {
 	pInfo= GameObjectNameStorage.LookupEntry(entry);
-	if(!pInfo)return false;
+	if(!pInfo)
+		return false;
 
 	Object::_Create( mapid, x, y, z, ang );
 	SetEntry(  entry );
@@ -225,7 +226,7 @@ void GameObject::Despawn(uint32 delay, uint32 respawntime)
 	if(m_spawn)
 	{
 		SetState( static_cast<uint8>( m_spawn->state ));
-		SetUInt32Value(GAMEOBJECT_FLAGS, m_spawn->flags);
+		SetFlags( m_spawn->flags );
 	}
 
 	CALL_GO_SCRIPT_EVENT(this, OnDespawn)();
@@ -278,7 +279,7 @@ void GameObject::SaveToDB()
 		<< GetParentRotation(2) << ","
 		<< GetParentRotation(3) << ","
 		<< uint32( GetState() ) << ","
-		<< GetUInt32Value(GAMEOBJECT_FLAGS) << ","
+		<< GetFlags() << ","
 		<< GetFaction() << ","
 		<< GetScale() << ","
 		<< "0,"
@@ -391,7 +392,7 @@ bool GameObject::Load(GOSpawn *spawn)
 	m_spawn = spawn;
 	m_phase = spawn->phase;
 	//SetRotation(spawn->o);
-	SetUInt32Value(GAMEOBJECT_FLAGS,spawn->flags);
+	SetFlags( spawn->flags);
 //	SetLevel(spawn->level);
 	SetState( static_cast<uint8>( spawn->state ));	
 	if(spawn->faction)
@@ -412,13 +413,13 @@ void GameObject::DeleteFromDB()
 
 void GameObject::EventCloseDoor(){
 	SetState( 1 );
-	SetUInt32Value(GAMEOBJECT_FLAGS, GetUInt32Value( GAMEOBJECT_FLAGS ) & ~1);
+	SetFlags( GetFlags() & ~1 );
 }
 
 void GameObject::UseFishingNode(Player *player)
 {
 	sEventMgr.RemoveEvents( this );
-	if( GetUInt32Value( GAMEOBJECT_FLAGS ) != 32 ) // Clicking on the bobber before something is hooked
+	if( GetFlags() != 32 ) // Clicking on the bobber before something is hooked
 	{
 		player->GetSession()->OutPacket( SMSG_FISH_NOT_HOOKED );
 		EndFishing( player, true );
@@ -522,10 +523,10 @@ void GameObject::FishHooked(Player * player)
 {
 	WorldPacket  data(12);
 	data.Initialize(SMSG_GAMEOBJECT_CUSTOM_ANIM); 
-	data << GetGUID();
-	data << (uint32)(0); // value < 4
+	data << uint64( GetGUID() );
+	data << uint32( 0 ); // value < 4
 	player->GetSession()->SendPacket(&data);
-	SetUInt32Value(GAMEOBJECT_FLAGS, 32);
+	SetFlags( 32 );
  }
 
 /////////////
@@ -588,9 +589,6 @@ void GameObject::_LoadQuests()
 	sQuestMgr.LoadGOQuests(this);
 }
 
-/**
-* Summoned Go's
-*/
 void GameObject::_Expire()
 {
 	sEventMgr.RemoveEvents(this);
@@ -598,9 +596,7 @@ void GameObject::_Expire()
 	if( IsInWorld() )
 		RemoveFromWorld(true);
 
-	//sEventMgr.AddEvent(World::getSingletonPtr(), &World::DeleteObject, ((Object*)this), EVENT_DELETE_TIMER, 1000, 1);
 	delete this;
-	//this = NULL;
 }
 
 void GameObject::ExpireAndDelete()
@@ -616,17 +612,6 @@ void GameObject::ExpireAndDelete()
 		sEventMgr.AddEvent(this, &GameObject::_Expire, EVENT_GAMEOBJECT_EXPIRE, 1, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	else
 		delete this;
-}
-
-//! Deactivates selected gameobject ex. stops doors from opening/closing.
-void GameObject::Deactivate()
-{
-	SetUInt32Value(GAMEOBJECT_DYNAMIC, 0);
-}
-
-void GameObject::Activate()
-{
-	SetUInt32Value(GAMEOBJECT_DYNAMIC, 1);
 }
 
 void GameObject::CallScriptUpdate()
@@ -686,14 +671,6 @@ bool GameObject::HasLoot()
 
 uint32 GameObject::GetGOReqSkill()  
 {
-	//! Hardcoded values are BAD.
-	if(GetEntry() == 180215) 
-		return 300;
-
-	//! Gameobject does not require a skill, so let everyone use it.
-	if(GetInfo() == NULL)
-		return 0;
-	
 	//! Here we check the SpellFocus table against the dbcs
 	Lock *lock = dbcLock.LookupEntryForced( GetInfo()->sound0 );
 	if(!lock) return 0;
@@ -717,7 +694,6 @@ void GameObject::SetRotation(float rad)
 		rad = 1.f + 0.125f * sin;
 	else
 		rad = 1.25f + 0.125f * sin;
-//	SetFloatValue(GAMEOBJECT_ROTATION, rad);
 }
 
 void GameObject::UpdateRotation()

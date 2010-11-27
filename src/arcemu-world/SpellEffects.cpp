@@ -2513,7 +2513,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					if(lock->locktype[j] == 2 && lock->minlockskill[j] && lockskill >= lock->minlockskill[j])
 					{
 						v = lock->minlockskill[j];
-						gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+						gameObjTarget->SetFlags(  0);
 						gameObjTarget->SetState(  1);
 						//Add Fill GO loot here
 						if(gameObjTarget->loot.items.size() == 0)
@@ -3223,7 +3223,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		GameObject *go = u_caster->GetMapMgr()->CreateGameObject(GO_FISHING_BOBBER);
 
 		go->CreateFromProto( GO_FISHING_BOBBER, mapid, posx, posy, posz, orient );
-		go->SetUInt32Value( GAMEOBJECT_FLAGS, 0 );
+		go->SetFlags( 0 );
 		go->SetState( 0 );
 		go->SetUInt64Value( OBJECT_FIELD_CREATED_BY, m_caster->GetGUID() );
         u_caster->SetChannelSpellTargetGUID( go->GetGUID() );
@@ -3591,7 +3591,7 @@ void Spell::SpellEffectOpenLockItem(uint32 i)
 	// cebernic: atm doors works fine.
 	if( gameObjTarget->GetType() == GAMEOBJECT_TYPE_DOOR
 		|| gameObjTarget->GetType() == GAMEOBJECT_TYPE_GOOBER )
-		gameObjTarget->SetUInt32Value(GAMEOBJECT_FLAGS, gameObjTarget->GetUInt32Value( GAMEOBJECT_FLAGS ) | 1);
+		gameObjTarget->SetFlags(  gameObjTarget->GetFlags() | 1);
 
 	if(gameObjTarget->GetMapMgr()->GetMapInfo()->type==INSTANCE_NULL)//don't close doors for instances
 		sEventMgr.AddEvent(gameObjTarget,&GameObject::EventCloseDoor, EVENT_GAMEOBJECT_DOOR_CLOSE,10000,1,0);

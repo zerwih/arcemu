@@ -127,14 +127,6 @@ struct GameObjectInfo
 };
 #pragma pack(pop)
 
-enum GAMEOBJECT_BYTES
-{
-	GAMEOBJECT_BYTES_STATE			= 0,
-	GAMEOBJECT_BYTES_TYPE_ID		= 1,
-	GAMEOBJECT_BYTES_UNK			= 2, // todo: unknown atm
-	GAMEOBJECT_BYTES_ANIMPROGRESS	= 3,
-};
-
 enum GAMEOBJECT_TYPES
 {
 	GAMEOBJECT_TYPE_DOOR					= 0,
@@ -172,7 +164,8 @@ enum GAMEOBJECT_TYPES
 	GAMEOBJECT_TYPE_BARBER_CHAIR			= 32,
 	GAMEOBJECT_TYPE_DESTRUCTIBLE_BUILDING	= 33,
 	GAMEOBJECT_TYPE_GUILD_BANK				= 34,
-	GAMEOBJECT_TYPE_TRAPDOOR				= 35};
+	GAMEOBJECT_TYPE_TRAPDOOR				= 35
+};
 
 #define CALL_GO_SCRIPT_EVENT(obj, func) if(obj->GetTypeId() == TYPEID_GAMEOBJECT && static_cast<GameObject*>(obj)->GetScript() != NULL) static_cast<GameObject*>(obj)->GetScript()->func
 
@@ -233,24 +226,13 @@ public:
 	void _Expire();
 	
 	void ExpireAndDelete();
-
-	void Deactivate();
-	void Activate();
-
-	bool isQuestGiver()
-	{
-
-		if( GetType() == GAMEOBJECT_TYPE_QUESTGIVER ) 
-			return true;
-		else
-			return false;
-	};
-
+	
 	/// Quest data
 	std::list<QuestRelation *>* m_quests;
    
 	uint32 *m_ritualmembers;
-	uint32 m_ritualcaster,m_ritualtarget;
+	uint32 m_ritualcaster;
+	uint32  m_ritualtarget;
 	uint16 m_ritualspell;
 
 	virtual void InitAI();
@@ -309,24 +291,34 @@ public:
 	void SetAnimProgress( uint8 progress ){ SetByte( GAMEOBJECT_BYTES_1, 3, progress ); }
 	uint8 GetAnimProgress(){ return GetByte( GAMEOBJECT_BYTES_1, 3 ); }
 
-	uint32 GetOverrides() { return m_overrides; }
+	void Deactivate(){ SetUInt32Value(GAMEOBJECT_DYNAMIC, 0); }
+	void Activate(){ SetUInt32Value(GAMEOBJECT_DYNAMIC, 1); }
+	bool IsActive(){
+		if( m_uint32Values[ GAMEOBJECT_DYNAMIC ] == 1 )
+			return true;
+		else
+			return false;
+	}
 
-	//Easy Functions
-	void SetDisplayId( uint32 id ) { SetUInt32Value(GAMEOBJECT_DISPLAYID, id); }
-	uint32 GetDisplayId() { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
+	void SetDisplayId( uint32 id ){ SetUInt32Value(GAMEOBJECT_DISPLAYID, id); }
+	uint32 GetDisplayId(){ return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
 
-	void SetParentRotation( uint8 rot, float value ) { SetFloatValue(GAMEOBJECT_PARENTROTATION+rot, value); }
-	float GetParentRotation( uint8 rot ) { return GetFloatValue(GAMEOBJECT_PARENTROTATION+rot); }
+	void SetParentRotation( uint8 rot, float value ){ SetFloatValue(GAMEOBJECT_PARENTROTATION+rot, value); }
+	float GetParentRotation( uint8 rot ){ return GetFloatValue(GAMEOBJECT_PARENTROTATION+rot); }
 
-	void SetFaction( uint32 id ) 
-	{ 
+	void SetFaction( uint32 id ){ 
 		SetUInt32Value(GAMEOBJECT_FACTION, id); 
 		_setFaction();
 	}
-	uint32 GetFaction() { return GetUInt32Value(GAMEOBJECT_FACTION); }
+	uint32 GetFaction(){ return GetUInt32Value(GAMEOBJECT_FACTION); }
 
-	void SetLevel( uint32 level ) { SetUInt32Value(GAMEOBJECT_LEVEL, level); }
-	uint32 GetLevel() { return GetUInt32Value(GAMEOBJECT_LEVEL); }
+	void SetLevel( uint32 level ){ SetUInt32Value(GAMEOBJECT_LEVEL, level); }
+	uint32 GetLevel(){ return GetUInt32Value(GAMEOBJECT_LEVEL); }
+
+	void SetFlags( uint32 flags ){ SetUInt32Value( GAMEOBJECT_FLAGS, flags ); }
+	uint32 GetFlags(){ return GetUInt32Value( GAMEOBJECT_FLAGS ); }
+
+	uint32 GetOverrides() { return m_overrides; }
 
 protected:
 

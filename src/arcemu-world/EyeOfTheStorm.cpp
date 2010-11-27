@@ -491,7 +491,7 @@ void EyeOfTheStorm::DropFlag2(Player * plr, uint32 id)
 
 	plr->CastSpell(plr, 42792, true);
 
-	m_dropFlag->SetUInt32Value(GAMEOBJECT_FLAGS, 1);
+	m_dropFlag->SetFlags(  1);
 	m_dropFlag->PushToWorld( m_mapMgr );
 	m_flagHolder = 0;
 	sEventMgr.AddEvent( this, &EyeOfTheStorm::EventResetFlag, EVENT_EOTS_RESET_FLAG, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
@@ -519,7 +519,7 @@ void EyeOfTheStorm::EventResetFlag()
 		return;
 
 	m_dropFlag->RemoveFromWorld(false);
-	m_dropFlag->SetUInt32Value(GAMEOBJECT_FLAGS, 0);
+	m_dropFlag->SetFlags(  0);
 	m_standFlag->PushToWorld(m_mapMgr);
 
 	SetWorldState( 2757, 1 );
@@ -625,7 +625,7 @@ void EyeOfTheStorm::OnCreate()
 
 		m_bubbles[i]->SetScale( 0.1f);
 		m_bubbles[i]->SetState( 1);
-		m_bubbles[i]->SetUInt32Value(GAMEOBJECT_FLAGS,32);
+		m_bubbles[i]->SetFlags( 32);
 		m_bubbles[i]->SetFaction(114);
 		m_bubbles[i]->SetAnimProgress(  100);
 

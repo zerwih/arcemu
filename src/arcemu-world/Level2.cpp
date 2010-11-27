@@ -856,7 +856,7 @@ bool ChatHandler::HandleGOSpawn(const char *args, WorldSession *m_session)
 	gs->entry = go->GetEntry();
 	gs->facing = go->GetOrientation();
 	gs->faction = go->GetFaction();
-	gs->flags = go->GetUInt32Value(GAMEOBJECT_FLAGS);
+	gs->flags = go->GetFlags();
 	gs->id = objmgr.GenerateGameObjectSpawnID();
 	gs->o = 0.0f;
 	gs->o1 = go->GetParentRotation(0);
@@ -957,7 +957,7 @@ bool ChatHandler::HandleGOInfo(const char *args, WorldSession *m_session)
 	SystemMessage(m_session, "%s Entry:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetEntry() );
 	SystemMessage(m_session, "%s Model:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetDisplayId() );
 	SystemMessage(m_session, "%s State:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetState() );
-	SystemMessage(m_session, "%s flags:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetUInt32Value( GAMEOBJECT_FLAGS ) );
+	SystemMessage(m_session, "%s flags:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetFlags() );
 	SystemMessage(m_session, "%s dynflags:%s%u",MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetUInt32Value( GAMEOBJECT_DYNAMIC ) );
 	SystemMessage(m_session, "%s faction:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetFaction() );
 	SystemMessage(m_session, "%s phase:%s%u",	MSG_COLOR_GREEN,MSG_COLOR_LIGHTBLUE, GObj->GetPhase() );
@@ -1023,14 +1023,14 @@ bool ChatHandler::HandleGOEnable(const char *args, WorldSession *m_session)
 		RedSystemMessage(m_session, "No selected GameObject...");
 		return true;
 	}
-	if(GObj->GetUInt32Value(GAMEOBJECT_DYNAMIC) == 1)
+	if( GObj->IsActive() )
 	{
 		// Deactivate
-		GObj->SetUInt32Value(GAMEOBJECT_DYNAMIC, 0);
+		GObj->Deactivate();
 		BlueSystemMessage(m_session, "Gameobject deactivated.");
 	} else {
 		// /Activate
-		GObj->SetUInt32Value(GAMEOBJECT_DYNAMIC, 1);
+		GObj->Activate();
 		BlueSystemMessage(m_session, "Gameobject activated.");
 	}
 	sGMLog.writefromsession( m_session, "activated/deactivated gameobject %s, entry %u", GameObjectNameStorage.LookupEntry( GObj->GetEntry() )->Name, GObj->GetEntry() );
@@ -1049,12 +1049,12 @@ bool ChatHandler::HandleGOActivate(const char* args, WorldSession *m_session)
 	{
 		// Close/Deactivate
 		GObj->SetState(  0);
-		GObj->SetUInt32Value(GAMEOBJECT_FLAGS, (GObj->GetUInt32Value(GAMEOBJECT_FLAGS)-1));
+		GObj->SetFlags(  (GObj->GetFlags() - 1 ) );
 		BlueSystemMessage(m_session, "Gameobject closed.");
 	} else {
 		// Open/Activate
 		GObj->SetState(  1);
-		GObj->SetUInt32Value(GAMEOBJECT_FLAGS, (GObj->GetUInt32Value(GAMEOBJECT_FLAGS)+1));
+		GObj->SetFlags(  (GObj->GetFlags()+1));
 		BlueSystemMessage(m_session, "Gameobject opened.");
 	}
 	sGMLog.writefromsession( m_session, "opened/closed gameobject %s, entry %u", GameObjectNameStorage.LookupEntry( GObj->GetEntry() )->Name, GObj->GetEntry() );

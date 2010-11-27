@@ -488,7 +488,7 @@
       <Filter>Spells</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\EquipmentSetMgr.cpp" />
-    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\Trap.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\CObjectFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -760,7 +760,8 @@
     <ClInclude Include="..\..\src\arcemu-world\PlayerCache.h">
       <Filter>EventableObject\Object\Unit\Player</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\Trap.h" />
+    <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />
