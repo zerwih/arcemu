@@ -4671,15 +4671,18 @@ bool Unit::RemoveAurasByHeal()
 	return res;
 }
 
-void Unit::RemoveAllAreaAuras(){
+void Unit::ClearAllAreaAuraTargets(){
 	for( uint32 x = MAX_TOTAL_AURAS_START; x < MAX_TOTAL_AURAS_END; x++ ){
 		Aura *a = m_auras[ x ];
 		
 		if( a == NULL )
 			continue;
 
+		if( a->m_areaAura ) // This was not casted by us, so no removal
+			continue;
+
 		if( a->IsAreaAura() )
-			a->RemoveAA();
+			a->ClearAATargets();
 	}
 }
 
@@ -4690,10 +4693,7 @@ void Unit::RemoveAllAreaAuraByOther(){
 		if( a == NULL ) // empty slot
 			continue;
 
-		if( !a->m_areaAura ) // not area aura
-			continue;
-
-		if( a->GetCaster()->GetGUID() == GetGUID() ) // this originates from us
+		if( !a->m_areaAura ) // not area aura, or we casted it
 			continue;
 
 		a->Remove();
@@ -5936,7 +5936,7 @@ void Unit::RemoveFromWorld(bool free_guid)
 		}
 	}
 	
-	RemoveAllAreaAuras();
+	ClearAllAreaAuraTargets();
 	RemoveAllAreaAuraByOther();
 
 	Object::RemoveFromWorld(free_guid);
@@ -6468,7 +6468,6 @@ Creature* Unit::create_guardian(uint32 guardian_entry,uint32 duration,float angl
 	float z = 0;
 
 	Creature* p = GetMapMgr()->CreateCreature( guardian_entry );
-	p->SetInstanceID( GetMapMgr()->GetInstanceID() );
 
 	if( Vec )
 	{
