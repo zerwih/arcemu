@@ -673,7 +673,7 @@ void Arena::HookOnAreaTrigger(Player * plr, uint32 id)
 		if(m_buffs[buffslot] != NULL && m_buffs[buffslot]->IsInWorld())
 		{
 			/* apply the buff */
-			SpellEntry * sp = dbcSpell.LookupEntryForced(m_buffs[buffslot]->GetInfo()->sound3);
+			SpellEntry * sp = dbcSpell.LookupEntryForced(m_buffs[buffslot]->GetInfo()->raw.sound3);
 			Arcemu::Util::ARCEMU_ASSERT(   sp != NULL);
 
 			Spell * s = new Spell(plr, sp, true, 0);

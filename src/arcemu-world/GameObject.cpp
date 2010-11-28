@@ -299,30 +299,30 @@ void GameObject::InitAI()
 	uint32 spellid = 0;
 	if(pInfo->Type==GAMEOBJECT_TYPE_TRAP)
 	{	
-		spellid = pInfo->sound3;
+		spellid = pInfo->raw.sound3;
 	}
 	else if(pInfo->Type == GAMEOBJECT_TYPE_SPELL_FOCUS)
 	{
 		// get spellid from attached gameobject if there is such - by sound2 field
-		if( pInfo->sound2 != 0 ){
+		if( pInfo->raw.sound2 != 0 ){
 			
-			GameObjectInfo *gi = GameObjectNameStorage.LookupEntry( pInfo->sound2 );
+			GameObjectInfo *gi = GameObjectNameStorage.LookupEntry( pInfo->raw.sound2 );
 			if( gi == NULL ){
-				sLog.outError("Gamobject %u is of spellfocus type, has attachment GO data ( %u ), but attachment not found in database.", pInfo->ID, pInfo->sound2 );
+				sLog.outError("Gamobject %u is of spellfocus type, has attachment GO data ( %u ), but attachment not found in database.", pInfo->ID, pInfo->raw.sound2 );
 				return;
 			}
 
-			spellid = gi->sound3;
+			spellid = gi->raw.sound3;
 		}
 	}
 	else if(pInfo->Type == GAMEOBJECT_TYPE_RITUAL)
 	{	
-		m_ritualmembers = new uint32[pInfo->sound0];
-		memset(m_ritualmembers,0,sizeof(uint32)*pInfo->sound0);
+		m_ritualmembers = new uint32[pInfo->raw.sound0];
+		memset(m_ritualmembers,0,sizeof(uint32)*pInfo->raw.sound0);
 	}
     else if(pInfo->Type == GAMEOBJECT_TYPE_CHEST)
     {
-        Lock *pLock = dbcLock.LookupEntryForced(GetInfo()->sound0);
+        Lock *pLock = dbcLock.LookupEntryForced(GetInfo()->raw.sound0);
         if(pLock)
         {
             for(uint32 i= 0; i < LOCK_NUM_CASES; i++)
@@ -458,7 +458,7 @@ void GameObject::UseFishingNode(Player *player)
 		if(  school->GetType() != GAMEOBJECT_TYPE_FISHINGHOLE )
 			continue;
 
-		if ( !isInRange( school, (float)school->GetInfo()->sound1 ) )
+		if ( !isInRange( school, (float)school->GetInfo()->raw.sound1 ) )
 		{
 			school = NULL;
 			continue;
@@ -471,9 +471,9 @@ void GameObject::UseFishingNode(Player *player)
 	{
 		
 		if( school->GetMapMgr() != NULL )
-			lootmgr.FillGOLoot( &school->loot, school->GetInfo()->sound1, school->GetMapMgr()->iInstanceMode );
+			lootmgr.FillGOLoot( &school->loot, school->GetInfo()->raw.sound1, school->GetMapMgr()->iInstanceMode );
 		else
-			lootmgr.FillGOLoot( &school->loot, school->GetInfo()->sound1, 0 );
+			lootmgr.FillGOLoot( &school->loot, school->GetInfo()->raw.sound1, 0 );
 		
 		player->SendLoot( school->GetGUID(), LOOT_FISHING, school->GetMapId() );
 		EndFishing( player, false );
@@ -675,7 +675,7 @@ bool GameObject::HasLoot()
 uint32 GameObject::GetGOReqSkill()  
 {
 	//! Here we check the SpellFocus table against the dbcs
-	Lock *lock = dbcLock.LookupEntryForced( GetInfo()->sound0 );
+	Lock *lock = dbcLock.LookupEntryForced( GetInfo()->raw.sound0 );
 	if(!lock) return 0;
 	for(uint32 i = 0; i < LOCK_NUM_CASES; i++)
 	{
