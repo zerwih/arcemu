@@ -1548,14 +1548,12 @@ void MapMgr::_PerformObjectDuties()
 	{
 		difftime = mstime - lastGameobjectUpdate;
 
-		GameObjectSet::iterator itr = activeGameObjects.begin();
-		GameObject * ptr;
-		for(; itr != activeGameObjects.end(); )
-		{
-			ptr = *itr;
+		for( std::vector< GameObject * >::iterator itr = GOStorage.begin(); itr != GOStorage.end();  ){
+			GameObject *go = *itr;
 			++itr;
-			if(ptr != NULL)
-				ptr->Update( difftime );
+
+			if( go != NULL )
+				go->Update( difftime );
 		}
 
 		lastGameobjectUpdate = mstime;

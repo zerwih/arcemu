@@ -550,7 +550,6 @@ public:
 	void DeleteFromDB();
 
 	void EventCloseDoor();
-	void EventCastSpell(uint32 guid, uint32 sp, bool triggered);
 	void SetRotation(float rad);
 	uint64 m_rotation;
 	void UpdateRotation();
@@ -606,8 +605,6 @@ public:
    
 
 	GameObjectAIScript* GetScript() { return myScript; }
-
-	void TrapSearchTarget();	// Traps need to find targets faster :P
 
 	bool HasAI() { return spell != 0; }
 	GOSpawn * m_spawn;

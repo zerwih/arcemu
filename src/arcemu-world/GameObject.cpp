@@ -121,18 +121,6 @@ bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, fl
 	return true;
 }
 
-void GameObject::EventCastSpell(uint32 guid, uint32 sp, bool triggered)
-{
-	Spell * spp = new Spell(this,dbcSpell.LookupEntry(sp),false,NULL);
-	SpellCastTargets tars(guid);
-	spp->prepare(&tars);
-}
-
-void GameObject::TrapSearchTarget()
-{
-	Update(100);
-}
-
 void GameObject::Update(uint32 p_time)
 {
 	if(m_event_Instanceid != m_instanceId)
@@ -147,7 +135,7 @@ void GameObject::Update(uint32 p_time)
 	if(m_deleted)
 		return;
 
-	if(spell && ( GetState() == 1))
+	if( spell != NULL && ( GetState() == 1) )
 	{
 		if(checkrate > 1)
 		{
