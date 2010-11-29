@@ -517,7 +517,7 @@ public:
    
 	bool Load(GOSpawn *spawn);
 
-	void Update(uint32 p_time);
+	void Update( unsigned long time_passed );
 
 	void Spawn(MapMgr * m);
 	void Despawn(uint32 delay, uint32 respawntime);

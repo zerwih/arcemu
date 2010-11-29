@@ -599,12 +599,12 @@ bool World::SetInitialWorldSettings()
 	return true;
 }
 
-void World::Update(time_t diff)
+void World::Update( unsigned long time_passed )
 {
-	eventholder->Update((uint32)diff);
+	eventholder->Update((uint32)time_passed);
 	sAuctionMgr.Update();
 	_UpdateGameTime();
-	UpdateQueuedSessions((uint32)diff);
+	UpdateQueuedSessions((uint32)time_passed);
 #ifdef SESSION_CAP
 	if( GetSessionCount() >= SESSION_CAP )
 		TerminateProcess(GetCurrentProcess(),0);

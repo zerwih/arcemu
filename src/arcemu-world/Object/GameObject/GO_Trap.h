@@ -34,7 +34,7 @@ namespace Arcemu{
 
 			void InitAI();
 
-			void Update( uint32 p_time );
+			void Update( unsigned long time_passed );
 
 			///////////////////////////////////////////////////////////////////
 			//void CastSpell( uint64 TargetGUID, uint32 SpellID )

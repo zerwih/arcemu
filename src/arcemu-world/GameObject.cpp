@@ -119,7 +119,7 @@ bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, fl
 	return true;
 }
 
-void GameObject::Update(uint32 p_time)
+void GameObject::Update( unsigned long time_passed )
 {
 	if(m_event_Instanceid != m_instanceId)
 	{

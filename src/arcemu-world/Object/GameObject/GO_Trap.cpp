@@ -35,7 +35,7 @@ namespace Arcemu{
 		charges = pInfo->trap.charges;
 	}
 
-	void GO_Trap::Update( uint32 p_time ){
+	void GO_Trap::Update( unsigned long time_passed ){
 		if(m_deleted)
 			return;
 

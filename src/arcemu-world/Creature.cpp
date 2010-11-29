@@ -258,9 +258,9 @@ Creature::~Creature()
 	Arcemu::Util::ARCEMU_ASSERT( m_owner == NULL );
 }
 
-void Creature::Update( uint32 p_time )
+void Creature::Update( unsigned long time_passed )
 {
-	Unit::Update( p_time );
+	Unit::Update( time_passed );
 	if(IsTotem() && IsDead())
 	{
         DeleteMe();

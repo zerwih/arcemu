@@ -427,6 +427,7 @@
     <ClInclude Include="..\..\src\arcemu-world\ChannelMgr.h" />
     <ClInclude Include="..\..\src\arcemu-world\Chat.h" />
     <ClInclude Include="..\..\src\arcemu-world\EquipmentSetMgr.h" />
+    <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
     <ClInclude Include="..\..\src\arcemu-world\MiscHandler.h" />
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />

@@ -894,7 +894,7 @@ public:
 	friend class AIInterface;
 	friend class Aura;
 
-	void Update( uint32 time );
+	void Update( unsigned long time_passed );
 	virtual void RemoveFromWorld(bool free_guid);
 	virtual void OnPushToWorld();
 

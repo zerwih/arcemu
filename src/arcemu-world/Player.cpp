@@ -902,12 +902,12 @@ bool Player::Create(WorldPacket& data )
 }
 
 
-void Player::Update( uint32 p_time )
+void Player::Update( unsigned long time_passed )
 {
 	if(!IsInWorld())
 		return;
 
-	Unit::Update( p_time );
+	Unit::Update( time_passed );
 	uint32 mstime = getMSTime();
 
     RemoveGarbageItems();
@@ -924,10 +924,10 @@ void Player::Update( uint32 p_time )
 
 	if( m_onAutoShot)
 	{
-		if( m_AutoShotAttackTimer > p_time )
+		if( m_AutoShotAttackTimer > time_passed )
 		{
 			//sLog.outDebug( "HUNTER AUTOSHOT 0) %i, %i", m_AutoShotAttackTimer, p_time );
-			m_AutoShotAttackTimer -= p_time;
+			m_AutoShotAttackTimer -= time_passed;
 		}
 		else
 		{
@@ -937,8 +937,8 @@ void Player::Update( uint32 p_time )
 	}
 	else if(m_AutoShotAttackTimer > 0)
 	{
-		if(m_AutoShotAttackTimer > p_time)
-			m_AutoShotAttackTimer -= p_time;
+		if(m_AutoShotAttackTimer > time_passed)
+			m_AutoShotAttackTimer -= time_passed;
 		else
 			m_AutoShotAttackTimer = 0;
 	}
@@ -950,10 +950,10 @@ void Player::Update( uint32 p_time )
 		if( m_UnderwaterTime )
 		{
 			// not taking dmg yet
-			if(p_time >= m_UnderwaterTime)
+			if( time_passed >= m_UnderwaterTime)
 				m_UnderwaterTime = 0;
 			else
-				m_UnderwaterTime -= p_time;
+				m_UnderwaterTime -= time_passed;
 		}
 
 		if( !m_UnderwaterTime )
@@ -975,7 +975,7 @@ void Player::Update( uint32 p_time )
 		if(m_UnderwaterTime < m_UnderwaterMaxTime)
 		{
 			// regenning
-			m_UnderwaterTime += (p_time * 10);
+			m_UnderwaterTime += ( time_passed * 10);
 
 			if(m_UnderwaterTime >= m_UnderwaterMaxTime)
 			{
@@ -1021,13 +1021,13 @@ void Player::Update( uint32 p_time )
 
 	if(m_pvpTimer)
 	{
-		if(p_time >= m_pvpTimer)
+		if( time_passed >= m_pvpTimer)
 		{
 			RemovePvPFlag();
 			m_pvpTimer = 0;
 		}
 		else
-			m_pvpTimer -= p_time;
+			m_pvpTimer -= time_passed;
 	}
 
 	if (sWorld.Collision)
@@ -1047,17 +1047,11 @@ void Player::Update( uint32 p_time )
 			}
 			m_indoorCheckTimer = mstime + COLLISION_INDOOR_CHECK_INTERVAL;
 		}
-
-		/*if( mstime >= m_flyhackCheckTimer )
-		{
-			_FlyhackCheck();
-			m_flyhackCheckTimer = mstime + 10000;
-		}*/
 	}
 
 	if( m_drunk > 0 )
 	{
-		m_drunkTimer += p_time;
+		m_drunkTimer += time_passed;
 
 		if( m_drunkTimer > 10000 )
 			HandleSobering();
