@@ -38,12 +38,10 @@ GameObject::GameObject(uint64 guid)
 	SetAnimProgress( 100 );
 	m_wowGuid.Init(GetGUID());
 	SetScale(  1);//info->Size  );
-	counter= 0;//not needed at all but to prevent errors that var was not initialized, can be removed in release
 	bannerslot = bannerauraslot = -1;
 	m_summonedGo = false;
 	invisible = false;
 	invisibilityFlag = INVIS_FLAG_NORMAL;
-	spell = 0;
 	m_summoner = NULL;
 	charges = -1;
 	m_ritualcaster = 0;
@@ -132,59 +130,6 @@ void GameObject::Update( unsigned long time_passed )
 
 	if(m_deleted)
 		return;
-
-	if( spell != NULL && ( GetState() == 1) )
-	{
-        for( std::set< Object* >::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr )
-		{
-            float dist;
-
-            Object *o = *itr;
-
-			dist = GetDistanceSq( o );
-
-			if( o != m_summoner && o->IsUnit() && dist <= range)
-			{
-				if(m_summonedGo)
-				{
-					if(!m_summoner)
-					{
-						ExpireAndDelete();
-						return;
-					}
-					
-                    if(!isAttackable(m_summoner, o ))
-                        continue;
-				}
-				
-				Spell * sp = new Spell( this, spell, true, NULL );
-				SpellCastTargets tgt( o->GetGUID() );
-				tgt.m_destX = GetPositionX();
-				tgt.m_destY = GetPositionY();
-				tgt.m_destZ = GetPositionZ();
-				sp->prepare(&tgt);
-
-				// proc on trap trigger
-				if( pInfo->Type == GAMEOBJECT_TYPE_TRAP )
-				{
-					if( m_summoner != NULL )
-						m_summoner->HandleProc( PROC_ON_TRAP_TRIGGER, reinterpret_cast< Unit* >( o ), spell );
-				} 
-
-				if(m_summonedGo && pInfo->trap.charges != 0 )
-				{
-					ExpireAndDelete();
-					return;
-				}
-
-				if(spell->EffectImplicitTargetA[0] == 16 ||
-					spell->EffectImplicitTargetB[0] == 16)
-				{
-					return;	 // on area don't continue.
-				}
-			}
-		}
-    }
 }
 
 void GameObject::Spawn(MapMgr * m)
@@ -276,23 +221,7 @@ void GameObject::InitAI()
 	if(!pInfo)
 		return;
 	
-	uint32 spellid = 0;
-	
-	if(pInfo->Type == GAMEOBJECT_TYPE_SPELL_FOCUS)
-	{
-		// get spellid from attached gameobject if there is such - by sound2 field
-		if( pInfo->raw.sound2 != 0 ){
-			
-			GameObjectInfo *gi = GameObjectNameStorage.LookupEntry( pInfo->raw.sound2 );
-			if( gi == NULL ){
-				sLog.outError("Gamobject %u is of spellfocus type, has attachment GO data ( %u ), but attachment not found in database.", pInfo->ID, pInfo->raw.sound2 );
-				return;
-			}
-
-			spellid = gi->raw.sound3;
-		}
-	}
-	else if(pInfo->Type == GAMEOBJECT_TYPE_RITUAL)
+	if(pInfo->Type == GAMEOBJECT_TYPE_RITUAL)
 	{	
 		m_ritualmembers = new uint32[pInfo->raw.sound0];
 		memset(m_ritualmembers,0,sizeof(uint32)*pInfo->raw.sound0);
@@ -304,40 +233,6 @@ void GameObject::InitAI()
 
 	if( myScript == NULL )
 		myScript = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
-
-	// hackfix for bad spell in BWL
-	if(!spellid || spellid == 22247)
-		return;
-
-	SpellEntry *sp= dbcSpell.LookupEntryForced(spellid);
-	if(!sp)
-	{
-		spell = NULL;
-		return;
-	}
-	else
-	{
-		spell = sp;
-	}
-	//ok got valid spell that will be casted on target when it comes close enough
-	//get the range for that 
-	
-	float r = 0;
-
-	for(uint32 i= 0;i<3;i++)
-	{
-		if(sp->Effect[i])
-		{
-			float t = GetRadius(dbcSpellRadius.LookupEntry(sp->EffectRadiusIndex[i]));
-			if(t > r)
-				r = t;
-		}
-	}
-
-	if(r < 0.1)//no range
-		r = GetMaxRange(dbcSpellRange.LookupEntry(sp->rangeIndex));
-
-	range = r*r;//square to make code faster
 }
 
 bool GameObject::Load(GOSpawn *spawn)

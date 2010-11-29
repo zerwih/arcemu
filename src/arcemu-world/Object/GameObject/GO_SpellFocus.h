@@ -17,42 +17,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
 namespace Arcemu{
 	/////////////////////////////////////////////////////////////////////
-	//class GO_Trap
-	//  Class implementing Type 6 (TRAP) GameObjects
+	//class GO_SpellFocus
+	//  Class implementing Type 8 (SPELL_FOCUS) GameObjects
 	//
 	////////////////////////////////////////////////////////////////////
-	class GO_Trap : public GameObject{
+	class GO_SpellFocus : public GameObject{
 
-		public:
-			GO_Trap();
+	public:
+		GO_SpellFocus();
 
-			GO_Trap( uint64 GUID );
+		GO_SpellFocus( uint64 GUID );
+		
+		~GO_SpellFocus();
 
-			~GO_Trap();
+		void InitAI();
 
-			void InitAI();
-
-			void Update( unsigned long time_passed );
-
-			///////////////////////////////////////////////////////////////////
-			//void CastSpell( uint64 TargetGUID, uint32 SpellID )
-			//  Makes the Trap try to cast a spell on a target
-			//
-			//Parameters
-			//  uint64 TargetGUID  -  GUID of the Target Object
-			//  uint32 SpellId     -  Identifier of the spell to cast
-			//
-			//Return Value
-			//  None
-			//
-			//
-			//////////////////////////////////////////////////////////////////
-			void CastSpell( uint64 TargetGUID, uint32 SpellID );
+		void Update( unsigned long time_passed );
+		
+		///////////////////////////////////////////////////////////////////
+		//void CastSpell( uint64 TargetGUID, uint32 SpellID )
+		//  Makes the Trap try to cast a spell on a target
+		//
+		//Parameters
+		//  uint64 TargetGUID  -  GUID of the Target Object
+		//  uint32 SpellId     -  Identifier of the spell to cast
+		//
+		//Return Value
+		//  None
+		//
+		//
+		//////////////////////////////////////////////////////////////////
+		void CastSpell( uint64 TargetGUID, uint32 SpellID );
 
 	private:
 		SpellEntry *spell;
+		float range;
 	};
-
 }
