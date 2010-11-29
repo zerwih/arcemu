@@ -17,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
+#ifndef GO_TRAP_HPP
+#define GO_TRAP_HPP
+
 namespace Arcemu{
 	/////////////////////////////////////////////////////////////////////
 	//class GO_Trap
@@ -56,3 +59,5 @@ namespace Arcemu{
 	};
 
 }
+
+#endif

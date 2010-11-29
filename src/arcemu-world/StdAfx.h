@@ -125,6 +125,7 @@
 #include "Object/GameObject/GO_ILockable.h"
 #include "Object/GameObject/GO_Trap.h"
 #include "Object/GameObject/GO_SpellFocus.h"
+#include "Object/GameObject/GO_Questgiver.h"
 #include "Group.h"
 #include "Guild.h"
 #include "HonorHandler.h"

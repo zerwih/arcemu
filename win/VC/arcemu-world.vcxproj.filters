@@ -490,6 +490,8 @@
     <ClCompile Include="..\..\src\arcemu-world\EquipmentSetMgr.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\CObjectFactory.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_QuestGiver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -765,6 +767,8 @@
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.h" />
     <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Questgiver.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />

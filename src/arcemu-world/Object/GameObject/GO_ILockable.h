@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef GO_ILOCKABLE_HPP
+#define GO_ILOCKABLE_HPP
+
 namespace Arcemu{
 	
 	///////////////////////////////////////////////////////
@@ -86,3 +89,5 @@ namespace Arcemu{
 		virtual unsigned long GetLockId() = 0;
 	};
 }
+
+#endif

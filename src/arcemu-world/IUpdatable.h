@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef IUPDATABLE_HPP
+#define IUPDATABLE_HPP
+
 namespace Arcemu{
 	
 	//////////////////////////////////////////////////////////////////////////
@@ -43,3 +46,5 @@ namespace Arcemu{
 		virtual void Update( unsigned long time_passed ) = 0;
 	};
 }
+
+#endif

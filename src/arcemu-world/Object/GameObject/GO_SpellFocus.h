@@ -18,6 +18,9 @@
  *
  */
 
+#ifndef GO_SPELLFOCUS_HPP
+#define GO_SPELLFOCUS_HPP
+
 namespace Arcemu{
 	/////////////////////////////////////////////////////////////////////
 	//class GO_SpellFocus
@@ -57,3 +60,5 @@ namespace Arcemu{
 		float range;
 	};
 }
+
+#endif

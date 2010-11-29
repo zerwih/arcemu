@@ -160,7 +160,8 @@ void WorldSession::HandleQuestGiverQueryQuestOpcode( WorldPacket & recv_data )
 		if( quest_giver->GetType() == GAMEOBJECT_TYPE_QUESTGIVER )
 		{
 			bValid = true;
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id), false);
+			Arcemu::GO_QuestGiver *qg = static_cast< Arcemu::GO_QuestGiver* >( quest_giver );
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)qg->GetQuestRelation(qst->id), false);
 		}
 	} 
 	else if(guidtype==HIGHGUID_TYPE_ITEM)
@@ -357,14 +358,15 @@ void WorldSession::HandleQuestgiverRequestRewardOpcode( WorldPacket & recv_data 
 		if( quest_giver->GetType() == GAMEOBJECT_TYPE_QUESTGIVER )
 		{
 			bValid = true;
-			qst = quest_giver->FindQuest(quest_id, QUESTGIVER_QUEST_END);
+			Arcemu::GO_QuestGiver *qg = static_cast< Arcemu::GO_QuestGiver* >( quest_giver );
+			qst = qg->FindQuest(quest_id, QUESTGIVER_QUEST_END);
 			/*if(!qst) sQuestMgr.FindQuest(quest_id);*/
 			if(!qst)
 			{
 				sLog.outError("WARNING: Cannot get reward for quest %u, as it doesn't exist at GO %u.", quest_id, quest_giver->GetEntry());
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)qg->GetQuestRelation(qst->id),false);
 		}
 	}
 
@@ -440,14 +442,15 @@ void WorldSession::HandleQuestgiverCompleteQuestOpcode( WorldPacket & recvPacket
 		bValid = false;
 		if( quest_giver->GetType() == GAMEOBJECT_TYPE_QUESTGIVER )
 		{
-			qst = quest_giver->FindQuest(quest_id, QUESTGIVER_QUEST_END);
+			Arcemu::GO_QuestGiver *qg = static_cast< Arcemu::GO_QuestGiver* >( quest_giver );
+			qst = qg->FindQuest(quest_id, QUESTGIVER_QUEST_END);
 			/*if(!qst) sQuestMgr.FindQuest(quest_id);*/
 			if(!qst)
 			{
 				sLog.outError("WARNING: Cannot complete quest %u, as it doesn't exist at GO %u.", quest_id, quest_giver->GetEntry());
 				return;
 			}
-			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)quest_giver->GetQuestRelation(qst->id),false);
+			status = sQuestMgr.CalcQuestStatus(qst_giver, GetPlayer(), qst, (uint8)qg->GetQuestRelation(qst->id),false);
 		}
 	}
 
