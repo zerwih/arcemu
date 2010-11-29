@@ -55,32 +55,7 @@ enum GAMEOBJECT_OVERRIDES //by VLack
 	//Later other types might folow, or the upper bytes might get used for the AREAWIDE option in the overrides variable...
 };
 
-#if ENABLE_SHITTY_STL_HACKS == 1
 typedef HM_NAMESPACE::hash_map<Quest*, uint32 > GameObjectGOMap;
-#else
-namespace HM_NAMESPACE
-{
-	template <>
-	struct hash<Quest*>
-	{
-		union __vp
-		{
-			size_t s;
-			Quest* p;
-		};
-
-		size_t operator()(Quest* __x) const
-		{
-			__vp vp;
-			vp.p = __x;
-			return vp.s;
-		}
-	};
-};
-
-typedef HM_NAMESPACE::hash_map<Quest*, uint32, HM_NAMESPACE::hash<Quest*> > GameObjectGOMap;
-#endif
-
 typedef HM_NAMESPACE::hash_map<Quest*, std::map<uint32, uint32> > GameObjectItemMap;
 
 #pragma pack(push,1)
@@ -529,7 +504,10 @@ public:
 	/************************************************************************/
 	/* LUA Stuff                                                            */
 	/************************************************************************/
+	GameObject();
+
 	GameObject(uint64 guid);
+
 	~GameObject( );
 
 	GameObjectInfo* GetInfo() { return pInfo; }
@@ -539,7 +517,7 @@ public:
    
 	bool Load(GOSpawn *spawn);
 
-	virtual void Update(uint32 p_time);
+	void Update(uint32 p_time);
 
 	void Spawn(MapMgr * m);
 	void Despawn(uint32 delay, uint32 respawntime);
@@ -592,7 +570,6 @@ public:
 	SpellEntry* spell;
 	
 	float range;
-	uint8 checkrate;
 	uint16 counter;
 	int32 charges;//used for type==22,to limit number of usages.
 	bool invisible;//invisible

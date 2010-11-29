@@ -311,7 +311,7 @@ public:
 	void CreateWayPoint ( uint32 WayPointID, uint32 mapid, float x, float y, float z, float ang);
 
 	/// Updates
-	virtual void Update( uint32 time );
+	void Update( uint32 time );
 
 	/// Creature inventory
 	ARCEMU_INLINE uint32 GetItemIdBySlot(uint32 slot) { return m_SellItems->at(slot).itemid; }

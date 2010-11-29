@@ -122,6 +122,7 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "Object/GameObject/GO_ILockable.h"
+#include "Object/GameObject/GO_Trap.h"
 #include "Group.h"
 #include "Guild.h"
 #include "HonorHandler.h"

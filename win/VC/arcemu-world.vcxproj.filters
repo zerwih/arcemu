@@ -489,6 +489,7 @@
     </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\EquipmentSetMgr.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\CObjectFactory.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -762,6 +763,8 @@
     </ClInclude>
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.h" />
+    <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />

@@ -195,32 +195,6 @@ struct AI_Spell
 	uint32 autocast_type;
 };
 
-/*
-#if ENABLE_SHITTY_STL_HACKS == 1
-typedef HM_NAMESPACE::hash_map<Unit*, int32> TargetMap;
-#else
-namespace HM_NAMESPACE
-{
-	template <>
-	struct hash<Unit*>
-	{
-		union __vp {
-			size_t s;
-			Unit* p;
-		};
-
-		size_t operator()(Unit* __x) const
-		{
-			__vp vp;
-			vp.p = __x;
-			return vp.s;
-		}
-	};
-};
-
-typedef HM_NAMESPACE::hash_map<Unit*, int32, HM_NAMESPACE::hash<Unit*> > TargetMap;
-#endif
-*/
 typedef HM_NAMESPACE::hash_map<uint64, int32> TargetMap;
 
 typedef std::set<Unit*> AssistTargetSet;
@@ -329,7 +303,7 @@ public:
 	void EventChangeFaction( Unit *ForceAttackersToHateThisInstead= NULL );	//we have to tell our current enemies to stop attacking us, we should also forget about our targets
 
 	// Update
-	virtual void Update(uint32 p_time);
+	void Update(uint32 p_time);
 
 	// Movement
 	void SendMoveToPacket(float toX, float toY, float toZ, float toO, uint32 time, uint32 MoveFlags);
