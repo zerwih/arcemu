@@ -277,6 +277,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Chat.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\CObjectFactory.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\EquipmentSetMgr.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_QuestGiver.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -436,6 +439,7 @@
     <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
     <ClInclude Include="..\..\src\arcemu-world\MiscHandler.h" />
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Questgiver.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.h" />

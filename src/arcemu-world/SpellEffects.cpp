@@ -3197,9 +3197,6 @@ void Spell::SpellEffectSummonObject(uint32 i)
 		// Todo / Fix me: Add fishskill to the calculations
 		minskill = fishentry->MinSkill;
 		spell->SendChannelStart( 20000 ); // 30 seconds
-		/*spell->SendSpellStart();
-		spell->SendCastResult(SPELL_CANCAST_OK);
-		spell->SendSpellGo ();*/
 
 		GameObject *go = u_caster->GetMapMgr()->CreateGameObject(GO_FISHING_BOBBER);
 
@@ -3212,12 +3209,15 @@ void Spell::SpellEffectSummonObject(uint32 i)
 
 		go->PushToWorld( m_caster->GetMapMgr() );
 
+		Arcemu::GO_FishingNode *fn = static_cast< Arcemu::GO_FishingNode* >( go );
+
 		if( lootmgr.IsFishable( zone ) ) // Only set a 'splash' if there is any loot in this area / zone
 		{
 			uint32 seconds = RandomUInt(17) + 2;
-			sEventMgr.AddEvent( go, &GameObject::FishHooked, static_cast< Player* >( m_caster ), EVENT_GAMEOBJECT_FISH_HOOKED, seconds * 1000, 1, 0 );
+			sEventMgr.AddEvent( fn, &Arcemu::GO_FishingNode::EventFishHooked, EVENT_GAMEOBJECT_FISH_HOOKED, seconds * 1000, 1, 0 );
 		}
-		sEventMgr.AddEvent( go, &GameObject::EndFishing, static_cast< Player* >( m_caster ),false, EVENT_GAMEOBJECT_END_FISHING, 20000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+		sEventMgr.AddEvent( fn, &Arcemu::GO_FishingNode::EndFishing, static_cast< Player* >( m_caster ),false, EVENT_GAMEOBJECT_END_FISHING, 20000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+
 		p_caster->SetSummonedObject( go );
 	}
 	else
