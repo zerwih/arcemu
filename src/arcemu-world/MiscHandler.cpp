@@ -1622,22 +1622,13 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 				plyr->GetSession()->SendPacket(&data);
 			}
 		}
-	case GAMEOBJECT_TYPE_CAMERA://eye of azora
+	case GAMEOBJECT_TYPE_CAMERA:
 		{
-			/*WorldPacket pkt(SMSG_TRIGGER_CINEMATIC,4);
-			pkt << (uint32)1;//i ve found only on such item,id =1
-			SendPacket(&pkt);*/
-
-			/* these are usually scripted effects. but in the case of some, (e.g. orb of translocation) the spellid is located in unknown1 */
-			/*SpellEntry * sp = dbcSpell.LookupEntryForced(goinfo->Unknown1);
-			if(sp != NULL)
-				_player->CastSpell(_player,sp,true);  -   WTF?  Cast spell 1 ?*/
-
-			if(goinfo->raw.Unknown1)
-			{
-				uint32 cinematicid = goinfo->raw.sound1;
-				plyr->GetSession()->OutPacket(SMSG_TRIGGER_CINEMATIC, 4, &cinematicid);
+			
+			if( goinfo->camera.cinematicId != 0 ){
+				plyr->GetSession()->OutPacket( SMSG_TRIGGER_CINEMATIC, 4, &goinfo->camera.cinematicId );
 			}
+
 		}break;
 	case GAMEOBJECT_TYPE_MEETINGSTONE:	// Meeting Stone
 		{
