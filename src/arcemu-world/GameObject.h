@@ -527,11 +527,6 @@ public:
 	void ExpireAndDelete();
 
 	int32 charges;
-	
-	uint32 *m_ritualmembers;
-	uint32 m_ritualcaster;
-	uint32  m_ritualtarget;
-	uint16 m_ritualspell;
 
 	virtual void InitAI();
 	

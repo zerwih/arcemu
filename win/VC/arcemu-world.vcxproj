@@ -283,6 +283,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_QuestGiver.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -442,6 +445,7 @@
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Questgiver.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.h" />
     <ClInclude Include="..\..\src\arcemu-world\PlayerCache.h" />
