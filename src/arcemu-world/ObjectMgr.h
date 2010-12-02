@@ -207,28 +207,6 @@ struct InstanceReputationModifier
 	vector<InstanceReputationMod> mods;
 };
 
-struct NpcMonsterSay
-{
-	float Chance;
-	uint32 Language;
-	uint32 Type;
-	const char * MonsterName;
-
-	uint32 TextCount;
-	const char ** Texts;
-};
-
-enum MONSTER_SAY_EVENTS
-{
-	MONSTER_SAY_EVENT_ENTER_COMBAT		= 0,
-	MONSTER_SAY_EVENT_RANDOM_WAYPOINT	= 1,
-	MONSTER_SAY_EVENT_CALL_HELP			= 2,
-	MONSTER_SAY_EVENT_ON_COMBAT_STOP	= 3,
-	MONSTER_SAY_EVENT_ON_DAMAGE_TAKEN	= 4,
-	MONSTER_SAY_EVENT_ON_DIED			= 5,
-	NUM_MONSTER_SAY_EVENTS,
-};
-
 enum AREATABLE_FLAGS
 {
     AREA_CITY_AREA          = 0x20,
@@ -637,8 +615,7 @@ public:
 	typedef HM_NAMESPACE::hash_map<uint32, NpcMonsterSay*> MonsterSayMap;
 	MonsterSayMap mMonsterSays[NUM_MONSTER_SAY_EVENTS];
 
-	void HandleMonsterSayEvent(Creature * pCreature, MONSTER_SAY_EVENTS Event);
-	bool HasMonsterSay(uint32 Entry, MONSTER_SAY_EVENTS Event);
+	NpcMonsterSay * HasMonsterSay(uint32 Entry, MONSTER_SAY_EVENTS Event);
 	void LoadMonsterSay();
 
 	bool HandleInstanceReputationModifiers(Player * pPlayer, Unit * pVictim);
@@ -662,7 +639,7 @@ public:
 
 	std::set<ProfessionDiscovery*> ProfessionDiscoveryTable;
 
-	// cebernic: This is an perfect Broadcast system,multi-lang supported also.
+	// cebernic: This is a perfect Broadcast system,multi-lang supported also.
 	ARCEMU_INLINE uint32 GetBCGroupCountByKey(uint32 Key) { return (uint32)m_BCEntryStorage.count(Key); }
 	ARCEMU_INLINE bool IsBCEntryStorageEmpty() { return m_BCEntryStorage.empty(); }
 	ARCEMU_INLINE BCEntryStorage::iterator GetBCTotalItemBegin() { return m_BCEntryStorage.begin(); }

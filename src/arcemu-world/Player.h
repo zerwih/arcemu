@@ -54,7 +54,6 @@ class SpeedCheatDetector;
 #define MAX_SPEC_COUNT 2
 #define GLYPHS_COUNT 6
 
-#define PLAYER_LEVEL_CAP_70     80
 #define PLAYER_LEVEL_CAP                80
 #define PLAYER_ARENA_MIN_LEVEL  70
 
@@ -1116,6 +1115,7 @@ public:
 	bool                HasQuestMob(uint32 entry);
 	bool                HasQuest(uint32 entry);
 	void                RemoveQuestMob(uint32 entry);
+	void                AddQuestKill(uint32 questid, uint8 reqid, uint32 delay = 0);
 
 
 	/////////////////////////////////////////////////////////////
