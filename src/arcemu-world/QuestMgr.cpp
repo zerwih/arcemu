@@ -958,10 +958,7 @@ void QuestMgr::OnPlayerItemPickup(Player* plr, Item* item)
 						data << qle->GetQuest()->required_item[j] << uint32(1);
 						plr->GetSession()->SendPacket(&data);
 						if(qle->CanBeFinished())
-						{
-							plr->UpdateNearbyGameObjects();
 							qle->SendQuestComplete();
-						}
 						break;
 					}
 				}
@@ -991,10 +988,7 @@ void QuestMgr::OnPlayerExploreArea(Player* plr, uint32 AreaID)
 					CALL_QUESTSCRIPT_EVENT(qle, OnExploreArea)(qle->m_explored_areas[j], plr, qle);
 					qle->UpdatePlayerFields();
 					if(qle->CanBeFinished())
-					{
-						plr->UpdateNearbyGameObjects();
 						qle->SendQuestComplete();
-					}
 					break;
 				}
 			}
@@ -1021,10 +1015,7 @@ void QuestMgr::AreaExplored(Player* plr, uint32 QuestID)
 					CALL_QUESTSCRIPT_EVENT(qle, OnExploreArea)(qle->m_explored_areas[j], plr, qle);
 					qle->UpdatePlayerFields();
 					if(qle->CanBeFinished())
-					{
-						plr->UpdateNearbyGameObjects();
 						qle->SendQuestComplete();
-					}
 					break;
 				}
 			}
