@@ -713,7 +713,7 @@ Aura::Aura( SpellEntry* proto, int32 duration, Object* caster, Unit* target, boo
 	Arcemu::Util::ARCEMU_ASSERT( target != NULL );
 	m_target = target;
 
-	if( m_target->GetTypeId() == TYPEID_PLAYER )
+	if( m_target->IsPlayer() )
 		p_target = static_cast< Player* >( m_target );
 	else
 		p_target = NULL;
@@ -1488,7 +1488,7 @@ void Aura::SpellAuraModBaseResistancePerc(bool apply)
 	{
 		if(Flag & (((uint32)1)<< x))
 		{
-			if(m_target->GetTypeId() == TYPEID_PLAYER)
+			if(m_target->IsPlayer())
 			{
 				if(mod->m_amount>0)
 				{
@@ -1501,7 +1501,7 @@ void Aura::SpellAuraModBaseResistancePerc(bool apply)
 				static_cast< Player* >( m_target )->CalcResistance(x);
 
 			}
-			else if(m_target->GetTypeId() == TYPEID_UNIT)
+			else if(m_target->IsCreature())
 			{
 				static_cast<Creature*>(m_target)->BaseResistanceModPct[x]+=amt;
 				static_cast<Creature*>(m_target)->CalcResistance(x);
@@ -1557,7 +1557,7 @@ void Aura::SpellAuraModPossess(bool apply)
 		// make sure Player::UnPossess() didn't fail, if it did we will just free the target here
 		if( m_target->GetCharmedByGUID() != 0 )
 		{
-			if( m_target->GetTypeId() == TYPEID_UNIT )
+			if( m_target->IsCreature() )
 			{
 				m_target->setAItoUse( true );
 				m_target->m_redirectSpellPackets = 0;
@@ -1839,7 +1839,7 @@ void Aura::SpellAuraModConfuse(bool apply)
 {
 	Unit* u_caster = GetUnitCaster();
 
-	if( m_target->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(m_target)->IsTotem() )
+	if( m_target->IsCreature() && static_cast<Creature*>(m_target)->IsTotem() )
 		return;
 
 	if(apply)
@@ -1904,7 +1904,7 @@ void Aura::SpellAuraModCharm(bool apply)
 	Player *caster = GetPlayerCaster();
 	if( caster == NULL )
 		return;
-	if( m_target->GetTypeId() != TYPEID_UNIT )
+	if( !m_target->IsCreature() )
 		return;
 
 	Creature* target = static_cast< Creature* >( m_target );
@@ -1984,7 +1984,7 @@ void Aura::SpellAuraModFear(bool apply)
 {
 	Unit* u_caster = GetUnitCaster();
 
-	if( m_target->GetTypeId() == TYPEID_UNIT && 
+	if( m_target->IsCreature() && 
         ( static_cast<Creature*>(m_target)->IsTotem() || static_cast< Creature* >( m_target )->isRooted() ) )
 		return;
 
@@ -2229,15 +2229,19 @@ void Aura::EventPeriodicHeal( uint32 amount )
 
 		std::vector<Unit*> target_threat;
 		int count = 0;
+		Creature* tmp_creature = NULL;
 		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 		{
-			if((*itr)->GetTypeId() != TYPEID_UNIT || !static_cast<Unit *>(*itr)->CombatStatus.IsInCombat() || (static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(u_caster) == 0 && static_cast<Unit *>(*itr)->GetAIInterface()->getThreatByPtr(m_target) == 0))
+			if( !(*itr)->IsCreature() )
+				continue;
+			tmp_creature = TO_CREATURE(*itr);
+			if( !tmp_creature->CombatStatus.IsInCombat() || tmp_creature->GetAIInterface()->getThreatByPtr(u_caster) == 0 && tmp_creature->GetAIInterface()->getThreatByPtr(m_target) == 0)
 				continue;
 
-			if( !(u_caster->GetPhase() & (*itr)->GetPhase()) ) //Can't see, no threat
+			if( !(u_caster->GetPhase() & tmp_creature->GetPhase()) ) //Can't see, no threat
 				continue;
 
-			target_threat.push_back(static_cast<Unit *>(*itr));
+			target_threat.push_back(tmp_creature);
 			count++;
 		}
 		if (count == 0)
@@ -2262,7 +2266,7 @@ void Aura::SpellAuraModAttackSpeed( bool apply )
 	else
 		SetPositive();
 
-	if ( m_target->GetTypeId() == TYPEID_PLAYER )
+	if ( m_target->IsPlayer() )
 	{
 		if(apply)
 		{
@@ -2365,7 +2369,7 @@ void Aura::SpellAuraModStun(bool apply)
 		m_target->m_special_state |= UNIT_STATE_STUN;
 		m_target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
-		if(m_target->GetTypeId() == TYPEID_UNIT)
+		if(m_target->IsCreature())
 			m_target->GetAIInterface()->setNextTarget( TO_UNIT(NULL) );
 
 		// remove the current spell (for channalers)
@@ -2402,7 +2406,7 @@ void Aura::SpellAuraModStun(bool apply)
 		}
 
 		// attack them back.. we seem to lose this sometimes for some reason
-		if(m_target->GetTypeId() == TYPEID_UNIT)
+		if(m_target->IsCreature())
 		{
 			Unit * target = GetUnitCaster();
 			if( m_target->GetAIInterface()->getNextTarget() != NULL )
@@ -2504,7 +2508,7 @@ void Aura::SpellAuraModDamageDone(bool apply)
 			}
 		}
 	}
-	else if( m_target->GetTypeId() == TYPEID_UNIT )
+	else if( m_target->IsCreature() )
 	{
 		if( mod->m_amount > 0 )
 		{
@@ -2620,7 +2624,7 @@ void Aura::SpellAuraModStealth(bool apply)
 		m_target->m_stealthLevel += mod->m_amount;
 
 		// hack fix for vanish stuff
-		if( m_spellProto->NameHash == SPELL_HASH_VANISH && m_target->GetTypeId() == TYPEID_PLAYER )	 // Vanish
+		if( m_spellProto->NameHash == SPELL_HASH_VANISH && m_target->IsPlayer() )	 // Vanish
 		{
 
 			for( Object::InRangeSet::iterator iter = m_target->GetInRangeSetBegin();iter != m_target->GetInRangeSetEnd(); ++iter )
@@ -2761,7 +2765,7 @@ void Aura::SpellAuraModInvisibility(bool apply)
 	{
 		m_target->SetInvisibility(GetSpellId());
 		m_target->m_invisFlag = static_cast<uint8>( mod->m_miscValue );
-		if( m_target->GetTypeId() == TYPEID_PLAYER )
+		if( m_target->IsPlayer() )
 		{
 			if( GetSpellId() == 32612 )
 				static_cast<Player*>(m_target)->SetFlag( PLAYER_FIELD_BYTES2, 0x4000 ); //Mage Invis self visual
@@ -2772,7 +2776,7 @@ void Aura::SpellAuraModInvisibility(bool apply)
 	else
 	{
 		m_target->m_invisFlag = INVIS_FLAG_NORMAL;
-		if( m_target->GetTypeId() == TYPEID_PLAYER )
+		if( m_target->IsPlayer() )
 		{
 			if( GetSpellId() == 32612 )
 				static_cast<Player*>(m_target)->RemoveFlag( PLAYER_FIELD_BYTES2, 0x4000 );
@@ -2888,7 +2892,7 @@ void Aura::SpellAuraModResistance(bool apply)
 	else
 		amt = -mod->m_amount;
 	Unit* caster = GetUnitCaster();
-	if (!IsPositive() && caster != NULL && m_target->GetTypeId() == TYPEID_UNIT)
+	if (!IsPositive() && caster != NULL && m_target->IsCreature())
 		m_target->GetAIInterface()->AttackReaction(caster, 1, GetSpellId());
 
 	if( GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE || GetSpellProto()->NameHash == SPELL_HASH_FAERIE_FIRE__FERAL_ )
@@ -2906,7 +2910,7 @@ void Aura::SpellAuraModResistance(bool apply)
 			amt = (int32)(amt * 1.17);
 	}
 
-	if( m_target->GetTypeId() == TYPEID_PLAYER )
+	if( m_target->IsPlayer() )
 	{
 		for( uint32 x = 0; x < 7; x++ )
 		{
@@ -2920,7 +2924,7 @@ void Aura::SpellAuraModResistance(bool apply)
 			}
 		}
 	}
-	else if(m_target->GetTypeId() == TYPEID_UNIT)
+	else if(m_target->IsCreature())
 	{
 		for(uint32 x= 0;x<7;x++)
 		{
@@ -3117,7 +3121,7 @@ void Aura::SpellAuraModRoot(bool apply)
 		if(m_target->m_rooted == 0)
 			m_target->Unroot();
 
-		if(m_target->GetTypeId() == TYPEID_UNIT)
+		if(m_target->IsCreature())
 			m_target->GetAIInterface()->AttackReaction(GetUnitCaster(), 1, 0);
 
 		if( GetSpellProto()->School == SCHOOL_FROST && !--m_target->asc_frozen )
@@ -3201,7 +3205,7 @@ void Aura::SpellAuraModStat( bool apply )
 			static_cast< Player* >( m_target )->UpdateStats();
 			static_cast< Player* >( m_target )->UpdateChances();
 		}
-		else if( m_target->GetTypeId() == TYPEID_UNIT )
+		else if( m_target->IsCreature() )
 		{
 			for( uint8 x = 0; x < 5; x++ )
 			{
@@ -3225,7 +3229,7 @@ void Aura::SpellAuraModStat( bool apply )
 			static_cast< Player* >( m_target )->UpdateStats();
 			static_cast< Player* >( m_target )->UpdateChances();
 		}
-		else if( m_target->GetTypeId() == TYPEID_UNIT )
+		else if( m_target->IsCreature() )
 		{
 			static_cast< Creature* >( m_target )->FlatStatMod[ mod->m_miscValue ] += val;
 			static_cast< Creature* >( m_target )->CalcStat( mod->m_miscValue );
@@ -3235,7 +3239,7 @@ void Aura::SpellAuraModStat( bool apply )
 
 void Aura::SpellAuraModSkill(bool apply)
 {
-	if (m_target->GetTypeId() == TYPEID_PLAYER)
+	if (m_target->IsPlayer())
 	{
 		if(apply)
 		{
@@ -3450,7 +3454,7 @@ void Aura::SpellAuraModIncreaseEnergy(bool apply)
 	m_target->ModMaxPower(mod->m_miscValue, amount);
 	m_target->ModPower(mod->m_miscValue, amount);
 
-	if(mod->m_miscValue == 0 && m_target->GetTypeId() == TYPEID_PLAYER)
+	if(mod->m_miscValue == 0 && m_target->IsPlayer())
 	{
 		static_cast< Player* >( m_target )->SetManaFromSpell(static_cast< Player* >( m_target )->GetManaFromSpell() + amount);
 	}
@@ -4460,7 +4464,7 @@ void Aura::SpellAuraTransform(bool apply)
 				if(apply)
 				{
 					Unit* caster = GetUnitCaster();
-					if (caster != NULL && m_target->GetTypeId() == TYPEID_UNIT)
+					if (caster != NULL && m_target->IsCreature())
 						m_target->GetAIInterface()->AttackReaction(caster, 1, GetSpellId());
 
 					m_target->SetDisplayId(displayId);
@@ -5016,7 +5020,7 @@ void Aura::SpellAuraAddFarSight(bool apply)
 {
 	if(apply)
 	{
-		if(m_target->GetTypeId() != TYPEID_PLAYER)
+		if(!m_target->IsPlayer())
 			return;
 
 		//FIXME:grep aka Nublex will fix this
@@ -5264,7 +5268,7 @@ void Aura::SpellAuraModPercStat(bool apply)
 			p_target->UpdateStats();
 			p_target->UpdateChances();
 		}
-		else if( m_target->GetTypeId() == TYPEID_UNIT )
+		else if( m_target->IsCreature() )
 		{
 			static_cast< Creature* >( m_target )->StatModPct[ mod->m_miscValue ] += val;
 			static_cast< Creature* >( m_target )->CalcStat( mod->m_miscValue );
@@ -5424,9 +5428,9 @@ void Aura::SpellAuraChannelDeathItem(bool apply)
 	}
 	else
 	{
-		if( m_target->GetTypeId() == TYPEID_UNIT || m_target->GetTypeId() == TYPEID_PLAYER )
+		if( m_target->IsUnit() )
 		{
-			if ( m_target->GetTypeId() == TYPEID_UNIT && TO_CREATURE(m_target)->GetCreatureInfo()->Type == UNIT_TYPE_CRITTER )
+			if ( m_target->IsCreature() && TO_CREATURE(m_target)->GetCreatureInfo()->Type == UNIT_TYPE_CRITTER )
 				return;
 
 			if(m_target->IsDead())
@@ -5720,7 +5724,7 @@ void Aura::SpellAuraModResistancePCT(bool apply)
 				p_target->CalcResistance(x);
 
 			}
-			else if( m_target->GetTypeId() == TYPEID_UNIT )
+			else if( m_target->IsCreature() )
 			{
 				static_cast< Creature*>( m_target )->ResistanceModPct[x] += amt;
 				static_cast< Creature*>( m_target )->CalcResistance(x);
@@ -6478,7 +6482,7 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 			p_target->UpdateStats();
 			p_target->UpdateChances();
 		}
-		else if( m_target->GetTypeId() == TYPEID_UNIT )
+		else if( m_target->IsCreature() )
 		{
 			for(uint8 x = 0; x < 5; x++ )
 			{
@@ -6515,7 +6519,7 @@ void Aura::SpellAuraModTotalStatPerc(bool apply)
 			p_target->UpdateStats();
 			p_target->UpdateChances();
 		}
-		else if( m_target->GetTypeId() == TYPEID_UNIT )
+		else if( m_target->IsCreature() )
 		{
 			static_cast< Creature* >( m_target )->TotalStatModPct[ mod->m_miscValue ] += val;
 			static_cast< Creature* >( m_target )->CalcStat( mod->m_miscValue );
@@ -6567,7 +6571,7 @@ void Aura::SpellAuraModHaste( bool apply )
 			m_target->ModBaseAttackTime(MELEE,-mod->fixed_amount[mod->i] );
 			m_target->ModBaseAttackTime(OFFHAND,-mod->fixed_amount[mod->i*2] );
 
-			if ( m_target->GetTypeId() == TYPEID_UNIT )
+			if ( m_target->IsCreature() )
 				static_cast< Creature* >( m_target )->m_speedFromHaste += mod->fixed_amount[mod->i];
 		}
 		else
@@ -6575,7 +6579,7 @@ void Aura::SpellAuraModHaste( bool apply )
 			m_target->ModBaseAttackTime(MELEE,mod->fixed_amount[mod->i] );
 			m_target->ModBaseAttackTime(OFFHAND,mod->fixed_amount[mod->i*2] );
 
-			if ( m_target->GetTypeId() == TYPEID_UNIT )
+			if ( m_target->IsCreature() )
 				static_cast< Creature* >( m_target )->m_speedFromHaste -= mod->fixed_amount[mod->i];
 		}
 	}
@@ -6943,7 +6947,7 @@ void Aura::SpellAuraModRangedAttackPowerPct(bool apply)
 
 void Aura::SpellAuraIncreaseDamageTypePCT(bool apply)
 {
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if(m_target->IsPlayer())
 	{
 		if(apply)
 		{
@@ -6968,7 +6972,7 @@ void Aura::SpellAuraIncreaseDamageTypePCT(bool apply)
 
 void Aura::SpellAuraIncreaseCricticalTypePCT(bool apply)
 {
-	if(m_target->GetTypeId() == TYPEID_PLAYER)
+	if(m_target->IsPlayer())
 	{
 		if(apply)
 		{
@@ -6993,7 +6997,7 @@ void Aura::SpellAuraIncreaseCricticalTypePCT(bool apply)
 
 void Aura::SpellAuraIncreasePartySpeed(bool apply)
 {
-	if(m_target->GetTypeId() == TYPEID_PLAYER && m_target->isAlive() && m_target->GetMount() == 0)
+	if(m_target->IsPlayer() && m_target->isAlive() && m_target->GetMount() == 0)
 	{
 		if(apply)
 		{
@@ -7492,7 +7496,7 @@ void Aura::SpellAuraIncreaseArmorByPctInt(bool apply)
 				p_target->FlatResistanceModifierPos[x] += amt;
 				p_target->CalcResistance(x);
 			}
-			else if(m_target->GetTypeId() == TYPEID_UNIT)
+			else if(m_target->IsCreature())
 			{
 				static_cast<Creature*>(m_target)->FlatResistanceMod[x] += amt;
 				static_cast<Creature*>(m_target)->CalcResistance(x);
@@ -7681,7 +7685,7 @@ void Aura::SpellAuraModAttackerCritChance(bool apply)
 
 void Aura::SpellAuraIncreaseAllWeaponSkill(bool apply)
 {
-	if (m_target->GetTypeId() == TYPEID_PLAYER)
+	if (m_target->IsPlayer())
 	{
 		if(apply)
 		{

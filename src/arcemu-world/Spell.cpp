@@ -358,7 +358,7 @@ void Spell::FillSpecifiedTargetsInArea(uint32 i,float srcx,float srcy,float srcz
 
 		if( GetProto()->TargetCreatureType)
 		{
-			if((*itr)->GetTypeId()!= TYPEID_UNIT)
+			if( !(*itr)->IsCreature() )
 				continue;
 			CreatureInfo *inf = TO_CREATURE(*itr)->GetCreatureInfo();
 			if(!(1<<(inf->Type-1) & GetProto()->TargetCreatureType))
@@ -434,7 +434,7 @@ void Spell::FillAllTargetsInArea(uint32 i,float srcx,float srcy,float srcz, floa
 		}
 		if( GetProto()->TargetCreatureType )
 		{
-			if( (*itr)->GetTypeId()!= TYPEID_UNIT )
+			if( !(*itr)->IsCreature() )
 				continue;
 			CreatureInfo *inf = TO_CREATURE(*itr)->GetCreatureInfo();
 			if( !( 1 << (inf->Type-1) & GetProto()->TargetCreatureType ) )
@@ -495,7 +495,7 @@ void Spell::FillAllFriendlyInArea( uint32 i, float srcx, float srcy, float srcz,
 
 		if( GetProto()->TargetCreatureType )
 		{
-			if((*itr)->GetTypeId()!= TYPEID_UNIT)
+			if( !(*itr)->IsCreature() )
 				continue;
 			CreatureInfo *inf = TO_CREATURE(*itr)->GetCreatureInfo();
 			if(!(1<<(inf->Type-1) & GetProto()->TargetCreatureType))
@@ -563,7 +563,7 @@ uint64 Spell::GetSinglePossibleEnemy(uint32 i,float prange)
 
 		if( GetProto()->TargetCreatureType )
 		{
-			if( (*itr)->GetTypeId() != TYPEID_UNIT )
+			if( !(*itr)->IsCreature() )
 				continue;
 			CreatureInfo *inf = TO_CREATURE(*itr)->GetCreatureInfo();
 			if(!(1<<(inf->Type-1) & GetProto()->TargetCreatureType))
@@ -616,7 +616,7 @@ uint64 Spell::GetSinglePossibleFriend(uint32 i,float prange)
 			continue;
 		if( GetProto()->TargetCreatureType )
 		{
-			if((*itr)->GetTypeId()!= TYPEID_UNIT)
+			if( !(*itr)->IsCreature() )
 				continue;
 			CreatureInfo *inf = TO_CREATURE(*itr)->GetCreatureInfo();
 				if(!(1<<(inf->Type-1) & GetProto()->TargetCreatureType))
@@ -654,7 +654,7 @@ uint8 Spell::DidHit( uint32 effindex, Unit* target )
 	if( u_victim == NULL )
 		return SPELL_DID_HIT_MISS;
 	
-	Player* p_victim = ( target->GetTypeId() == TYPEID_PLAYER ) ? static_cast< Player* >( target ) : NULL;
+	Player* p_victim = target->IsPlayer() ? static_cast< Player* >( target ) : NULL;
 
 	float baseresist[3] = { 4.0f, 5.0f, 6.0f };
 	int32 lvldiff;
@@ -676,7 +676,7 @@ uint8 Spell::DidHit( uint32 effindex, Unit* target )
 	/************************************************************************/
 	/* Check if the unit is evading                                         */
 	/************************************************************************/
-	if( u_victim->GetTypeId()==TYPEID_UNIT && u_victim->GetAIInterface()->getAIState() == STATE_EVADE )
+	if( u_victim->IsCreature() && u_victim->GetAIInterface()->getAIState() == STATE_EVADE )
 		return SPELL_DID_HIT_EVADE;
 
 	/************************************************************************/
@@ -1040,7 +1040,7 @@ void Spell::cancel()
 					if(p_caster->GetSummonedObject()->IsInWorld())
 						p_caster->GetSummonedObject()->RemoveFromWorld(true);
 					// for now..
-					Arcemu::Util::ARCEMU_ASSERT(   p_caster->GetSummonedObject()->GetTypeId() == TYPEID_GAMEOBJECT);
+					Arcemu::Util::ARCEMU_ASSERT(p_caster->GetSummonedObject()->IsGameObject());
 					delete p_caster->GetSummonedObject();
 					p_caster->SetSummonedObject(NULL);
 				}
@@ -1569,7 +1569,7 @@ void Spell::AddTime(uint32 type)
 
 			if(!p_caster)
 			{
-				if(m_caster->GetTypeId() == TYPEID_UNIT)
+				if(m_caster->IsCreature())
 					u_caster->GetAIInterface()->AddStopTime(delay);
 			}
 			//in case cast is delayed, make sure we do not exit combat
@@ -2288,7 +2288,7 @@ void Spell::SendChannelUpdate(uint32 time)
 
 void Spell::SendChannelStart(uint32 duration)
 {
-	if (m_caster->GetTypeId() != TYPEID_GAMEOBJECT)
+	if (!m_caster->IsGameObject())
 	{
 		// Send Channel Start
 		WorldPacket data(MSG_CHANNEL_START, 22);
@@ -3348,7 +3348,7 @@ uint8 Spell::CanCast(bool tolerate)
 
 			for(std::set<Object*>::iterator itr = p_caster->GetInRangeSetBegin(); itr != p_caster->GetInRangeSetEnd(); itr++ )
 			{
-				if ((*itr)->GetTypeId() != TYPEID_GAMEOBJECT)
+				if (!(*itr)->IsGameObject())
 					continue;
 
 				GameObject *go = TO_GAMEOBJECT( *itr );
@@ -3826,7 +3826,7 @@ uint8 Spell::CanCast(bool tolerate)
 					{
 						if((int32)target->getLevel() > GetProto()->EffectBasePoints[0]+1 + int32(p_caster->getLevel() - GetProto()->spellLevel))
 							return SPELL_FAILED_HIGHLEVEL;
-						else if(target->GetTypeId() == TYPEID_UNIT)
+						else if(target->IsCreature())
 						{
 							Creature * c = TO_CREATURE(target);
 							if (c->GetCreatureInfo()->Rank >ELITE_ELITE)
@@ -3870,7 +3870,7 @@ uint8 Spell::CanCast(bool tolerate)
 							return SPELL_FAILED_UNKNOWN;
 					}
 
-					Creature *tame = tgt->GetTypeId() == TYPEID_UNIT ? TO_CREATURE(tgt) : NULL;
+					Creature *tame = tgt->IsCreature() ? TO_CREATURE(tgt) : NULL;
 
 					if ( tame == NULL )
 						result = PETTAME_INVALIDCREATURE;
@@ -5046,21 +5046,21 @@ void Spell::Heal( int32 amount, bool ForceCrit )
 	{
 		std::vector<Unit*> target_threat;
 		int count = 0;
-		Unit* tmp_unit;
+		Creature* tmp_creature;
 		for(std::set<Object*>::iterator itr = u_caster->GetInRangeSetBegin(); itr != u_caster->GetInRangeSetEnd(); ++itr)
 		{
-			if( (*itr)->GetTypeId() != TYPEID_UNIT )
+			if( !(*itr)->IsCreature() )
 				continue;
 			
-			tmp_unit = static_cast< Unit* >( *itr );
+			tmp_creature = TO_CREATURE( *itr );
 
-			if( !tmp_unit->CombatStatus.IsInCombat() || ( tmp_unit->GetAIInterface()->getThreatByPtr( u_caster ) == 0 && tmp_unit->GetAIInterface()->getThreatByPtr( unitTarget ) == 0 ) )
+			if( !tmp_creature->CombatStatus.IsInCombat() || ( tmp_creature->GetAIInterface()->getThreatByPtr( u_caster ) == 0 && tmp_creature->GetAIInterface()->getThreatByPtr( unitTarget ) == 0 ) )
 				continue;
 
 			if( !( u_caster->GetPhase() & (*itr)->GetPhase() ) ) //Can't see, can't be a threat
 				continue;
 
-			target_threat.push_back( tmp_unit );
+			target_threat.push_back( tmp_creature );
 			count++;
 		}
 		if ( count == 0 )
@@ -5308,7 +5308,7 @@ void ApplyDiminishingReturnTimer(uint32 * Duration, Unit * Target, SpellEntry * 
 		return;
 
 	// Check if we don't apply to pve
-	if(!PvE && Target->GetTypeId() != TYPEID_PLAYER && !Target->IsPet())
+	if(!PvE && !Target->IsPlayer() && !Target->IsPet())
 		return;
 
 	// TODO: check for spells that should do this
@@ -5353,7 +5353,7 @@ void UnapplyDiminishingReturnTimer(Unit * Target, SpellEntry * spell)
 	if(Grp == 0xFFFF) return;
 
 	// Check if we don't apply to pve
-	if(!PvE && Target->GetTypeId() != TYPEID_PLAYER && !Target->IsPet())
+	if(!PvE && !Target->IsPlayer() && !Target->IsPet())
 		return;
 
 	//Target->m_diminishAuraCount[Grp]--;

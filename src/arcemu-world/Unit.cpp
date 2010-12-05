@@ -2786,7 +2786,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 		if( weapon_damage_type != RANGED && !backAttack )
 			dodge = pVictim->GetStat(STAT_AGILITY) / 14.5f; // what is this value?
 		victim_skill = pVictim->getLevel() * 5;
-		if(pVictim->m_objectTypeId == TYPEID_UNIT)
+		if(pVictim->IsCreature())
 		{
 			Creature * c = TO_CREATURE(pVictim);
 			if( c->GetCreatureInfo()->Rank == ELITE_WORLDBOSS )
@@ -2857,7 +2857,7 @@ uint32 Unit::GetSpellDidHitResult( Unit* pVictim, uint32 weapon_damage_type, Spe
 	else
 	{
 		self_skill = this->getLevel() * 5;
-		if(m_objectTypeId == TYPEID_UNIT)
+		if(IsCreature())
 		{
 			Creature * c = TO_CREATURE(this);
 			if( c->GetCreatureInfo()->Rank == ELITE_WORLDBOSS )
@@ -3010,7 +3010,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		dmg.school_type = ability->School;
 	else
 	{
-		if (GetTypeId() == TYPEID_UNIT)
+		if (IsCreature())
 			dmg.school_type = static_cast< Creature* >( this )->BaseAttackType;
 		else
 			dmg.school_type = SCHOOL_NORMAL;
@@ -3086,7 +3086,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 		}
 
 		victim_skill = pVictim->getLevel() * 5;
-		if ( pVictim->m_objectTypeId == TYPEID_UNIT )
+		if ( pVictim->IsCreature() )
 		{
 			if ( c->GetCreatureInfo()->Rank == ELITE_WORLDBOSS )
 			{
@@ -3161,7 +3161,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	else
 	{
 		self_skill = this->getLevel() * 5;
-		if(m_objectTypeId == TYPEID_UNIT)
+		if(IsCreature())
 		{
 			Creature * c = TO_CREATURE(this);
 			if(c->GetCreatureInfo()->Rank == ELITE_WORLDBOSS)
@@ -3393,13 +3393,13 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	case 0:
 		hit_status |= HITSTATUS_MISS;
 		// dirty ai agro fix
-		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->getNextTarget() == NULL)
+		if(pVictim->IsCreature() && pVictim->GetAIInterface()->getNextTarget() == NULL)
 			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
 		break;
 //--------------------------------dodge-----------------------------------------------------
 	case 1:
 		// dirty ai agro fix
-		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->getNextTarget() == NULL)
+		if(pVictim->IsCreature() && pVictim->GetAIInterface()->getNextTarget() == NULL)
 			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
 
 		CALL_SCRIPT_EVENT(pVictim, OnTargetDodged)(this);
@@ -3428,7 +3428,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 //--------------------------------parry-----------------------------------------------------
 	case 2:
 		// dirty ai agro fix
-		if(pVictim->GetTypeId() == TYPEID_UNIT && pVictim->GetAIInterface()->getNextTarget() == NULL)
+		if(pVictim->IsCreature() && pVictim->GetAIInterface()->getNextTarget() == NULL)
 			pVictim->GetAIInterface()->AttackReaction(this, 1, 0);
 
 		CALL_SCRIPT_EVENT(pVictim, OnTargetParried)(this);
@@ -3646,7 +3646,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 						//sLog.outString( "DEBUG: After Resilience check: %u" , dmg.full_damage );
 					}
 
-					if (pVictim->GetTypeId() == TYPEID_UNIT && static_cast<Creature*>(pVictim)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS)
+					if (pVictim->IsCreature() && static_cast<Creature*>(pVictim)->GetCreatureInfo()->Rank != ELITE_WORLDBOSS)
 						pVictim->Emote( EMOTE_ONESHOT_WOUNDCRITICAL );
 
 					vproc |= PROC_ON_CRIT_HIT_VICTIM;
@@ -3737,7 +3737,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 	}
 
 	//--------------------------special states processing---------------------------------------
-	if(pVictim->GetTypeId() == TYPEID_UNIT)
+	if(pVictim->IsCreature())
 	{
 		if(pVictim->GetAIInterface() && (pVictim->GetAIInterface()->getAIState()== STATE_EVADE ||
 										(pVictim->GetAIInterface()->GetIsSoulLinked() && pVictim->GetAIInterface()->getSoullinkedWith() != this)))
@@ -3748,7 +3748,7 @@ void Unit::Strike( Unit* pVictim, uint32 weapon_damage_type, SpellEntry* ability
 			dmg.resisted_damage = 0;
 		}
 	}
-	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >(pVictim)->GodModeCheat == true)
+	if(pVictim->IsPlayer() && static_cast< Player* >(pVictim)->GodModeCheat == true)
 	{
 		dmg.resisted_damage = dmg.full_damage; //godmode
 	}
@@ -4068,7 +4068,7 @@ void Unit::smsg_AttackStop(Unit* pVictim)
 		return;
 
 	WorldPacket data(SMSG_ATTACKSTOP, 24);
-	if(m_objectTypeId==TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 		data << pVictim->GetNewGUID();
 		data << uint8(0);
@@ -4125,7 +4125,7 @@ void Unit::smsg_AttackStart(Unit* pVictim)
     // FLAGS changed so other players see attack animation
     //    addUnitFlag(UNIT_FLAG_COMBAT);
     //    setUpdateMaskBit(UNIT_FIELD_FLAGS );
-    if(GetTypeId() == TYPEID_PLAYER)
+    if(IsPlayer())
     {
         Player* pThis = static_cast< Player* >( this );
         if( pThis->cannibalize)
@@ -4531,7 +4531,7 @@ void Unit::AddAura(Aura * aur)
 		{
 			pCaster->CombatStatus.OnDamageDealt( this );
 
-			if(m_objectTypeId == TYPEID_UNIT)
+			if(IsCreature())
 				m_aiInterface->AttackReaction(pCaster, 1, aur->GetSpellId());
 		}
 		/*if(isAlive() && CanAgroHash(aur->m_spellProto->NameHash)) //no threat for hunter's mark
@@ -5156,7 +5156,7 @@ void Unit::Emote(EmoteType emote)
 void Unit::SendChatMessageToPlayer(uint8 type, uint32 lang, const char *msg, Player *plr)
 {
 	size_t UnitNameLength = 0, MessageLength = 0;
-	CreatureInfo *ci = (m_objectTypeId == TYPEID_UNIT) ? TO_CREATURE(this)->GetCreatureInfo() : NULL;
+	CreatureInfo *ci = IsCreature() ? TO_CREATURE(this)->GetCreatureInfo() : NULL;
 
 	if(ci == NULL || plr == NULL)
 		return;
@@ -5237,7 +5237,7 @@ void Unit::OnRemoveInRangeObject(Object* pObj)
 	m_oppFactsInRange.erase(pObj);
 	m_sameFactsInRange.erase(pObj);
 
-	if(pObj->GetTypeId() == TYPEID_UNIT || pObj->GetTypeId() == TYPEID_PLAYER)
+	if(pObj->IsUnit())
 	{
 
 		Unit *pUnit = static_cast<Unit*>(pObj);
@@ -5528,7 +5528,7 @@ void Unit::SetStandState(uint8 standstate)
 	if( standstate == STANDSTATE_STAND )//standup
 		RemoveAurasByInterruptFlag(AURA_INTERRUPT_ON_STAND_UP);
 
-	if( m_objectTypeId == TYPEID_PLAYER )
+	if( IsPlayer() )
 		static_cast< Player* >( this )->GetSession()->OutPacket( SMSG_STANDSTATE_UPDATE, 1, &standstate );
 }
 
@@ -5733,7 +5733,7 @@ void Unit::Root()
 {
 	this->m_special_state |= UNIT_STATE_ROOT;
 
-	if(m_objectTypeId == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 		static_cast< Player* >( this )->SetMovement(MOVE_ROOT, 1);
 	}
@@ -5750,7 +5750,7 @@ void Unit::Unroot()
 {
 	this->m_special_state &= ~UNIT_STATE_ROOT;
 
-	if(m_objectTypeId == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 		static_cast< Player* >( this )->SetMovement(MOVE_UNROOT, 5);
 	}
@@ -6212,17 +6212,12 @@ void Unit::RemoveAurasOfSchool(uint32 School, bool Positive, bool Immune)
 
 void Unit::EnableFlight()
 {
-	if(m_objectTypeId != TYPEID_PLAYER || TO_PLAYER(this)->m_changingMaps)
+	if(!IsPlayer() || TO_PLAYER(this)->m_changingMaps)
 	{
 		WorldPacket data(SMSG_MOVE_SET_CAN_FLY, 13);
 		data << GetNewGUID();
 		data << uint32(2);
 		SendMessageToSet(&data, true);
-
-		if( IsPlayer() )
-		{
-			static_cast< Player* >( this )->m_setflycheat = true;
-		}
 	}
 	else
 	{
@@ -6238,15 +6233,12 @@ void Unit::EnableFlight()
 
 void Unit::DisableFlight()
 {
-	if(m_objectTypeId != TYPEID_PLAYER || TO_PLAYER(this)->m_changingMaps)
+	if(!IsPlayer() || TO_PLAYER(this)->m_changingMaps)
 	{
 		WorldPacket data(SMSG_MOVE_UNSET_CAN_FLY, 13);
 		data << GetNewGUID();
 		data << uint32(5);
 		SendMessageToSet(&data, true);
-
-		if( IsPlayer() )
-			static_cast< Player* >( this )->m_setflycheat = false;
 	}
 	else
 	{
@@ -6288,7 +6280,7 @@ void Unit::UpdateVisibility()
 	Object * pObj;
 	Player * plr;
 
-	if( m_objectTypeId == TYPEID_PLAYER )
+	if( IsPlayer() )
 	{
 		plr = static_cast< Player* >( this );
 		for( Object::InRangeSet::iterator itr2 = m_objectsInRange.begin(); itr2 != m_objectsInRange.end();)
@@ -6317,7 +6309,7 @@ void Unit::UpdateVisibility()
 				}
 			}
 
-			if( pObj->GetTypeId() == TYPEID_PLAYER )
+			if( pObj->IsPlayer() )
 			{
 				pl = static_cast< Player* >( pObj );
 				can_see = pl->CanSee( plr );
@@ -6568,7 +6560,7 @@ void CombatStatusHandler::ClearMyHealers()
 
 void CombatStatusHandler::WeHealed(Unit * pHealTarget)
 {
-	if(pHealTarget->GetTypeId() != TYPEID_PLAYER || m_Unit->GetTypeId() != TYPEID_PLAYER || pHealTarget == m_Unit)
+	if(!pHealTarget->IsPlayer() || !m_Unit->IsPlayer() || pHealTarget == m_Unit)
 		return;
 
 	if(pHealTarget->CombatStatus.IsInCombat())
@@ -6607,7 +6599,7 @@ void CombatStatusHandler::UpdateFlag()
 			// remove any of our healers from combat too, if they are able to be.
 			ClearMyHealers();
 
-			if( m_Unit->GetTypeId() == TYPEID_PLAYER )
+			if( m_Unit->IsPlayer() )
 				TO_PLAYER(m_Unit)->UpdatePotionCooldown();
 		}
 	}
@@ -6640,7 +6632,7 @@ void CombatStatusHandler::AddAttackTarget(const uint64& guid)
 
 	m_attackTargets.insert(guid);
 	//printf("Adding attack target "I64FMT" to "I64FMT"\n", guid, m_Unit->GetGUID());
-	if(m_Unit->GetTypeId() == TYPEID_PLAYER &&
+	if(m_Unit->IsPlayer() &&
 		m_primaryAttackTarget != guid)			// players can only have one attack target.
 	{
 		if(m_primaryAttackTarget)
@@ -7437,7 +7429,7 @@ void Unit::AggroPvPGuards()
 	Unit *tmpUnit;
 	for(Object::InRangeSet::iterator i = GetInRangeSetBegin(); i != GetInRangeSetEnd(); ++i)
 	{
-		if((*i)->GetTypeId() == TYPEID_UNIT)
+		if((*i)->IsCreature())
 		{
 			tmpUnit = static_cast< Unit* >(*i);
 			if( tmpUnit->GetAIInterface() && tmpUnit->GetAIInterface()->m_isNeutralGuard && CalcDistance(tmpUnit) <= (50.0f * 50.0f) )

@@ -72,38 +72,29 @@ int32 HonorHandler::CalculateHonorPointsForKill( uint32 playerLevel, uint32 vict
 	return float2int32( honor_points );
 }
 
-void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
+void HonorHandler::OnPlayerKilled( Player *pPlayer, Player* pVictim )
 {
-	if( pVictim == NULL || pPlayer == NULL )
+	if( pVictim->m_honorless )
 		return;
 
-	if( pPlayer->GetTypeId() != TYPEID_PLAYER || !pVictim->IsUnit() )
-		return;
-
-	if( !pVictim->IsPlayer() || static_cast< Player* >( pVictim )->m_honorless )
-		return;
-
-    if( pVictim->IsPlayer() )
+	if( pPlayer->m_bg )
 	{
-		if( pPlayer->m_bg )
-		{
-			if( static_cast< Player* >( pVictim )->m_bgTeam == pPlayer->m_bgTeam )
-				return;
+		if( pVictim->m_bgTeam == pPlayer->m_bgTeam )
+			return;
 
-			// patch 2.4, players killed >50 times in battlegrounds won't be worth honor for the rest of that bg
-			if( static_cast<Player*>(pVictim)->m_bgScore.Deaths >= 50 )
-				return;
-		}
-		else
-		{
-			if( pPlayer->GetTeam() == static_cast< Player* >( pVictim )->GetTeam() )
-				return;
-		}
+		// patch 2.4, players killed >50 times in battlegrounds won't be worth honor for the rest of that bg
+		if( pVictim->m_bgScore.Deaths >= 50 )
+			return;
+	}
+	else
+	{
+		if( pPlayer->GetTeam() == pVictim->GetTeam() )
+			return;
 	}
 
 	// Calculate points
 	int32 Points = 0;
-	if(pVictim->IsPlayer() && pPlayer != pVictim)
+	if(pPlayer != pVictim)
 		Points = CalculateHonorPointsForKill( pPlayer->getLevel(), pVictim->getLevel() );
 
 	if( Points > 0 )
@@ -139,7 +130,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 						// Send PVP credit
 						WorldPacket data(SMSG_PVP_CREDIT, 12);
 						uint32 pvppoints = pts * 10;
-						data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
+						data << pvppoints << pVictim->GetGUID() << uint32(pVictim->GetPVPRank());
 						(*vtr)->GetSession()->SendPacket(&data);
 					}
 				}
@@ -205,7 +196,7 @@ void HonorHandler::OnPlayerKilledUnit( Player *pPlayer, Unit* pVictim )
 
 					WorldPacket data(SMSG_PVP_CREDIT, 12);
 					uint32 pvppoints = contributorpts * 10; // Why *10?
-					data << pvppoints << pVictim->GetGUID() << uint32(static_cast< Player* >(pVictim)->GetPVPRank());
+					data << pvppoints << pVictim->GetGUID() << uint32(pVictim->GetPVPRank());
 					pAffectedPlayer->GetSession()->SendPacket(&data);
 				}
 				int PvPToken = 0;

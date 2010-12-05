@@ -584,8 +584,6 @@ Player::~Player ( )
 		delete itr->second;
 	m_reputation.clear();
 
-	m_objectTypeId = TYPEID_UNUSED;
-
 	if(m_playerInfo)
 		m_playerInfo->m_loggedInPlayer= NULL;
 
@@ -3880,20 +3878,15 @@ void Player::RemoveFromWorld()
 		if(m_SummonedObject->GetInstanceID() != GetInstanceID())
 		{
 			sEventMgr.AddEvent(m_SummonedObject, &Object::Delete, EVENT_GAMEOBJECT_EXPIRE, 100, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT | EVENT_FLAG_DELETES_OBJECT);
-		}else
+		}
+		else
 		{
-			if(m_SummonedObject->GetTypeId() == TYPEID_PLAYER)
+			if(m_SummonedObject->IsInWorld())
 			{
-
+				m_SummonedObject->RemoveFromWorld(true);
 			}
-			else
-			{
-				if(m_SummonedObject->IsInWorld())
-				{
-					m_SummonedObject->RemoveFromWorld(true);
-				}
-				delete m_SummonedObject;
-			}
+			Arcemu::Util::ARCEMU_ASSERT(m_SummonedObject->IsGameObject());
+			delete m_SummonedObject;
 		}
 		m_SummonedObject = NULL;
 	}
@@ -5662,7 +5655,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 	if(getDeathState() == CORPSE) // we are dead and we have released our spirit
 	{
-		if(object_type == TYPEID_PLAYER)
+		if(obj->IsPlayer())
 		{
 			Player *pObj = static_cast< Player* >(obj);
 
@@ -5677,7 +5670,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 		if(myCorpseInstanceId == GetInstanceID())
 		{
-			if(obj->GetTypeId() == TYPEID_CORPSE && static_cast<Corpse*>(obj)->GetOwner() == GetGUID())
+			if(obj->IsCorpse() && static_cast<Corpse*>(obj)->GetOwner() == GetGUID())
 				return true;
 
 			if(obj->GetDistanceSq(myCorpseLocation) <= CORPSE_VIEW_DISTANCE)
@@ -5687,9 +5680,9 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 		if(m_deathVision) // if we have arena death-vision we can see everything
 			return true;
 
-		if(object_type == TYPEID_UNIT)
+		if(obj->IsCreature())
 		{
-			Unit *uObj = static_cast<Unit *>(obj);
+			Creature *uObj = TO_CREATURE(obj);
 
 			return uObj->IsSpiritHealer(); // we can't see any NPCs except spirit-healers
 		}
@@ -5821,7 +5814,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 void Player::AddInRangeObject(Object* pObj)
 {
 	//Send taxi move if we're on a taxi
-	if (m_CurrentTaxiPath && (pObj->GetTypeId() == TYPEID_PLAYER))
+	if (m_CurrentTaxiPath && pObj->IsPlayer())
 	{
 		uint32 ntime = getMSTime();
 
@@ -5834,7 +5827,7 @@ void Player::AddInRangeObject(Object* pObj)
 	Unit::AddInRangeObject(pObj);
 
 	//if the object is a unit send a move packet if they have a destination
-	if(pObj->GetTypeId() == TYPEID_UNIT)
+	if(pObj->IsCreature())
 	{
 		static_cast< Creature* >( pObj )->GetAIInterface()->SendCurrentMove(this);
     }
@@ -5862,7 +5855,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 			m_currentSpell->cancel();	   // cancel the spell
 		m_CurrentCharm= 0;
 
-		if( p->m_temp_summon && p->GetTypeId() == TYPEID_UNIT )
+		if( p->m_temp_summon && p->IsCreature() )
 			static_cast< Creature* >( p )->DeleteMe();
 	}
 
@@ -6547,7 +6540,7 @@ void Player::UpdateNearbyGameObjects()
     for (Object::InRangeSet::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr)
 	{
 		Object * obj = (*itr);
-		if(obj->GetTypeId() == TYPEID_GAMEOBJECT)
+		if(obj->IsGameObject())
 		{
 			bool activate_quest_object = false;
 			GameObject *go = TO_GAMEOBJECT(obj);
@@ -9856,7 +9849,7 @@ void Player::Possess(Unit * pTarget)
 		return;
 
 	m_CurrentCharm = pTarget->GetGUID();
-	if(pTarget->GetTypeId() == TYPEID_UNIT)
+	if(pTarget->IsCreature())
 	{
 		// unit-only stuff.
 		pTarget->setAItoUse(false);
@@ -9954,7 +9947,7 @@ void Player::UnPossess()
 
 	SpeedCheatReset();
 
-	if(pTarget->GetTypeId() == TYPEID_UNIT)
+	if(pTarget->IsCreature())
 	{
 		// unit-only stuff.
 		pTarget->setAItoUse(true);
@@ -12917,7 +12910,8 @@ void Player::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 
 		if( pVictim->IsPlayer() ){
 
-			sHookInterface.OnKillPlayer( this, static_cast< Player* >( pVictim ) );
+			Player* playerVictim = TO_PLAYER(pVictim);
+			sHookInterface.OnKillPlayer( this, playerVictim );
 			
 			bool setAurastateFlag = false;
 			
@@ -12927,7 +12921,7 @@ void Player::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 				GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, GetAreaID(), 1, 0);
 				GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL, 1, 0, 0);
 #endif
-				HonorHandler::OnPlayerKilledUnit( this, pVictim );
+				HonorHandler::OnPlayerKilled( this, playerVictim );
 				setAurastateFlag = true;
 
 				}
@@ -13441,7 +13435,7 @@ void Player::AcceptQuest( uint64 guid, uint32 quest_id ){
 	if( GetQuestLogForEntry( qst->id ) )
 		return;
 
-	if( qst_giver->GetTypeId() == TYPEID_UNIT && static_cast< Creature* >( qst_giver )->m_escorter != NULL )
+	if( qst_giver->IsCreature() && static_cast< Creature* >( qst_giver )->m_escorter != NULL )
 	{
 		m_session->SystemMessage("You cannot accept this quest at this time.");
 		return;
@@ -13529,7 +13523,7 @@ void Player::AcceptQuest( uint64 guid, uint32 quest_id ){
 		//GetPlayer()->timed_quest_slot = log_slot;
 	}
 
-	if(qst->count_required_item || qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)	// gameobject quests deactivate
+	if(qst->count_required_item || qst_giver->IsGameObject())	// gameobject quests deactivate
 		UpdateNearbyGameObjects();
 
 	//ScriptSystem->OnQuestEvent(qst, static_cast< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);

@@ -877,7 +877,7 @@ void Spell::SpellEffectTeleportUnits( uint32 i )  // Teleport Units
 			}
 		}
 		
-		if( unitTarget->GetTypeId() == TYPEID_UNIT )
+		if( unitTarget->IsCreature() )
 		{
 			if( unitTarget->GetTargetGUID() != 0 )
 			{
@@ -1419,7 +1419,7 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 			// unit resurrection handler
 			if(unitTarget)
 			{
-				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->IsDead())
+				if(unitTarget->IsCreature() && unitTarget->IsPet() && unitTarget->IsDead())
 				{
 					uint32 hlth = ((uint32)GetProto()->EffectBasePoints[i] > unitTarget->GetMaxHealth()) ? unitTarget->GetMaxHealth() : (uint32)GetProto()->EffectBasePoints[i];
 					uint32 mana = ((uint32)GetProto()->EffectBasePoints[i] > unitTarget->GetMaxPower( POWER_TYPE_MANA )) ? unitTarget->GetMaxPower( POWER_TYPE_MANA ) : (uint32)GetProto()->EffectBasePoints[i];
@@ -2371,13 +2371,24 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 {
 	//Used by mortar team
 	//Triggers area effect spell at destinatiom
-	if(!m_caster) return;
 
 	uint32 spellid = GetProto()->EffectTriggerSpell[i];
-	if(!spellid) return;
+	if( spellid == 0 ){
+		sLog.outError("Spell %u ( %s ) has a trigger missle effect ( %u ) but no trigger spell ID. Spell needs fixing.", m_spellInfo->Id, m_spellInfo->Name, i );
+		return;
+	}
 
 	SpellEntry *spInfo = dbcSpell.LookupEntryForced(spellid);
-	if(!spInfo) return;
+	if( spInfo == NULL ){
+		sLog.outError("Spell %u ( %s ) has a trigger missle effect ( %u ) but has an invalid trigger spell ID. Spell needs fixing.", m_spellInfo->Id, m_spellInfo->Name, i );
+		return;
+	}
+	
+	// Cast the triggered spell on the destination location, spells like Freezing Arrow use it
+	if( ( u_caster != NULL ) && ( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION ) ){
+		u_caster->CastSpellAoF( m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, spInfo, true );
+		return;
+	}
 
 	float spellRadius = GetRadius(i);
 
@@ -2997,7 +3008,7 @@ void Spell::SpellEffectSummonGuardian(uint32 i) // Summon Guardian
 void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 {
 	Player*target;
-	if(m_caster->GetTypeId() != TYPEID_PLAYER)
+	if(!m_caster->IsPlayer())
 	{
 		// Check targets
 		if( m_targets.m_unitTarget )
@@ -3722,7 +3733,7 @@ void Spell::SpellEffectDistract(uint32 i) // Distract
 void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 {
 	//Show random loot based on roll,
-	if(!unitTarget || !p_caster || unitTarget->GetTypeId() != TYPEID_UNIT)
+	if(!unitTarget || !p_caster || !unitTarget->IsCreature())
 		return;
 
 	Creature *target = static_cast<Creature*>( unitTarget );
@@ -3880,10 +3891,10 @@ void Spell::SpellEffectUseGlyph(uint32 i)
 
 void Spell::SpellEffectHealMechanical(uint32 i)
 {
-	if(!unitTarget || unitTarget->GetTypeId() != TYPEID_UNIT || static_cast<Creature*>(unitTarget)->GetCreatureInfo()->Type != UNIT_TYPE_MECHANICAL)
+	if(!unitTarget || !unitTarget->IsCreature() || static_cast<Creature*>(unitTarget)->GetCreatureInfo()->Type != UNIT_TYPE_MECHANICAL)
 		return;
 
-	Heal((int32)damage);
+	Heal(damage);
 }
 
 void Spell::SpellEffectSummonObjectWild(uint32 i)
@@ -3929,19 +3940,15 @@ void Spell::SpellEffectSanctuary(uint32 i) // Stop all attacks made to you
 	//use these instead
 	Object::InRangeSet::iterator itr = u_caster->GetInRangeSetBegin();
 	Object::InRangeSet::iterator itr_end = u_caster->GetInRangeSetEnd();
-	Unit * pUnit;
 
 	if(u_caster->IsPlayer())
 		static_cast<Player*>(u_caster)->RemoveAllAuraType( SPELL_AURA_MOD_ROOT );
 
 	for( ; itr != itr_end; ++itr )
-		if( (*itr)->IsUnit() )
-		{
-			pUnit = static_cast<Unit*>(*itr);
-
-			if( pUnit && pUnit->GetTypeId() == TYPEID_UNIT )
-				pUnit->GetAIInterface()->RemoveThreatByPtr( unitTarget );
-		}
+	{
+		if( (*itr)->IsCreature() )
+			TO_CREATURE(*itr)->GetAIInterface()->RemoveThreatByPtr( unitTarget );
+	}
 }
 
 void Spell::SpellEffectAddComboPoints(uint32 i) // Add Combo Points
@@ -4498,7 +4505,7 @@ void Spell::SpellEffectCharge(uint32 i)
 	data << time;
 	data << uint32(1);
 	data << x << y << z;
-	if(unitTarget->GetTypeId() == TYPEID_UNIT)
+	if(unitTarget->IsCreature())
 		unitTarget->GetAIInterface()->StopMovement(2000);
 
 	u_caster->SendMessageToSet(&data, true);
@@ -4723,8 +4730,22 @@ void Spell::SpellEffectSummonObjectSlot(uint32 i)
 
 	// spawn a new one
 	GoSummon = u_caster->GetMapMgr()->CreateGameObject(GetProto()->EffectMiscValue[i]);
+
+	float dx = 0.0f;
+	float dy = 0.0f;
+	float dz = 0.0f;
+
+	if( m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION ){
+		dx = m_targets.m_destX;
+		dy = m_targets.m_destY;
+		dz = m_targets.m_destZ;
+	}else{
+		dx = m_caster->GetPositionX();
+		dy = m_caster->GetPositionY();
+		dz = m_caster->GetPositionZ();
+	}
 	
-	if( !GoSummon->CreateFromProto(GetProto()->EffectMiscValue[i], m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), m_caster->GetOrientation() ))
+	if( !GoSummon->CreateFromProto(GetProto()->EffectMiscValue[i], m_caster->GetMapId(), dx, dy, dz, m_caster->GetOrientation() ))
 	{
 		delete GoSummon;
 		return;
@@ -4898,7 +4919,7 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 			// unit resurrection handler
 			if(unitTarget)
 			{
-				if(unitTarget->GetTypeId()==TYPEID_UNIT && unitTarget->IsPet() && unitTarget->IsDead())
+				if(unitTarget->IsCreature() && unitTarget->IsPet() && unitTarget->IsDead())
 				{
 					uint32 hlth = ((uint32)GetProto()->EffectBasePoints[i] > unitTarget->GetMaxHealth()) ? unitTarget->GetMaxHealth() : (uint32)GetProto()->EffectBasePoints[i];
 					uint32 mana = ((uint32)GetProto()->EffectBasePoints[i] > unitTarget->GetMaxPower( POWER_TYPE_MANA )) ? unitTarget->GetMaxPower( POWER_TYPE_MANA ) : (uint32)GetProto()->EffectBasePoints[i];
@@ -5335,7 +5356,7 @@ void Spell::SpellEffectRedirectThreat(uint32 i)
 	if (!p_caster || !unitTarget)
 		return;
 
-	if ((unitTarget->GetTypeId() == TYPEID_PLAYER && p_caster->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->GetTypeId() == TYPEID_UNIT && !unitTarget->IsPet()))
+	if ((unitTarget->IsPlayer() && p_caster->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->IsCreature() && !unitTarget->IsPet()))
 		return;
 
 	p_caster->SetMisdirectionTarget(unitTarget->GetGUID());
@@ -5624,7 +5645,7 @@ void Spell::SpellEffectActivateSpec(uint32 i)
 
 void Spell::SpellEffectDurabilityDamage(uint32 i)
 {
-	if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+	if(!unitTarget || !unitTarget->IsPlayer())
 		return;
  
 	int16 slot = int16(GetProto()->EffectMiscValue[i]);
@@ -5717,7 +5738,7 @@ void Spell::SpellEffectDurabilityDamage(uint32 i)
 
 void Spell::SpellEffectDurabilityDamagePCT(uint32 i)
 {
-	if(!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+	if(!unitTarget || !unitTarget->IsPlayer())
 		return;
 
 	int16 slot = int16(GetProto()->EffectMiscValue[i]);

@@ -99,10 +99,10 @@ bool isHostile(Object* objA, Object* objB)// B is hostile for A?
 	if(objA == objB)
 		return false;   // can't attack self.. this causes problems with buffs if we don't have it :p
 
-	if(objA->GetTypeId() == TYPEID_CORPSE)
+	if(objA->IsCorpse())
 		return false;
 
-	if(objB->GetTypeId() == TYPEID_CORPSE)
+	if(objB->IsCorpse())
 		return false;
 
 	if( !(objA->m_phase & objB->m_phase) ) //What you can't see, can't be hostile!
@@ -221,10 +221,10 @@ bool isAttackable(Object* objA, Object* objB, bool CheckStealth)// A can attack 
 	if( !(objA->m_phase & objB->m_phase) ) //What you can't see, you can't attack either...
 		return false;
 
-	if(objA->GetTypeId() == TYPEID_CORPSE)
+	if(objA->IsCorpse())
 		return false;
 
-	if(objB->GetTypeId() == TYPEID_CORPSE)
+	if(objB->IsCorpse())
 		return false;
 
 	// Players in feign death flags can't be attacked (where did you get this information from?)
@@ -495,13 +495,13 @@ bool isCombatSupport(Object* objA, Object* objB)// B combat supports A?
 	if(!objA || !objB)
 		return false;
 
-	if(objA->GetTypeId() == TYPEID_CORPSE )
+	if(objA->IsCorpse() )
 		return false;
 
-	if(objB->GetTypeId() == TYPEID_CORPSE)
+	if(objB->IsCorpse())
 		return false;
 
-	if ( objA->GetTypeId()!=TYPEID_UNIT || objB->GetTypeId()!=TYPEID_UNIT ) return false; // cebernic: lowchance crashfix.
+	if ( !objA->IsCreature() || !objB->IsCreature() ) return false; // cebernic: lowchance crashfix.
 	// also if it's not a unit, it shouldn't support combat anyways.
 
 	if( objA->IsPet() || objB->IsPet() ) // fixes an issue where horde pets would chain aggro horde guards and vice versa for alliance.

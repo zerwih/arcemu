@@ -651,7 +651,7 @@ bool ChatHandler::HandleMonsterSayCommand(const char* args, WorldSession *m_sess
 		RedSystemMessage(m_session, "Please select a creature or player before using this command.");
 		return true;
 	}
-	if(crt->GetTypeId() == TYPEID_PLAYER)
+	if(crt->IsPlayer())
 	{
 		WorldPacket * data = this->FillMessageData(CHAT_MSG_SAY, LANG_UNIVERSAL, args, crt->GetGUID(), 0);
 		crt->SendMessageToSet(data, true);
@@ -676,7 +676,7 @@ bool ChatHandler::HandleMonsterYellCommand(const char* args, WorldSession *m_ses
 		RedSystemMessage(m_session, "Please select a creature or player before using this command.");
 		return true;
 	}
-	if(crt->GetTypeId() == TYPEID_PLAYER)
+	if(crt->IsPlayer())
 	{
 		WorldPacket * data = this->FillMessageData(CHAT_MSG_YELL, LANG_UNIVERSAL, args, crt->GetGUID(), 0);
 		crt->SendMessageToSet(data, true);
@@ -716,7 +716,7 @@ bool ChatHandler::HandleGOSelect(const char *args, WorldSession *m_session)
 				else if(Itr == Itr2)
 					break;
 
-				if((*Itr)->GetTypeId() == TYPEID_GAMEOBJECT)
+				if((*Itr)->IsGameObject())
 				{
 					// Find the current go, move to the next one
 					if(bUseNext)
@@ -739,7 +739,7 @@ bool ChatHandler::HandleGOSelect(const char *args, WorldSession *m_session)
 	{
 		for( ; Itr != Itr2; Itr++ )
 		{
-			if( (*Itr)->GetTypeId() == TYPEID_GAMEOBJECT )
+			if( (*Itr)->IsGameObject() )
 			{
 				if( (nDist = m_session->GetPlayer()->CalcDistance( *Itr )) < cDist )
 				{

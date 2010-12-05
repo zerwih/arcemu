@@ -71,7 +71,6 @@ enum TYPEID {
 	TYPEID_CORPSE		= 7,
 	TYPEID_AIGROUP	   = 8,
 	TYPEID_AREATRIGGER   = 9,
-	TYPEID_UNUSED			= 10,//Used to signal invalid reference (object deallocated but someone is still using it)
 };
 
 enum OBJECT_UPDATE_TYPE {
@@ -176,9 +175,10 @@ public:
 	bool IsPlayer() { return m_objectTypeId == TYPEID_PLAYER; }
 	bool IsCreature() { return m_objectTypeId == TYPEID_UNIT; }
 	bool IsItem() { return m_objectTypeId == TYPEID_ITEM; }
-	bool IsGO() { return m_objectTypeId == TYPEID_GAMEOBJECT; }
 	virtual bool IsPet() { return false; }
 	bool IsGameObject() { return m_objectTypeId == TYPEID_GAMEOBJECT; }
+	bool IsCorpse() { return m_objectTypeId == TYPEID_CORPSE; }
+	bool IsContainer() { return m_objectTypeId == TYPEID_CONTAINER; }
 
 	//! This includes any nested objects we have, inventory for example.
 	virtual uint32  BuildCreateUpdateBlockForPlayer( ByteBuffer *data, Player *target );
@@ -435,7 +435,7 @@ public:
 	bool RemoveIfInRange( Object * obj )
 	{
 		InRangeSet::iterator itr = m_objectsInRange.find(obj);
-		if( obj->GetTypeId() == TYPEID_PLAYER )
+		if( obj->IsPlayer() )
 			m_inRangePlayers.erase( obj );
 
 		if( itr == m_objectsInRange.end() )

@@ -1833,6 +1833,10 @@ void Pet::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 un
 	}
 
 	if( pVictim->GetHealth() <= damage ){
+		if( pVictim->isTrainingDummy() ){
+			pVictim->SetHealth( 1 );
+			return;
+		}
 
 		if( m_Owner->m_bg != NULL ){
 			m_Owner->m_bg->HookOnUnitKill( m_Owner, pVictim );
@@ -1843,7 +1847,8 @@ void Pet::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 un
 
 		if( pVictim->IsPlayer() ){
 
-			sHookInterface.OnKillPlayer( m_Owner, static_cast< Player* >( pVictim ) );
+			Player* playerVictim = TO_PLAYER(pVictim);
+			sHookInterface.OnKillPlayer( m_Owner, playerVictim );
 			
 			bool setAurastateFlag = false;
 			
@@ -1853,7 +1858,7 @@ void Pet::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 un
 				m_Owner->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_HONORABLE_KILL_AT_AREA, m_Owner->GetAreaID(), 1, 0);
 				m_Owner->GetAchievementMgr().UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_EARN_HONORABLE_KILL, 1, 0, 0);
 #endif
-				HonorHandler::OnPlayerKilledUnit( m_Owner, pVictim );
+				HonorHandler::OnPlayerKilled( m_Owner, playerVictim );
 				setAurastateFlag = true;
 
 				}

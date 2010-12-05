@@ -86,14 +86,13 @@ Object::Object() : m_position(0,0,0,0), m_spawnLocation(0,0,0,0)
 
 Object::~Object( )
 {
-	if(m_objectTypeId != TYPEID_ITEM)
+	if(!IsItem())
 		Arcemu::Util::ARCEMU_ASSERT(   !m_inQueue);
 
 	Arcemu::Util::ARCEMU_ASSERT( !IsInWorld() );
 
 	// for linux
 	m_instanceId = INSTANCEID_NOT_IN_WORLD;
-	m_objectTypeId=TYPEID_UNUSED;
 
 	if( m_currentSpell ) 
 	{
@@ -120,7 +119,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	uint32 flags2 = 0;
 
 	uint8 updatetype = UPDATETYPE_CREATE_OBJECT;
-	if(m_objectTypeId == TYPEID_CORPSE)
+	if(IsCorpse())
 	{
 		if(static_cast<Corpse*>(this)->GetDisplayId() == 0)
 			return 0;
@@ -169,7 +168,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	}
 
 	// gameobject stuff
-	if( IsGameObject() )
+	if(IsGameObject())
 	{
 
 		switch( TO_GAMEOBJECT( this )->GetType() )
@@ -196,7 +195,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 				}break;
 		}
 		//The above 3 checks FAIL to identify transports, thus their flags remain 0x58, and this is BAAAAAAD! Later they don't get position x,y,z,o updates, so they appear randomly by a client-calculated path, they always face north, etc... By: VLack
-		if( flags != 0x0352 && GetTypeId() == TYPEID_GAMEOBJECT && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT && !(static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
+		if( flags != 0x0352 && IsGameObject() && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT && !(static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
 			flags = 0x0352;
 	}
 
@@ -216,7 +215,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	updateMask.SetCount( m_valuesCount );
 	_SetCreateBits( &updateMask, target );
 
-	if(GetTypeId() == TYPEID_GAMEOBJECT && (static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
+	if(IsGameObject() && (static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
 	{
 		updateMask.SetBit(GAMEOBJECT_PARENTROTATION_02);
 		updateMask.SetBit(GAMEOBJECT_PARENTROTATION_03);
@@ -343,7 +342,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 
 	Player * pThis = NULL;
 	MovementInfo* moveinfo = NULL;
-	if(GetTypeId() == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 		pThis = static_cast< Player* >( this );
 		if(pThis->GetSession())
@@ -355,7 +354,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 		}
 	}
 	Creature * uThis = NULL;
-	if (GetTypeId() == TYPEID_UNIT)
+	if (IsCreature())
 		uThis = static_cast<Creature*>(this);
 
 	if (flags & UPDATEFLAG_LIVING) //0x20
@@ -496,7 +495,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 			*data << (float)m_position.z;
 			*data << (float)m_position.o;
 
-			if (m_objectTypeId == TYPEID_CORPSE)
+			if (IsCorpse())
 				*data << (float)m_position.o; //VLack: repeat the orientation!
 			else
 				*data << (float)0;
@@ -567,45 +566,48 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 
 	if(updateMask->GetBit(OBJECT_FIELD_GUID) && target)	   // We're creating.
 	{
-		Creature * pThis = static_cast<Creature*>(this);
-		if(GetTypeId() == TYPEID_UNIT && pThis->IsTagged() && (pThis->loot.gold || pThis->loot.items.size()))
+		if(IsCreature())
 		{
-			// Let's see if we're the tagger or not.
-			oldflags = m_uint32Values[UNIT_DYNAMIC_FLAGS];
-			uint32 Flags = m_uint32Values[UNIT_DYNAMIC_FLAGS];
-			uint32 oldFlags = 0;
-
-			if(pThis->GetTaggerGUID() == target->GetGUID())
+			Creature * pThis = static_cast<Creature*>(this);
+			if(pThis->IsTagged() && (pThis->loot.gold || pThis->loot.items.size()))
 			{
-				// Our target is our tagger.
-				oldFlags = U_DYN_FLAG_TAGGED_BY_OTHER;
+				// Let's see if we're the tagger or not.
+				oldflags = m_uint32Values[UNIT_DYNAMIC_FLAGS];
+				uint32 Flags = m_uint32Values[UNIT_DYNAMIC_FLAGS];
+				uint32 oldFlags = 0;
 
-				if(Flags & U_DYN_FLAG_TAGGED_BY_OTHER)
-					Flags &= ~oldFlags;
+				if(pThis->GetTaggerGUID() == target->GetGUID())
+				{
+					// Our target is our tagger.
+					oldFlags = U_DYN_FLAG_TAGGED_BY_OTHER;
 
-				if( !(Flags & U_DYN_FLAG_LOOTABLE) && pThis->HasLootForPlayer( target ) )
-					Flags |= U_DYN_FLAG_LOOTABLE;
+					if(Flags & U_DYN_FLAG_TAGGED_BY_OTHER)
+						Flags &= ~oldFlags;
+
+					if( !(Flags & U_DYN_FLAG_LOOTABLE) && pThis->HasLootForPlayer( target ) )
+						Flags |= U_DYN_FLAG_LOOTABLE;
+				}
+				else
+				{
+					// Target is not the tagger.
+					oldFlags = U_DYN_FLAG_LOOTABLE;
+
+					if(!(Flags & U_DYN_FLAG_TAGGED_BY_OTHER))
+						Flags |= U_DYN_FLAG_TAGGED_BY_OTHER;
+
+					if(Flags & U_DYN_FLAG_LOOTABLE)
+						Flags &= ~oldFlags;
+				}
+
+				m_uint32Values[UNIT_DYNAMIC_FLAGS] = Flags;
+
+				updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
+
+				reset = true;
 			}
-			else
-			{
-				// Target is not the tagger.
-				oldFlags = U_DYN_FLAG_LOOTABLE;
-
-				if(!(Flags & U_DYN_FLAG_TAGGED_BY_OTHER))
-					Flags |= U_DYN_FLAG_TAGGED_BY_OTHER;
-
-				if(Flags & U_DYN_FLAG_LOOTABLE)
-					Flags &= ~oldFlags;
-			}
-
-			m_uint32Values[UNIT_DYNAMIC_FLAGS] = Flags;
-
-			updateMask->SetBit(UNIT_DYNAMIC_FLAGS);
-
-			reset = true;
 		}
 
-		if( target && GetTypeId() == TYPEID_GAMEOBJECT )
+		if( target && IsGameObject() )
 		{
 			GameObject *go = TO_GAMEOBJECT(this);
 			QuestLogEntry *qle;
@@ -782,7 +784,7 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 	bool updateMap = false, result = true;
 
 	//It's a good idea to push through EVERY transport position change, no matter how small they are. By: VLack aka. VLsoft
-	if( GetTypeId() == TYPEID_GAMEOBJECT && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT )
+	if( IsGameObject() && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT )
 		updateMap = true;
 
 	//if (m_position.x != newX || m_position.y != newY)
@@ -805,7 +807,7 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 		m_lastMapUpdatePosition.ChangeCoords(newX,newY,newZ,newOrientation);
 		m_mapMgr->ChangeObjectLocation(this);
 
-		if( m_objectTypeId == TYPEID_PLAYER && static_cast< Player* >( this )->GetGroup() && static_cast< Player* >( this )->m_last_group_position.Distance2DSq(m_position) > 25.0f ) // distance of 5.0
+		if( IsPlayer() && static_cast< Player* >( this )->GetGroup() && static_cast< Player* >( this )->m_last_group_position.Distance2DSq(m_position) > 25.0f ) // distance of 5.0
 		{
             static_cast< Player* >( this )->GetGroup()->HandlePartialChange( PARTY_UPDATE_FLAG_POSITION, static_cast< Player* >( this ) );
 		}
@@ -1014,7 +1016,7 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 	}
 
 	//! Group update handling
-	if(m_objectTypeId == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 		TO_PLAYER(this)->HandleUpdateFieldChanged(index);
 		if(IsInWorld())
@@ -1050,7 +1052,7 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 				break;
 		}
 	}
-	else if(m_objectTypeId == TYPEID_UNIT)
+	else if(IsCreature())
 	{
 		switch(index)
 		{
@@ -1059,7 +1061,7 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 			case UNIT_FIELD_POWER3:
 			case UNIT_FIELD_POWER4:
 			case UNIT_FIELD_POWER7:
-				static_cast< Unit* >( this )->SendPowerUpdate(false);
+				TO_CREATURE( this )->SendPowerUpdate(false);
 				break;
 			default:
 				break;
@@ -1095,7 +1097,7 @@ void Object::ModUnsigned32Value(uint32 index, int32 mod)
 		}
 	}
 
-	if(m_objectTypeId == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 #ifdef OPTIMIZED_PLAYER_SAVING
 		switch(index)
@@ -1123,7 +1125,7 @@ void Object::ModUnsigned32Value(uint32 index, int32 mod)
 				break;
 		}
 	}
-	else if(m_objectTypeId == TYPEID_UNIT)
+	else if(IsCreature())
 	{
 		switch(index)
 		{
@@ -1132,7 +1134,7 @@ void Object::ModUnsigned32Value(uint32 index, int32 mod)
 			case UNIT_FIELD_POWER3:
 			case UNIT_FIELD_POWER4:
 			case UNIT_FIELD_POWER7:
-				static_cast< Unit* >( this )->SendPowerUpdate(false);
+				TO_CREATURE( this )->SendPowerUpdate(false);
 				break;
 			default:
 				break;
@@ -1158,7 +1160,7 @@ void Object::ModSignedInt32Value(uint32 index, int32 value )
 		}
 	}
 
-	if(m_objectTypeId == TYPEID_PLAYER)
+	if(IsPlayer())
 	{
 #ifdef OPTIMIZED_PLAYER_SAVING
 		switch(index)
@@ -1472,10 +1474,10 @@ bool Object::isInBack(Object* target)
     double angle = atan2( y, x );
     angle = ( angle >= 0.0 ) ? angle : 2.0 * M_PI + angle;
 
-	// if we are a unit and have a UNIT_FIELD_TARGET then we are always facing them
-	if( m_objectTypeId == TYPEID_UNIT && TO_UNIT(this)->GetTargetGUID() != 0 )
+	// if we are a creature and have a UNIT_FIELD_TARGET then we are always facing them
+	if( IsCreature() && TO_CREATURE(this)->GetTargetGUID() != 0 )
 	{
-		Unit* pTarget = TO_UNIT(this)->GetAIInterface()->getNextTarget();
+		Unit* pTarget = TO_CREATURE(this)->GetAIInterface()->getNextTarget();
 		if( pTarget != NULL )
 			angle -= double( Object::calcRadAngle( target->m_position.x, target->m_position.y, pTarget->m_position.x, pTarget->m_position.y ) );
 		else
@@ -1518,14 +1520,14 @@ void Object::_setFaction()
 {
 	FactionTemplateDBC* factT = NULL;
 
-	if(GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER)
+	if(IsUnit())
 	{
 		factT = dbcFactionTemplate.LookupEntryForced(TO_UNIT(this)->GetFaction());
 		if( !factT )
 			sLog.outError("Unit does not have a valid faction. It will make him act stupid in world. Don't blame us, blame yourself for not checking :P, faction %u set to entry %u",TO_UNIT(this)->GetFaction(),GetEntry() );
 	}
 	else
-	if(GetTypeId() == TYPEID_GAMEOBJECT)
+	if(IsGameObject())
 	{
 		factT = dbcFactionTemplate.LookupEntryForced(static_cast<GameObject*>(this)->GetFaction());
 		if( !factT )
@@ -1552,7 +1554,7 @@ void Object::UpdateOppFactionSet()
 	{
         Object *i = *itr;
 
-        if( ( i->IsUnit() ) || ( i->GetTypeId() == TYPEID_GAMEOBJECT ) )
+        if( i->IsUnit() || i->IsGameObject() )
 		{
 			if(isHostile( this, i) )
 			{
@@ -1582,7 +1584,7 @@ void Object::UpdateSameFactionSet()
 	{
         Object *i = *itr;
 
-        if( ( i->IsUnit() ) || ( i->GetTypeId() == TYPEID_GAMEOBJECT) )
+        if( i->IsUnit() || i->IsGameObject() )
 		{
 			if( isFriendly( this, i ) )
 			{
@@ -1776,7 +1778,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			res = float( dmg.full_damage - dmg.resisted_damage );
 	}
 	//------------------------------special states----------------------------------------------
-	if(pVictim->GetTypeId() == TYPEID_PLAYER && static_cast< Player* >(pVictim)->GodModeCheat == true)
+	if(pVictim->IsPlayer() && static_cast< Player* >(pVictim)->GodModeCheat == true)
 	{
 		res = float(dmg.full_damage);
 		dmg.resisted_damage = dmg.full_damage;

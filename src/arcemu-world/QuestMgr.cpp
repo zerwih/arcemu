@@ -187,7 +187,7 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 	std::list<QuestRelation *>::const_iterator q_end;
 	bool bValid = false;
 
-	if( quest_giver->GetTypeId() == TYPEID_GAMEOBJECT )
+	if( quest_giver->IsGameObject() )
 	{
 		bValid = false;
 
@@ -205,7 +205,7 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 			q_end = questgiver->QuestsEnd();
 		}
 	} 
-	else if( quest_giver->GetTypeId() == TYPEID_UNIT )
+	else if( quest_giver->IsCreature() )
 	{
 		bValid = static_cast< Creature* >( quest_giver )->HasQuests();
 		if(bValid)
@@ -214,13 +214,13 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 			q_end = static_cast<Creature*>(quest_giver)->QuestsEnd();
 		}
 	}
-    else if( quest_giver->GetTypeId() == TYPEID_ITEM )
+    else if( quest_giver->IsItem() )
     {
         if( static_cast< Item* >( quest_giver )->GetProto()->QuestId )
             bValid = true;
     }
 	//This will be handled at quest share so nothing important as status
-	else if(quest_giver->GetTypeId() == TYPEID_PLAYER)
+	else if(quest_giver->IsPlayer())
 	{
 		status = QMGR_QUEST_AVAILABLE;
 	}
@@ -232,7 +232,7 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 		return status;
 	}
 
-    if(quest_giver->GetTypeId() == TYPEID_ITEM)
+    if(quest_giver->IsItem())
     {
         Quest *pQuest = QuestStorage.LookupEntry( static_cast<Item*>(quest_giver)->GetProto()->QuestId );
         QuestRelation qr;
@@ -264,7 +264,7 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 	std::list<QuestRelation *>::const_iterator q_end;
 	bool bValid = false;
 
-	if(quest_giver->GetTypeId() == TYPEID_GAMEOBJECT)
+	if(quest_giver->IsGameObject())
 	{
 		bValid = false;
 
@@ -283,7 +283,7 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 			
 		}
 	} 
-	else if(quest_giver->GetTypeId() == TYPEID_UNIT)
+	else if(quest_giver->IsCreature())
 	{
 		bValid = static_cast<Creature*>(quest_giver)->HasQuests();
 		if(bValid)
@@ -612,7 +612,7 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 	*data << uint32(1);//Emote
 
 	bool bValid = false;
-	if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
+	if(qst_giver->IsGameObject())
 	{
 		bValid = false;
 
@@ -630,7 +630,7 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 			ed = questgiver->QuestsEnd();
 		}
 	} 
-	else if(qst_giver->GetTypeId() == TYPEID_UNIT)
+	else if(qst_giver->IsCreature())
 	{
 		bValid = static_cast<Creature*>(qst_giver)->HasQuests();
 		if(bValid)
@@ -1036,10 +1036,10 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 				break;
 
 			// Let's do this properly. Determine the faction of the creature, and give reputation to his faction.
-			if( qst_giver->GetTypeId() == TYPEID_UNIT )
+			if( qst_giver->IsCreature() )
 				if( static_cast<Creature*>(qst_giver)->m_factionDBC != NULL )
 					fact = static_cast<Creature*>(qst_giver)->m_factionDBC->ID;
-			if( qst_giver->GetTypeId() == TYPEID_GAMEOBJECT )
+			if( qst_giver->IsGameObject() )
 				fact = static_cast<GameObject*>(qst_giver)->GetFaction();
 		}
 		else
@@ -1100,7 +1100,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 	qle->Finish();
 	
 	
-	if(qst_giver->GetTypeId() == TYPEID_UNIT)
+	if(qst_giver->IsCreature())
 	{
 		if(!static_cast<Creature*>(qst_giver)->HasQuest(qst->id, 2))
 		{
@@ -1731,7 +1731,7 @@ void QuestMgr::BuildQuestFailed(WorldPacket* data, uint32 questid)
 
 bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 {
-	if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT ){
+	if(qst_giver->IsGameObject() ){
 		GameObject *go = TO_GAMEOBJECT( qst_giver );
 		if( go->GetType() != GAMEOBJECT_TYPE_QUESTGIVER )
 			return false;
@@ -1757,7 +1757,7 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 
 		bool bValid = false;
 
-		if(qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)
+		if(qst_giver->IsGameObject())
 		{
 			
 			bValid = false;
@@ -1776,7 +1776,7 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 				q_end   = questgiver->QuestsEnd();
 			}
 		} 
-		else if(qst_giver->GetTypeId() == TYPEID_UNIT)
+		else if(qst_giver->IsCreature())
 		{
 			bValid = static_cast<Creature*>(qst_giver)->HasQuests();
 			if(bValid)

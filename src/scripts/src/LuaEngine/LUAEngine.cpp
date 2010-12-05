@@ -280,7 +280,7 @@ void LuaEngine::PUSH_GO(Object *go, lua_State *L)
 void LuaEngine::PUSH_ITEM(Object * item, lua_State *L)
 {
 	Item * pItem = NULL;
-	if(item != NULL && (item->GetTypeId() == TYPEID_ITEM || item->GetTypeId() == TYPEID_CONTAINER))
+	if(item != NULL && (item->IsItem() || item->IsContainer()))
 		pItem = static_cast<Item*>(item);
 	if(L == NULL)
 		ArcLuna<Item>::push(lu,pItem);
@@ -1049,7 +1049,7 @@ void LuaHookOnQuestAccept(Player * pPlayer, Quest * pQuest, Object * pQuestGiver
 			sLuaMgr.PUSH_UNIT(pQuestGiver);
 		else if(pQuestGiver->IsGameObject() )
 			sLuaMgr.PUSH_GO(pQuestGiver);
-		else if(pQuestGiver->GetTypeId() == TYPEID_ITEM)
+		else if(pQuestGiver->IsItem())
 			sLuaMgr.PUSH_ITEM(pQuestGiver);
 		else
 			sLuaMgr.PUSH_NIL();
@@ -1182,7 +1182,7 @@ void LuaHookOnQuestFinished(Player * pPlayer, Quest * pQuest, Object * pQuestGiv
 			sLuaMgr.PUSH_UNIT(pQuestGiver);
 		else if(pQuestGiver->IsGameObject() )
 			sLuaMgr.PUSH_GO(pQuestGiver);
-		else if(pQuestGiver->GetTypeId() == TYPEID_ITEM)
+		else if(pQuestGiver->IsItem())
 			sLuaMgr.PUSH_ITEM(pQuestGiver);
 		else
 			sLuaMgr.PUSH_NIL();
@@ -1842,7 +1842,7 @@ public:
 	void GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 	{
 		GET_LOCK
-		if(pObject->GetTypeId() == TYPEID_UNIT)
+		if(pObject->IsCreature())
         {
 			if(m_unit_gossip_binding == NULL) { RELEASE_LOCK; return; }
 
@@ -1853,7 +1853,7 @@ public:
 			sLuaMgr.PUSH_BOOL(AutoSend);
 			sLuaMgr.ExecuteCall(4);
         }
-        else if(pObject->GetTypeId() == TYPEID_ITEM)
+        else if(pObject->IsItem())
         {
 			if(m_item_gossip_binding == NULL) { RELEASE_LOCK; return; }
 
@@ -1864,7 +1864,7 @@ public:
 			sLuaMgr.PUSH_BOOL(AutoSend);
 			sLuaMgr.ExecuteCall(4);
         }
-		else if(pObject->GetTypeId() == TYPEID_GAMEOBJECT)
+		else if(pObject->IsGameObject())
         {
 			if(m_go_gossip_binding == NULL) { RELEASE_LOCK; return; }
 
@@ -1881,7 +1881,7 @@ public:
 	void GossipSelectOption(Object* pObject, Player* Plr, uint32 Id, uint32 IntId, const char * EnteredCode)
 	{
 		GET_LOCK
-		if(pObject->GetTypeId() == TYPEID_UNIT)
+		if(pObject->IsCreature())
         {
 			if(m_unit_gossip_binding == NULL) { RELEASE_LOCK; return; }
 
@@ -1894,7 +1894,7 @@ public:
 			sLuaMgr.PUSH_STRING(EnteredCode);
 			sLuaMgr.ExecuteCall(6);
         }
-        else if(pObject->GetTypeId() == TYPEID_ITEM)
+        else if(pObject->IsItem())
         {
 			if(m_item_gossip_binding == NULL) { RELEASE_LOCK; return; }
 			sLuaMgr.BeginCall(m_item_gossip_binding->m_functionReferences[GOSSIP_EVENT_ON_SELECT_OPTION]);
@@ -1906,7 +1906,7 @@ public:
 			sLuaMgr.PUSH_STRING(EnteredCode);
 			sLuaMgr.ExecuteCall(6);
         }
-        else if(pObject->GetTypeId() == TYPEID_GAMEOBJECT)
+        else if(pObject->IsGameObject())
         {
 			if(m_go_gossip_binding == NULL) { RELEASE_LOCK; return; }
             sLuaMgr.BeginCall(m_go_gossip_binding->m_functionReferences[GOSSIP_EVENT_ON_SELECT_OPTION]);
@@ -1924,7 +1924,7 @@ public:
 	void GossipEnd(Object* pObject, Player* Plr)
 	{
 		GET_LOCK
-		if(pObject->GetTypeId() == TYPEID_UNIT)
+		if(pObject->IsCreature())
         {
 			if(m_unit_gossip_binding == NULL) { RELEASE_LOCK; return; }
 			sLuaMgr.BeginCall(m_unit_gossip_binding->m_functionReferences[GOSSIP_EVENT_ON_END]);
@@ -1933,7 +1933,7 @@ public:
 			sLuaMgr.PUSH_UNIT(Plr);
 			sLuaMgr.ExecuteCall(3);
         }
-        else if(pObject->GetTypeId() == TYPEID_ITEM)
+        else if(pObject->IsItem())
         {
 			if(m_item_gossip_binding == NULL) { RELEASE_LOCK; return; }
 			sLuaMgr.BeginCall(m_item_gossip_binding->m_functionReferences[GOSSIP_EVENT_ON_END]);
@@ -1942,7 +1942,7 @@ public:
 			sLuaMgr.PUSH_UNIT(Plr);
 			sLuaMgr.ExecuteCall(3);
         }
-        else if(pObject->GetTypeId() == TYPEID_GAMEOBJECT)
+        else if(pObject->IsGameObject())
         {
 			if(m_go_gossip_binding == NULL) { RELEASE_LOCK; return; }
             sLuaMgr.BeginCall(m_go_gossip_binding->m_functionReferences[GOSSIP_EVENT_ON_END]);
@@ -2940,17 +2940,17 @@ void LuaEngine::ResumeLuaThread(int ref) {
 /* SCRIPT FUNCTION IMPLEMENTATION                                       */
 /************************************************************************/
 
-#define TEST_UNIT() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_UNIT) { return 0; }
-#define TEST_UNIT_RET() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_UNIT) { lua_pushboolean(L,0); return 1; }
+#define TEST_UNIT() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsCreature()) { return 0; }
+#define TEST_UNIT_RET() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsCreature()) { lua_pushboolean(L,0); return 1; }
 
-#define TEST_PLAYER() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_PLAYER) { return 0; }
-#define TEST_PLAYER_RET() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_PLAYER) { lua_pushboolean(L,0); return 1; }
+#define TEST_PLAYER() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsPlayer()) { return 0; }
+#define TEST_PLAYER_RET() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsPlayer()) { lua_pushboolean(L,0); return 1; }
 
-#define TEST_UNITPLAYER() if(ptr == NULL || !ptr->IsInWorld() || ( ptr->GetTypeId() != TYPEID_PLAYER && ptr->GetTypeId() != TYPEID_UNIT)) { return 0; }
-#define TEST_UNITPLAYER_RET() if(ptr == NULL || !ptr->IsInWorld() || ( ptr->GetTypeId() != TYPEID_PLAYER && ptr->GetTypeId() != TYPEID_UNIT)) { lua_pushboolean(L,0); return 1; }
+#define TEST_UNITPLAYER() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsUnit()) { return 0; }
+#define TEST_UNITPLAYER_RET() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsUnit()) { lua_pushboolean(L,0); return 1; }
 
-#define TEST_GO() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_GAMEOBJECT) { return 0; }
-#define TEST_GO_RET() if(ptr == NULL || !ptr->IsInWorld() || ptr->GetTypeId() != TYPEID_GAMEOBJECT) { lua_pushboolean(L,0); return 1; }
+#define TEST_GO() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsGameObject()) { return 0; }
+#define TEST_GO_RET() if(ptr == NULL || !ptr->IsInWorld() || !ptr->IsGameObject()) { lua_pushboolean(L,0); return 1; }
 
 #define RET_NIL( ){ lua_pushnil(L); return 1; }
 #define RET_BOOL(exp) { (exp) ? lua_pushboolean(L,1) : lua_pushboolean(L,0); return 1; }
