@@ -265,7 +265,14 @@ void WorldSession::LogoutPlayer(bool Save)
 					static_cast< Creature* >( obj )->loot.looters.erase( _player->GetLowGUID() );
 					break;
 				case TYPEID_GAMEOBJECT:
-					static_cast< GameObject* >( obj )->loot.looters.erase( _player->GetLowGUID() );
+					GameObject *go = TO_GAMEOBJECT( obj );
+					
+					if( !go->IsLootable() )
+						break;
+
+					Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( go );
+
+					pLGO->loot.looters.erase( _player->GetLowGUID() );
 					break;
 				}
 			}

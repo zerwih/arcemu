@@ -32,6 +32,7 @@ enum LOOTTYPE{
 
 struct ItemPrototype;
 class MapMgr;
+
 class LootRoll : public EventableObject
 {
 public:
@@ -59,16 +60,14 @@ private:
 typedef vector<pair<RandomProps*, float> > RandomPropertyVector;
 typedef vector<pair<ItemRandomSuffixEntry*, float> > RandomSuffixVector;
 
-typedef struct
-{
+struct _LootItem{
 	ItemPrototype * itemproto;
 	uint32 displayid;
-}_LootItem;
+};
 
 typedef std::set<uint32> LooterSet;
 
-typedef struct
-{
+struct __LootItem{
 	_LootItem item;
 	uint32 iItemsCount;
 	RandomProps * iRandomProperty;
@@ -77,11 +76,10 @@ typedef struct
 	bool passed;
 	LooterSet has_looted;
 	uint32 ffa_loot;
-}__LootItem;
+};
 
 
-typedef struct
-{
+struct StoreLootItem{
 	_LootItem item;		// the item that drops
 	float chance;		// normal dungeon / normal 10men raid / old raid (10,25, or 40 men )
 	float chance2;		// heroic dungeon / normal 25men raid
@@ -90,21 +88,23 @@ typedef struct
 	uint32 mincount;	// minimum quantity to drop
 	uint32 maxcount;	// maximum quantity to drop
 	uint32 ffa_loot;	// can everyone from the group loot the item?
-}StoreLootItem;
+};
 
 
-typedef struct 
-{
+struct StoreLootList{
 	uint32 count;
-	StoreLootItem*items;
-}StoreLootList;
+	StoreLootItem *items;
+};
 
-typedef struct
-{
+struct Loot{
 	std::vector<__LootItem> items;
 	uint32 gold;
 	LooterSet looters;
-}Loot;
+
+	Loot(){
+		gold = 0;
+	}
+};
 
 struct tempy
 {

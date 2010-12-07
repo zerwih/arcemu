@@ -28,7 +28,7 @@ namespace Arcemu{
 	//  Implements Type 17 (FISHINGNODE) GameObjects
 	//
 	////////////////////////////////////////////////////////////////////////
-	class GO_FishingNode : public GameObject{
+	class GO_FishingNode : public GO_Lootable{
 	
 	public:
 
@@ -80,6 +80,10 @@ namespace Arcemu{
 		///////////////////////////////////////////////////////////////////////
 		void EventFishHooked();
 
+
+		bool IsLootable(){ return true; }
+
+		bool HasLoot();
 	};
 }
 

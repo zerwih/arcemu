@@ -493,6 +493,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_QuestGiver.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -771,6 +774,10 @@
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Questgiver.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Lootable.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />
