@@ -36,34 +36,33 @@ namespace Arcemu{
 
 		GO_FishingNode( uint64 GUID );
 
-		~GO_FishingNode();		
-		
+		~GO_FishingNode();
+
 		///////////////////////////////////////////////////////////////////////
-		//void UseFishingNode( Player *player )
-		//  Handles the click on the bobber, if there is a fish hooked
-		//  fills the loot, otherwise ends the fishing session
+		//bool UseNode()
+		//  Uses the fishing node.
 		//
 		//Parameters
-		//  Player *player  -  The fisherman
-		//
-		//Return Value
 		//  None
 		//
+		//Return Value
+		//  Returns true on success.
+		//  Returns false on success.
+		//
 		//
 		///////////////////////////////////////////////////////////////////////
-		void UseFishingNode( Player *player );
+		bool UseNode();
 		
 		///////////////////////////////////////////////////////////////////////
-		//void EndFishing( Player *player, bool abort )
+		//void EndFishing( bool abort )
 		//  Ends the fishing session. Despawns the bobber.
 		//
 		//Parameters
-		//  Player *player  -  The fisherman
 		//  bool abort      -  Indicates whether the fishing was a success or not
 		//
 		//
 		////////////////////////////////////////////////////////////////////////
-		void EndFishing( Player *player, bool abort );
+		void EndFishing( bool abort );
 
 		
 		///////////////////////////////////////////////////////////////////////

@@ -30,107 +30,18 @@ namespace Arcemu{
 	GO_FishingNode::~GO_FishingNode(){
 	}
 
-	void GO_FishingNode::UseFishingNode( Player *player ){
-
+	bool GO_FishingNode::UseNode(){
 		sEventMgr.RemoveEvents( this );
-
+		
 		// Clicking on the bobber before something is hooked
 		if( ( GetFlags() & 32 ) == 0 ){
-			player->GetSession()->OutPacket( SMSG_FISH_NOT_HOOKED );
-			EndFishing( player, true );
-			return;
+			EndFishing( true );
+			return false;
 		}
-		
-		uint32 zone = player->GetAreaID();
-		if( zone == 0 ) // If the player's area ID is 0, use the zone ID instead
-			zone = player->GetZoneId();
-		
-		FishingZoneEntry *entry = FishingZoneStorage.LookupEntry( zone );
-		if( entry == NULL ){
-			sLog.outError( "ERROR: Fishing zone information for zone %d not found!", zone );
-			EndFishing( player, true );
-			return;
-		}
-		
-		uint32 maxskill = entry->MaxSkill;
-		uint32 minskill = entry->MinSkill;
-		
-		if( player->_GetSkillLineCurrent( SKILL_FISHING, false ) < maxskill )
-			player->_AdvanceSkillLine( SKILL_FISHING, float2int32( 1.0f * sWorld.getRate( RATE_SKILLRATE ) ) );
-		
-		GameObject *go = NULL;
-		Arcemu::GO_FishingHole *school = NULL;
-
-		for( std::set< Object* >::iterator itr = this->m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr ){
-			Object *o = *itr;
-
-			if ( !o->IsGameObject() )
-				continue;
-			
-			go = TO_GAMEOBJECT( o );
-			
-			if(  go->GetType() != GAMEOBJECT_TYPE_FISHINGHOLE )
-				continue;
-
-			school = static_cast< Arcemu::GO_FishingHole* >( go );
-			
-			if ( !isInRange( school, static_cast< float >( school->GetInfo()->fishinghole.radius ) ) ){
-				school = NULL;
-				continue;
-			}else
-				break;
-		}
-		
-		if( school != NULL ){ // open school loot if school exists
-
-			if( school->GetMapMgr() != NULL )
-				lootmgr.FillGOLoot( &school->loot, school->GetInfo()->raw.sound1, school->GetMapMgr()->iInstanceMode );
-			else
-				lootmgr.FillGOLoot( &school->loot, school->GetInfo()->raw.sound1, 0 );
-			
-			player->SendLoot( school->GetGUID(), LOOT_FISHING, school->GetMapId() );
-			
-			EndFishing( player, false );
-			school->CatchFish();
-			
-			if ( !school->CanFish() )
-				sEventMgr.AddEvent( TO_GAMEOBJECT( school ), &GameObject::Despawn, (uint32)0, ( 1800000 + RandomUInt( 3600000 ) ), EVENT_GAMEOBJECT_EXPIRE, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT ); // respawn in 30 - 90 minutes
-		
-		}else if( Rand( ( ( player->_GetSkillLineCurrent( SKILL_FISHING, true ) - minskill ) * 100 ) / maxskill ) ){ // Open loot on success, otherwise FISH_ESCAPED.
-			
-			lootmgr.FillFishingLoot( &loot, zone );
-			player->SendLoot( GetGUID(), LOOT_FISHING, GetMapId() );
-			EndFishing( player, false );
-
-		}else{ // Failed
-
-			player->GetSession()->OutPacket( SMSG_FISH_ESCAPED );
-			EndFishing( player, true );
-
-		}
+		return true;
 	}
-	
-	void GO_FishingNode::EndFishing( Player *player, bool abort ){
-		Spell * spell = player->GetCurrentSpell();
-		
-		if( spell != NULL ){
-			
-			if( abort ){
-				
-				// abort because of a reason - Roe vs. Wade
-				//FIX ME: here 'failed' should appear over progress bar
-				spell->SendChannelUpdate( 0 );
-				spell->finish( false );
 
-			}else{
-				
-				// spell ended
-				spell->SendChannelUpdate( 0 );
-				spell->finish();
-
-			}
-		}
-		
+	void GO_FishingNode::EndFishing( bool abort ){
 		if( !abort )
 			sEventMgr.AddEvent( TO_GAMEOBJECT( this ), &GameObject::ExpireAndDelete, EVENT_GAMEOBJECT_EXPIRE, 10 * 1000, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 		else

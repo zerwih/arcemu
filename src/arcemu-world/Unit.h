@@ -1580,6 +1580,24 @@ public:
 	bool m_mageInvisibility;
 
 	void CancelSpell(Spell * ptr);
+
+
+	////////////////////////////////////////////////////////
+	//void EventStopChanneling( bool abort )
+	//  Stops channeling the current spell
+	//
+	//Parameters
+	//  bool abort  -  if true the spell will be finished
+	//                 unsuccessfully
+	//
+	//Return Value
+	//  None
+	//
+	//
+	////////////////////////////////////////////////////////
+	void EventStopChanneling( bool abort );
+
+
 	void EventStrikeWithAbility(uint64 guid, SpellEntry * sp, uint32 damage);
 	void DispelAll(bool positive);
 

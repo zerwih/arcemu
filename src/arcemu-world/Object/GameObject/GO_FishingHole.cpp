@@ -45,6 +45,9 @@ namespace Arcemu{
 	void GO_FishingHole::CatchFish(){
 		Arcemu::Util::ARCEMU_ASSERT( usage_remaining > 0 );
 		usage_remaining--;
+
+		if( usage_remaining == 0 )
+			sEventMgr.AddEvent( TO_GAMEOBJECT( this ), &GameObject::Despawn, uint32( 0 ), ( 1800000 + RandomUInt( 3600000 ) ), EVENT_GAMEOBJECT_EXPIRE, 10000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT ); // respawn in 30 - 90 minutes
 	}
 
 	void GO_FishingHole::CalcFishRemaining( bool force ){
