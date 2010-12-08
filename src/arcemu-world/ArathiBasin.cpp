@@ -266,7 +266,6 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 		m_controlPointAuras[Id]->SetState(  1);
 		m_controlPointAuras[Id]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_controlPointAuras[Id]->SetAnimProgress(  100);
-		m_controlPointAuras[Id]->bannerauraslot = static_cast<uint8>( Id );
 		m_controlPointAuras[Id]->PushToWorld(m_mapMgr);
 	}
 	else

@@ -869,6 +869,10 @@ namespace luaGameObject
 	int AddLoot(lua_State * L, GameObject* ptr)
 	{
 		TEST_GO()
+		if( !ptr->IsLootable() )
+			return 0;
+		Arcemu::GO_Lootable *lt = static_cast< Arcemu::GO_Lootable* >( ptr );
+
 		uint32 itemid = luaL_checkint(L,1);
 		uint32 mincount = luaL_checkint(L,2);
 		uint32 maxcount = luaL_checkint(L,3);
@@ -882,7 +886,7 @@ namespace luaGameObject
 				WorldDatabase.Execute("REPLACE INTO loot_gameobjects VALUES (%u, %u, %f, 0, 0, 0, %u, %u, %u)", ptr->GetEntry(), itemid, chance, mincount, maxcount, ffa_loot);
 			delete result;
 		}
-		lootmgr.AddLoot(&ptr->loot,itemid,mincount,maxcount,ffa_loot);
+		lootmgr.AddLoot( &lt->loot,itemid,mincount,maxcount,ffa_loot);
 		return 0;
 	}
 

@@ -548,7 +548,6 @@ public:
 	uint8 invisibilityFlag;
 	Unit* m_summoner;
 	int8 bannerslot;
-	int8 bannerauraslot;
 
 	void CallScriptUpdate();
    

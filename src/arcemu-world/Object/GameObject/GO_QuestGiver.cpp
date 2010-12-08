@@ -33,9 +33,7 @@ namespace Arcemu{
 
 	void GO_QuestGiver::InitAI(){
 		LoadQuests();
-
-		if( myScript == NULL )
-			myScript = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
+		GameObject::InitAI();
 	}
 	
 	void GO_QuestGiver::DeleteQuest( QuestRelation *Q ){

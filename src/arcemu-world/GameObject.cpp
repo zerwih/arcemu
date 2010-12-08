@@ -37,7 +37,7 @@ GameObject::GameObject( uint64 guid ){
 	SetAnimProgress( 100 );
 	m_wowGuid.Init( guid );
 	SetScale(  1 );
-	bannerslot = bannerauraslot = -1;
+	bannerslot = -1;
 	m_summonedGo = false;
 	invisible = false;
 	invisibilityFlag = INVIS_FLAG_NORMAL;
@@ -202,11 +202,7 @@ void GameObject::SaveToDB()
 	WorldDatabase.Execute(ss.str().c_str());
 }
 
-void GameObject::InitAI()
-{
-	if(!pInfo)
-		return;
-	
+void GameObject::InitAI(){
 	if( myScript == NULL )
 		myScript = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
 }
