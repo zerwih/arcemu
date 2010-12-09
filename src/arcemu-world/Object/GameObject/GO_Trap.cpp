@@ -52,6 +52,9 @@ namespace Arcemu{
 		if(!IsInWorld())
 			return;
 
+		if( spell == NULL )
+			return;
+
 		if( GetState() == 1 ){
 			
 			for( std::set< Object* >::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr ){
@@ -66,8 +69,12 @@ namespace Arcemu{
 					continue;
 				
 				dist = GetDistanceSq( o );
+
+				float maxdistance = sqrt( float( pInfo->trap.radius ) );
+				if( maxdistance == 0.0f )
+					maxdistance = 1.0f;
 				
-				if( dist <= pInfo->trap.radius){
+				if( dist <=  maxdistance ){
 
 					if(m_summonedGo){
 						if(!m_summoner){
