@@ -7821,9 +7821,9 @@ void Player::UpdateChannels(uint16 AreaID)
 	string channelname, AreaName;
 
 
-	if(GetMapId()==450)
+	if( GetMapId() == 450 )
 		AreaID = 2917;
-	if(GetMapId()==449)
+	else if( GetMapId() == 449 )
 		AreaID = 2918;
 
 	AreaTable * at2 = dbcArea.LookupEntry(GetZoneId());
@@ -8078,10 +8078,10 @@ void Player::EndDuel(uint8 WinCondition)
 			}
 
 			//we do not wish to lock the other player in duel state
-			DuelingWith->SetDuelArbiter(0 );
-			DuelingWith->SetDuelTeam(0 );
-			SetDuelArbiter(0 );
-			SetDuelTeam(0 );
+			DuelingWith->SetDuelArbiter( 0 );
+			DuelingWith->SetDuelTeam( 0 );
+			SetDuelArbiter( 0 );
+			SetDuelTeam( 0 );
 			sEventMgr.RemoveEvents( DuelingWith, EVENT_PLAYER_DUEL_BOUNDARY_CHECK );
 			sEventMgr.RemoveEvents( DuelingWith, EVENT_PLAYER_DUEL_COUNTDOWN );
 			DuelingWith->DuelingWith = NULL;
@@ -8134,9 +8134,9 @@ void Player::EndDuel(uint8 WinCondition)
 	//Send hook OnDuelFinished
 
     if ( WinCondition != 0 )
-            sHookInterface.OnDuelFinished( DuelingWith, this );
+		sHookInterface.OnDuelFinished( DuelingWith, this );
     else
-            sHookInterface.OnDuelFinished( this, DuelingWith );
+		sHookInterface.OnDuelFinished( this, DuelingWith );
 
 	//Clear Duel Related Stuff
 
@@ -8148,10 +8148,10 @@ void Player::EndDuel(uint8 WinCondition)
 		delete arbiter;
 	}
 
-	SetDuelArbiter(0 );
-	DuelingWith->SetDuelArbiter(0 );
-	SetDuelTeam(0 );
-	DuelingWith->SetDuelTeam(0 );
+	SetDuelArbiter( 0 );
+	SetDuelTeam( 0 );
+	DuelingWith->SetDuelArbiter( 0 );
+	DuelingWith->SetDuelTeam( 0 );
 
 	EventAttackStop();
 	DuelingWith->EventAttackStop();
@@ -8200,7 +8200,6 @@ void Player::EndDuel(uint8 WinCondition)
 
 void Player::StopMirrorTimer(uint32 Type)
 {
-
 	m_session->OutPacket(SMSG_STOP_MIRROR_TIMER, 4, &Type);
 }
 
@@ -8235,7 +8234,7 @@ void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
 	SetNextLevelXp(Info->XPToNextLevel);
 
 	// Set stats
-	for(uint32 i = 0; i < 5; ++i)
+	for( uint8 i = 0; i < 5; ++i )
 	{
 		BaseStats[i] = Info->Stat[i];
 		CalcStat(i);
@@ -8497,7 +8496,7 @@ void Player::SafeTeleport(MapMgr * mgr, const LocationVector & vec)
 
 void Player::SetGuildId(uint32 guildId)
 {
-	if(IsInWorld())
+	if( IsInWorld() )
 	{
 		const uint32 field = PLAYER_GUILDID;
 		sEventMgr.AddEvent(TO_OBJECT(this), &Object::SetUInt32Value, field, guildId, EVENT_PLAYER_SEND_PACKET, 1,
@@ -8505,13 +8504,13 @@ void Player::SetGuildId(uint32 guildId)
 	}
 	else
 	{
-		SetUInt32Value(PLAYER_GUILDID,guildId);
+		SetUInt32Value( PLAYER_GUILDID, guildId );
 	}
 }
 
 void Player::SetGuildRank(uint32 guildRank)
 {
-	if(IsInWorld())
+	if( IsInWorld() )
 	{
 		const uint32 field = PLAYER_GUILDRANK;
 		sEventMgr.AddEvent(TO_OBJECT(this), &Object::SetUInt32Value, field, guildRank, EVENT_PLAYER_SEND_PACKET, 1,
@@ -8519,7 +8518,7 @@ void Player::SetGuildRank(uint32 guildRank)
 	}
 	else
 	{
-		SetUInt32Value(PLAYER_GUILDRANK,guildRank);
+		SetUInt32Value( PLAYER_GUILDRANK, guildRank );
 	}
 }
 
@@ -8549,9 +8548,9 @@ void Player::UpdatePvPArea()
 	}
 
 	// This is where all the magic happens :P
-	if((at->category == AREAC_ALLIANCE_TERRITORY && IsTeamAlliance()) || (at->category == AREAC_HORDE_TERRITORY && IsTeamHorde()))
+	if( ( at->category == AREAC_ALLIANCE_TERRITORY && IsTeamAlliance() ) || ( at->category == AREAC_HORDE_TERRITORY && IsTeamHorde() ) )
 	{
-		if(!HasFlag(PLAYER_FLAGS, PLAYER_FLAG_PVP_TOGGLE) && !m_pvpTimer)
+		if( !HasFlag( PLAYER_FLAGS, PLAYER_FLAG_PVP_TOGGLE ) && !m_pvpTimer )
 		{
 			// I'm flagged and I just walked into a zone of my type. Start the 5min counter.
 			ResetPvPTimer();
@@ -8561,11 +8560,11 @@ void Player::UpdatePvPArea()
 	else
 	{
 		//Enemy city check
-		if(at->AreaFlags & AREA_CITY_AREA || at->AreaFlags & AREA_CITY)
+		if( at->AreaFlags & AREA_CITY_AREA || at->AreaFlags & AREA_CITY )
 		{
-			if((at->category == AREAC_ALLIANCE_TERRITORY && IsTeamHorde()) || (at->category == AREAC_HORDE_TERRITORY && IsTeamAlliance()))
+			if( ( at->category == AREAC_ALLIANCE_TERRITORY && IsTeamHorde() ) || ( at->category == AREAC_HORDE_TERRITORY && IsTeamAlliance() ) )
 			{
-				if(!IsPvPFlagged())
+				if( !IsPvPFlagged() )
 					SetPvPFlag();
 				else
 					StopPvPTimer();
@@ -10813,8 +10812,8 @@ void Player::RemoveQuestMob(uint32 entry) //Only for Kill Quests
 
 PlayerInfo::~PlayerInfo()
 {
-	if(m_Group)
-		m_Group->RemovePlayer(this);
+	if( m_Group != NULL )
+		m_Group->RemovePlayer( this );
 }
 
 void Player::CopyAndSendDelayedPacket(WorldPacket * data)
@@ -13736,4 +13735,44 @@ void Player::AddQuestKill(uint32 questid, uint8 reqid, uint32 delay)
 
 	if(qle->CanBeFinished())
 		qle->SendQuestComplete();
+}
+
+bool Player::CanBuyAt(VendorRestrictionEntry *vendor)
+{
+	if(vendor == NULL)
+		return true;
+
+	if( vendor->flags == RESTRICTION_CHECK_ALL )
+	{
+		// check for race mask
+		if( ( vendor->racemask > 0 ) && !( getRaceMask() & vendor->racemask ) )
+			return false;
+
+		// check for class mask
+		if( ( vendor->classmask > 0 ) && !( getClassMask() & vendor->classmask ) )
+			return false;
+
+		// check for required reputation
+		if( vendor->reqrepfaction )
+		{
+			uint32 plrep = GetStanding( vendor->reqrepfaction );
+			if( plrep < vendor->reqrepvalue )
+				return false;
+		}
+	}
+	else if( vendor->flags == RESTRICTION_CHECK_MOUNT_VENDOR )
+	{
+		if( ( vendor->racemask > 0 ) && ( vendor->reqrepfaction ) )
+		{
+			uint32 plrep = GetStanding( vendor->reqrepfaction );
+			if( !( getRaceMask() & vendor->racemask ) && ( plrep < vendor->reqrepvalue ) )
+				return false;
+		}
+		else
+		{
+			sLog.outError("VendorRestrictions: Mount vendor specified, but not enough info for creature %u", vendor->entry);
+		}
+	}
+
+	return true;
 }

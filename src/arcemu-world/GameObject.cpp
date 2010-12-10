@@ -233,7 +233,7 @@ void GameObject::DeleteFromDB()
 
 void GameObject::EventCloseDoor(){
 	SetState( 1 );
-	SetFlags( GetFlags() & ~1 );
+	RemoveFlag( GAMEOBJECT_FLAGS, 1 );
 }
 
 void GameObject::_Expire()

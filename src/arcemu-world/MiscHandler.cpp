@@ -1536,9 +1536,9 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 				obj->EventCloseDoor();
 			else
 			{
-				obj->SetFlags(  obj->GetFlags() | 1); // lock door
+				obj->SetFlag( GAMEOBJECT_FLAGS, 1 ); // lock door
 				obj->SetState(  0);
-				sEventMgr.AddEvent(obj,&GameObject::EventCloseDoor,EVENT_GAMEOBJECT_DOOR_CLOSE,20000,1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+				sEventMgr.AddEvent( obj, &GameObject::EventCloseDoor, EVENT_GAMEOBJECT_DOOR_CLOSE, 20000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 			}
 		}break;
 	case GAMEOBJECT_TYPE_FLAGSTAND:
@@ -1702,7 +1702,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		}break;
 	case GAMEOBJECT_TYPE_GOOBER:
 		{
-			//Quest related mostly
+			plyr->CastSpell( guid, goinfo->raw.Unknown1, false );
 
 			// show page
 			if(goinfo->raw.sound7)
@@ -1711,7 +1711,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 				data << obj->GetGUID();
 				plyr->GetSession()->SendPacket(&data);
 			}
-		}
+		}break;
 	case GAMEOBJECT_TYPE_CAMERA:
 		{
 			

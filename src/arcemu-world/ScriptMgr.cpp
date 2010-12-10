@@ -623,6 +623,14 @@ void ScriptMgr::register_dummy_spell( uint32* entries, exp_handle_dummy_spell ca
 	}
 };
 
+void ScriptMgr::register_script_effect( uint32* entries, exp_handle_script_effect callback ) 
+{
+	for( uint32 y = 0; entries[y] != 0; y++)
+	{
+		register_script_effect(entries[y], callback);
+	}
+};
+
 void ScriptMgr::register_script_effect( uint32 entry, exp_handle_script_effect callback ){
 	
 	HandleScriptEffectMap::iterator itr = SpellScriptEffects.find( entry );
@@ -840,7 +848,13 @@ void GossipScript::GossipHello(Object* pObject, Player* Plr, bool AutoSend)
 	objmgr.CreateGossipMenuForPlayer(&Menu, pCreature->GetGUID(), TextID, Plr);
 	
 	if (pCreature->isVendor())
-		Menu->AddItem(1, Plr->GetSession()->LocalizedWorldSrv(1), 1);
+	{
+		VendorRestrictionEntry * vendor = VendorRestrictionEntryStorage.LookupEntry(pCreature->GetProto()->Id);
+		if( Plr->CanBuyAt(vendor) )
+			Menu->AddItem(1, Plr->GetSession()->LocalizedWorldSrv(1), 1);
+		else
+			Menu->SetTextID(vendor->cannotbuyattextid);
+	}
 	
 	if( pCreature->isTrainer() || pCreature->isProf() || pCreature->isClass() )
 	{
