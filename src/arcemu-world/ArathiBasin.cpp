@@ -212,7 +212,6 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 			break;
 		}
 
-		m_controlPoints[Id]->bannerslot = static_cast<uint8>( Id );
 		m_controlPoints[Id]->PushToWorld(m_mapMgr);
 	}
 	else
@@ -1033,19 +1032,28 @@ void ArathiBasin::AssaultControlPoint(Player * pPlayer, uint32 Id)
 
 bool ArathiBasin::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell)
 {
-	// burlex todo: find a cleaner way to do this that doesn't waste memory.
-	if(pGo->bannerslot >= 0 && pGo->bannerslot < AB_NUM_CONTROL_POINTS)
-	{
-		//Stealthed / invisible players can't cap
-		//if(pPlayer->GetStealthLevel() > 0 || pPlayer->HasAurasWithNameHash(SPELL_HASH_PROWL) || pPlayer->HasAurasWithNameHash(SPELL_HASH_SHADOWMELD))
-		if(pPlayer->IsStealth() || pPlayer->m_invisible)
-			return false;
+	uint32 cpid = 0; //control point id, not child porn id!
+	for( cpid = 0; cpid < AB_NUM_CONTROL_POINTS; cpid++ ){
+		if( m_controlPoints[ cpid ] == NULL )
+			continue;
 
-		AssaultControlPoint(pPlayer,pGo->bannerslot);
-		return true;
+		if( m_controlPoints[ cpid ]->GetGUID() == pGo->GetGUID() )
+			break;
 	}
 
-	return false;
+	if( cpid == AB_NUM_CONTROL_POINTS )
+		return false;
+	
+	// burlex todo: find a cleaner way to do this that doesn't waste memory.
+	//Stealthed / invisible players can't cap
+	//if(pPlayer->GetStealthLevel() > 0 || pPlayer->HasAurasWithNameHash(SPELL_HASH_PROWL) || pPlayer->HasAurasWithNameHash(SPELL_HASH_SHADOWMELD))
+	
+	if(pPlayer->IsStealth() || pPlayer->m_invisible)
+		return false;
+	
+	AssaultControlPoint( pPlayer, cpid );
+	
+	return true;
 }
 
 void ArathiBasin::HookOnShadowSight() 

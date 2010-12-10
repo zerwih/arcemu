@@ -547,7 +547,6 @@ public:
 	bool invisible;//invisible
 	uint8 invisibilityFlag;
 	Unit* m_summoner;
-	int8 bannerslot;
 
 	void CallScriptUpdate();
    

@@ -1071,7 +1071,6 @@ void AlteracValley::AVNode::Spawn()
 		{
 			// initial spawn
 			m_flag = m_bg->SpawnGameObject(g->id[m_state], m_bg->GetMapMgr()->GetMapId(), g->x, g->y, g->z, g->o, 0, 0, 1.0f);
-			m_flag->bannerslot = static_cast<int8>( m_nodeId );
 			m_flag->SetFaction(g_gameObjectFactions[m_state]);
 			m_flag->SetAnimProgress(  100);
 			m_flag->Activate();
@@ -1434,15 +1433,25 @@ AlteracValley::~AlteracValley()
 
 bool AlteracValley::HookSlowLockOpen(GameObject * pGo, Player * pPlayer, Spell * pSpell)
 {
-	// burlex todo: find a cleaner way to do this that doesnt waste memory.
-	if(pGo->bannerslot >= 0 && pGo->bannerslot < AV_NUM_CONTROL_POINTS)
-	{
-		// TODO: anticheat here
-		m_nodes[pGo->bannerslot]->Assault(pPlayer);
-		return true;
+	uint32 nodeid = 0;
+	
+	for( nodeid = 0; nodeid < AV_NUM_CONTROL_POINTS; nodeid++ ){
+		if( m_nodes[ nodeid ] == NULL )
+			continue;
+
+		if( m_nodes[ nodeid ]->m_flag == NULL )
+			continue;
+
+		if( m_nodes[ nodeid ]->m_flag->GetGUID() == pGo->GetGUID() )
+			break;
 	}
 
-	return false;
+	if( nodeid == AV_NUM_CONTROL_POINTS )
+		return false;
+
+	m_nodes[ nodeid ]->Assault(pPlayer);
+	
+	return true;
 }
 
 void AlteracValley::HookFlagDrop(Player * plr, GameObject * obj)

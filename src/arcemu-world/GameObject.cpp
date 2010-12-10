@@ -37,7 +37,6 @@ GameObject::GameObject( uint64 guid ){
 	SetAnimProgress( 100 );
 	m_wowGuid.Init( guid );
 	SetScale(  1 );
-	bannerslot = -1;
 	m_summonedGo = false;
 	invisible = false;
 	invisibilityFlag = INVIS_FLAG_NORMAL;
