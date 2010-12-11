@@ -56,6 +56,7 @@ namespace Arcemu{
 
 	private:
 		SpellEntry *spell;
+		uint32 targetupdatetimer;
 	};
 
 }

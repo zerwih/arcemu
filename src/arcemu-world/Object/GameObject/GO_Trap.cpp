@@ -23,10 +23,12 @@
 namespace Arcemu{
 	GO_Trap::GO_Trap() : GameObject(){
 		spell = NULL;
+		targetupdatetimer = 0;
 	}
 
 	GO_Trap::GO_Trap( uint64 GUID ) : GameObject( GUID ){
 		spell = NULL;
+		targetupdatetimer = 0;
 	}
 
 	GO_Trap::~GO_Trap(){
@@ -35,9 +37,8 @@ namespace Arcemu{
 	void GO_Trap::InitAI(){
 		spell = dbcSpell.LookupEntryForced(  pInfo->trap.spellId );
 		charges = pInfo->trap.charges;
-		
-		if( myScript == NULL )
-			myScript = sScriptMgr.CreateAIScriptClassForGameObject(GetEntry(), this);
+
+		GameObject::InitAI();
 	}
 
 	void GO_Trap::Update( unsigned long time_passed ){
@@ -56,6 +57,15 @@ namespace Arcemu{
 			return;
 
 		if( GetState() == 1 ){
+
+			targetupdatetimer += time_passed;
+
+			// Update targets only every 2 seconds
+			if( targetupdatetimer > 2000 )
+				targetupdatetimer = 0;
+
+			if( targetupdatetimer != 0 )
+				return;
 			
 			for( std::set< Object* >::iterator itr = m_objectsInRange.begin(); itr != m_objectsInRange.end(); ++itr ){
 				float dist;
