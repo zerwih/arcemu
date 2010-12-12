@@ -22,9 +22,11 @@
 
 namespace Arcemu{
 	GO_FishingNode::GO_FishingNode() : GO_Lootable(){
+		FishHooked = false;
 	}
 
 	GO_FishingNode::GO_FishingNode( uint64 GUID ) : GO_Lootable( GUID ){
+		FishHooked = false;
 	}
 
 	GO_FishingNode::~GO_FishingNode(){
@@ -34,7 +36,7 @@ namespace Arcemu{
 		sEventMgr.RemoveEvents( this );
 		
 		// Clicking on the bobber before something is hooked
-		if( ( GetFlags() & 32 ) == 0 ){
+		if( !FishHooked ){
 			EndFishing( true );
 			return false;
 		}
@@ -57,7 +59,7 @@ namespace Arcemu{
 		
 		SendMessageToSet( &data, false, false );
 
-		SetFlags( GetFlags() | 32 );
+		FishHooked = true;
 	}
 
 	bool GO_FishingNode::HasLoot(){

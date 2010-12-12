@@ -1513,6 +1513,8 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 					fn->EndFishing( true );
 				}
 
+			}else{
+				plyr->GetSession()->OutPacket( SMSG_FISH_NOT_HOOKED );
 			}
 
 

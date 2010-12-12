@@ -125,7 +125,6 @@
 #include "Object/GameObject/GO_Lootable.h"
 #include "Object/GameObject/GO_Chest.h"
 #include "Object/GameObject/GO_FishingHole.h"
-#include "Object/GameObject/GO_ILockable.h"
 #include "Object/GameObject/GO_Trap.h"
 #include "Object/GameObject/GO_SpellFocus.h"
 #include "Object/GameObject/GO_Questgiver.h"

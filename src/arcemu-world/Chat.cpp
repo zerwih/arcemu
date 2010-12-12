@@ -370,11 +370,14 @@ void CommandTableStorage::Init()
 	static ChatCommand GameObjectCommandTable[] =
 	{
 		{ "select",       'o', &ChatHandler::HandleGOSelect,       "Selects the nearest GameObject to you",    NULL, 0, 0, 0 },
+		{ "selectguid",   'o', &ChatHandler::HandleGOSelectByGUID, "Selects the GO with GUID",				   NULL, 0, 0, 0 },
+		{ "state",        'o', &ChatHandler::HandleGOState,        "Sets the state byte of the GO",            NULL, 0, 0 ,0 },
+		{ "flags",        'o', &ChatHandler::HandleGOFlags,        "Sets the flags of the GO",                 NULL, 0, 0, 0 },
 		{ "delete",       'o', &ChatHandler::HandleGODelete,       "Deletes selected GameObject",              NULL, 0, 0, 0 },
 		{ "spawn",        'o', &ChatHandler::HandleGOSpawn,        "Spawns a GameObject by ID",                NULL, 0, 0, 0 },
 		{ "phase",        'o', &ChatHandler::HandleGOPhaseCommand, "<phase> <save> - Phase selected GameObject", NULL, 0, 0, 0 },
 		{ "info",         'o', &ChatHandler::HandleGOInfo,         "Gives you information about selected GO", NULL, 0, 0, 0 },
-		{ "activate",     'o', &ChatHandler::HandleGOActivate,     "Activates/Opens the selected GO.",         NULL, 0, 0, 0 },
+		{ "open",     'o', &ChatHandler::HandleGOOpen,     "Opens/Closes the selected GO.",         NULL, 0, 0, 0 },
 		{ "enable",       'o', &ChatHandler::HandleGOEnable,       "Enables the selected GO for use.",         NULL, 0, 0, 0 },
 		{ "scale",        'o', &ChatHandler::HandleGOScale,        "Sets scale of selected GO",                NULL, 0, 0, 0 },
 		{ "animprogress", 'o', &ChatHandler::HandleGOAnimProgress, "Sets anim progress",                       NULL, 0, 0, 0 },

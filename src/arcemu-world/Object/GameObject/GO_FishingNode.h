@@ -83,6 +83,9 @@ namespace Arcemu{
 		bool IsLootable(){ return true; }
 
 		bool HasLoot();
+
+	private:
+		bool FishHooked;
 	};
 }
 
