@@ -277,13 +277,22 @@
     <ClCompile Include="..\..\src\arcemu-world\Chat.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\CObjectFactory.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\EquipmentSetMgr.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_QuestGiver.cpp">
@@ -448,9 +457,12 @@
     <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
     <ClInclude Include="..\..\src\arcemu-world\MiscHandler.h" />
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Lootable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Questgiver.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.h" />

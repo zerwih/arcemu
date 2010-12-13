@@ -18,39 +18,26 @@
  *
  */
 
-#ifndef GO_CHEST_HPP
-#define GO_CHEST_HPP
+#include "../../StdAfx.h"
 
 namespace Arcemu{
-	///////////////////////////////////////////////////////////////////
-	//class GO_Chest
-	//  class implementing type 3 (Chest) GameObjects
-	//
-	//////////////////////////////////////////////////////////////////
-	class GO_Chest : public GO_Lootable{
+	GO_Goober::GO_Goober() : GameObject(){
+	}
 
-	public:
-		GO_Chest();
+	GO_Goober::GO_Goober( uint64 GUID ) : GameObject( GUID ){
+	}
 
+	GO_Goober::~GO_Goober(){
+	}
 
-		GO_Chest( uint64 GUID );
+	void GO_Goober::Open(){
+		SetState( GAMEOBJECT_STATE_OPEN );
+		if( pInfo->goober.autoCloseTime != 0 )
+			sEventMgr.AddEvent( this, &GO_Goober::Close, EVENT_GAMEOBJECT_CLOSE, pInfo->goober.autoCloseTime, 1, 0 );
+	}
 
-
-		~GO_Chest();
- 
-
-		bool IsLootable(){ return true; }
-
-
-		bool HasLoot();
-
-
-		void Open();
-
-
-		void Close();
-
-	};
+	void GO_Goober::Close(){
+		sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_CLOSE );
+		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
 }
-
-#endif

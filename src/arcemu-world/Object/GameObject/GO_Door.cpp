@@ -18,39 +18,40 @@
  *
  */
 
-#ifndef GO_CHEST_HPP
-#define GO_CHEST_HPP
+#include "../../StdAfx.h"
 
 namespace Arcemu{
-	///////////////////////////////////////////////////////////////////
-	//class GO_Chest
-	//  class implementing type 3 (Chest) GameObjects
-	//
-	//////////////////////////////////////////////////////////////////
-	class GO_Chest : public GO_Lootable{
+	GO_Door::GO_Door() : GameObject(){
+	}
 
-	public:
-		GO_Chest();
+	GO_Door::GO_Door( uint64 GUID ) : GameObject( GUID ){
+	}
 
+	GO_Door::~GO_Door(){
+	}
 
-		GO_Chest( uint64 GUID );
+	void GO_Door::InitAI(){
+		GameObject::InitAI();
 
+		if( pInfo->door.startOpen != 0 )
+			SetState( 0 );
+		else
+			SetState( 1 );
+	}
 
-		~GO_Chest();
- 
+	void GO_Door::Open(){
+		SetState( GAMEOBJECT_STATE_OPEN );
+		if( pInfo->door.autoCloseTime != 0 )
+			sEventMgr.AddEvent( this, &GO_Door::Close, 0, pInfo->door.autoCloseTime, 1, 0 );
+	}
 
-		bool IsLootable(){ return true; }
+	void GO_Door::Close(){
+		sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_CLOSE );
+		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
 
+	void GO_Door::SpecialOpen(){
+		SetState( GAMEOBJECT_STATE_ALTERNATIVE_OPEN );
+	}
 
-		bool HasLoot();
-
-
-		void Open();
-
-
-		void Close();
-
-	};
 }
-
-#endif

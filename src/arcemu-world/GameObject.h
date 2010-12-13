@@ -521,6 +521,38 @@ public:
 	//
 	////////////////////////////////////////////////////////////////////
 	virtual bool IsLootable(){ return false; }
+	
+	/////////////////////////////////////////////////////////////
+	//virtual void Open()
+	//  Opens the GameObject
+	//  Opened GameObjects can be interacted with or passed thru
+	//
+	//Parameters
+	//  None.
+	//
+	//Return Value
+	//  None.
+	//
+	//
+	////////////////////////////////////////////////////////////
+	virtual void Open(){}
+	
+	
+	/////////////////////////////////////////////////////////////
+	//virtual void Close()
+	//  Closes the GameObject
+	//  Closed GameObjects cannot be interacted with or passed thru
+	//
+	//Parameters
+	//  None.
+	//
+	//Return Value
+	//  None.
+	//
+	//
+	////////////////////////////////////////////////////////////
+	virtual void Close(){}
+
 
 	void Update( unsigned long time_passed );
 
@@ -531,7 +563,6 @@ public:
 	void SaveToDB();
 	void DeleteFromDB();
 
-	void EventCloseDoor();
 	void SetRotation(float rad);
 	uint64 m_rotation;
 	void UpdateRotation();

@@ -496,6 +496,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -768,7 +771,6 @@
       <Filter>EventableObject\Object\Unit\Player</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
-    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_ILockable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Trap.h" />
     <ClInclude Include="..\..\src\arcemu-world\IUpdatable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellFocus.h" />
@@ -778,6 +780,9 @@
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Lootable.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Ritual.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />

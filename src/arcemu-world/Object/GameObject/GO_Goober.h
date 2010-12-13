@@ -18,39 +18,32 @@
  *
  */
 
-#ifndef GO_CHEST_HPP
-#define GO_CHEST_HPP
+#ifndef GO_GOOBER_HPP
+#define GO_GOOBER_HPP
 
 namespace Arcemu{
-	///////////////////////////////////////////////////////////////////
-	//class GO_Chest
-	//  class implementing type 3 (Chest) GameObjects
+	////////////////////////////////////////////////////////////////////
+	//clas GO_Goober
+	//  Class implementing Type 10 (GOOBER) GameObjects
 	//
-	//////////////////////////////////////////////////////////////////
-	class GO_Chest : public GO_Lootable{
-
+	////////////////////////////////////////////////////////////////////
+	class GO_Goober : public GameObject{
 	public:
-		GO_Chest();
+		GO_Goober();
 
 
-		GO_Chest( uint64 GUID );
+		GO_Goober( uint64 GUID );
 
 
-		~GO_Chest();
- 
-
-		bool IsLootable(){ return true; }
-
-
-		bool HasLoot();
+		~GO_Goober();
 
 
 		void Open();
 
 
 		void Close();
-
 	};
 }
 
 #endif
+

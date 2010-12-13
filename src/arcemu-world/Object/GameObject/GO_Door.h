@@ -18,31 +18,27 @@
  *
  */
 
-#ifndef GO_CHEST_HPP
-#define GO_CHEST_HPP
+#ifndef GO_DOOR_HPP
+#define GO_DOOR_HPP
 
 namespace Arcemu{
-	///////////////////////////////////////////////////////////////////
-	//class GO_Chest
-	//  class implementing type 3 (Chest) GameObjects
+	////////////////////////////////////////////////////////////////////////
+	//class GO_Door
+	//  Implements Type 0 (DOOR) GameObjects
 	//
-	//////////////////////////////////////////////////////////////////
-	class GO_Chest : public GO_Lootable{
-
+	////////////////////////////////////////////////////////////////////////
+	class GO_Door : public GameObject{
 	public:
-		GO_Chest();
+		GO_Door();
+
+		
+		GO_Door( uint64 GUID );
 
 
-		GO_Chest( uint64 GUID );
+		~GO_Door();
 
 
-		~GO_Chest();
- 
-
-		bool IsLootable(){ return true; }
-
-
-		bool HasLoot();
+		void InitAI();
 
 
 		void Open();
@@ -50,6 +46,19 @@ namespace Arcemu{
 
 		void Close();
 
+		
+		///////////////////////////////////////////////////////////////////
+		//void SpecialOpen()
+		//  Opens the door with a special way. Like an explosion.
+		//
+		//Parameters
+		//  None
+		//
+		//Return Value
+		//  None
+		//
+		///////////////////////////////////////////////////////////////////
+		void SpecialOpen();
 	};
 }
 

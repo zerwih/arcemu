@@ -43,4 +43,14 @@ namespace Arcemu{
 		}
 		return false;
 	}
+
+
+	void GO_Chest::Open(){
+		SetState( GAMEOBJECT_STATE_OPEN );
+	}
+
+
+	void GO_Chest::Close(){
+		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
 }

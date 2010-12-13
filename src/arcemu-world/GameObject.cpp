@@ -230,11 +230,6 @@ void GameObject::DeleteFromDB()
 		WorldDatabase.Execute("DELETE FROM gameobject_spawns WHERE id=%u", m_spawn->id);
 }
 
-void GameObject::EventCloseDoor(){
-	SetState( 1 );
-	RemoveFlag( GAMEOBJECT_FLAGS, 1 );
-}
-
 void GameObject::_Expire()
 {
 	sEventMgr.RemoveEvents(this);
