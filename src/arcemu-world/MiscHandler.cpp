@@ -1521,18 +1521,12 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		}break;
 	case GAMEOBJECT_TYPE_DOOR:
 		{
-			if( obj->GetState() == GAMEOBJECT_STATE_CLOSED )
-				obj->Open();
-			else
-				obj->Close();
+			obj->Use( plyr->GetGUID() );
 
 		}break;
 
 	case GAMEOBJECT_TYPE_BUTTON:{
-		if( obj->GetState() == GAMEOBJECT_STATE_OPEN )
-			obj->Close();
-		else
-			obj->Open();
+		obj->Use( plyr->GetGUID() );
 								}break;
 
 	case GAMEOBJECT_TYPE_FLAGSTAND:
@@ -1696,10 +1690,7 @@ void WorldSession::HandleGameObjectUse(WorldPacket & recv_data)
 		}break;
 	case GAMEOBJECT_TYPE_GOOBER:
 		{
-			if( obj->GetState() == GAMEOBJECT_STATE_OPEN )
-				obj->Close();
-			else
-				obj->Open();
+			obj->Use( plyr->GetGUID() );
 
 			plyr->CastSpell( guid, goinfo->raw.Unknown1, false );
 

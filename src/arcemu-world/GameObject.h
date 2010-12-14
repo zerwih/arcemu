@@ -521,37 +521,49 @@ public:
 	//
 	////////////////////////////////////////////////////////////////////
 	virtual bool IsLootable(){ return false; }
-	
-	/////////////////////////////////////////////////////////////
-	//virtual void Open()
-	//  Opens the GameObject
-	//  Opened GameObjects can be interacted with or passed thru
+
+	////////////////////////////////////////////////////////////////////
+	//virtual void Use( uint64 GUID )
+	//  Uses the GameObject
 	//
 	//Parameters
-	//  None.
+	//  uint64 GUID - GUID of the user
 	//
 	//Return Value
-	//  None.
+	//  None
 	//
 	//
-	////////////////////////////////////////////////////////////
-	virtual void Open(){}
-	
-	
-	/////////////////////////////////////////////////////////////
-	//virtual void Close()
-	//  Closes the GameObject
-	//  Closed GameObjects cannot be interacted with or passed thru
+	////////////////////////////////////////////////////////////////////
+	virtual void Use( uint64 GUID ){}
+
+	///////////////////////////////////////////////////////////////////
+	//void CastSpell( uint64 TargetGUID, SpellEntry *sp )
+	//  Makes the Trap try to cast a spell on a target
 	//
 	//Parameters
-	//  None.
+	//  uint64 TargetGUID  -  GUID of the Target Object
+	//  SpellEntry *sp     -  Spell's prototype ( spell.dbc entry struct )
 	//
 	//Return Value
-	//  None.
+	//  None
 	//
+	////////////////////////////////////////////////////////////////////
+	void CastSpell( uint64 TargetGUID, SpellEntry *sp );
+
+
+	///////////////////////////////////////////////////////////////////
+	//void CastSpell( uint64 TargetGUID, uint32 SpellID )
+	//  Makes the Trap try to cast a spell on a target
 	//
-	////////////////////////////////////////////////////////////
-	virtual void Close(){}
+	//Parameters
+	//  uint64 TargetGUID  -  GUID of the Target Object
+	//  uint32 SpellId     -  Identifier of the spell to cast
+	//
+	//Return Value
+	//  None
+	//
+	////////////////////////////////////////////////////////////////////
+	void CastSpell( uint64 TargetGUID, uint32 SpellID );
 
 
 	void Update( unsigned long time_passed );
@@ -639,7 +651,6 @@ public:
 	uint32 GetOverrides() { return m_overrides; }
 
 protected:
-
 	bool m_summonedGo;
 	bool m_deleted;
 	GameObjectInfo *pInfo;

@@ -285,11 +285,10 @@ void GameObject::OnRemoveInRangeObject(Object* pObj)
 //! Remove gameobject from world, using their despawn animation.
 void GameObject::RemoveFromWorld(bool free_guid)
 {
-	WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
-	data << GetGUID();
-	SendMessageToSet(&data,true);
+	WorldPacket data( SMSG_GAMEOBJECT_DESPAWN_ANIM, 8 );
+	data << uint64( GetGUID() );
+	SendMessageToSet( &data, true );
 
-	sEventMgr.RemoveEvents(this, EVENT_GAMEOBJECT_TRAP_SEARCH_TARGET);
 	Object::RemoveFromWorld(free_guid);
 }
 
@@ -341,4 +340,26 @@ void GameObject::UpdateRotation()
 		SetParentRotation(2, r2);
 		SetParentRotation(3, r3);
 	}
+}
+
+void GameObject::CastSpell( uint64 TargetGUID, SpellEntry *sp ){
+	Spell *s = new Spell( this, sp, true, NULL );
+	
+	SpellCastTargets tgt( TargetGUID );
+	
+	tgt.m_destX = GetPositionX();
+	tgt.m_destY = GetPositionY();
+	tgt.m_destZ = GetPositionZ();
+
+	s->prepare( &tgt );
+}
+
+void GameObject::CastSpell( uint64 TargetGUID, uint32 SpellID ){
+	SpellEntry *sp = dbcSpell.LookupEntryForced( SpellID );
+	if( sp == NULL ){
+		sLog.outError("GameObject %u tried to cast a non-existing Spell %u.", pInfo->ID, SpellID );
+		return;
+	}
+
+	CastSpell( TargetGUID, sp );
 }

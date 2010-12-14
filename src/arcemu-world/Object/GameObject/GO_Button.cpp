@@ -26,6 +26,7 @@ namespace Arcemu{
 	}
 
 	GO_Button::GO_Button( uint64 GUID ) : GameObject( GUID ){
+		spell = NULL;
 	}
 
 	GO_Button::~GO_Button(){
@@ -37,6 +38,15 @@ namespace Arcemu{
 
 		if( pInfo->button.startOpen != 0 )
 			SetState( GAMEOBJECT_STATE_OPEN );
+
+		if( pInfo->button.linkedTrapId != 0 ){
+			GameObjectInfo *i = GameObjectNameStorage.LookupEntry( pInfo->button.linkedTrapId );
+			
+			if( i != NULL ){
+				if( i->trap.spellId != 0 )
+					spell = dbcSpell.LookupEntryForced( i->trap.spellId );
+			}
+		}
 	}
 
 
@@ -49,5 +59,18 @@ namespace Arcemu{
 	void GO_Button::Close(){
 		sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_CLOSE );
 		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
+
+
+	void GO_Button::Use( uint64 GUID ){
+		if( GetState() == GAMEOBJECT_STATE_CLOSED ){
+			Open();
+			
+			if( spell != NULL )
+				CastSpell( GUID, spell );
+
+		}else{
+			Close();
+		}
 	}
 }

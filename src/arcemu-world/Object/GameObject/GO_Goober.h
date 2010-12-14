@@ -37,11 +37,20 @@ namespace Arcemu{
 
 		~GO_Goober();
 
+		void InitAI();
+
+
+		void Use( uint64 GUID );
+
 
 		void Open();
 
 
 		void Close();
+
+	private:
+		SpellEntry *spell;
+
 	};
 }
 

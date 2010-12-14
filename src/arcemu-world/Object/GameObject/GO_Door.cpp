@@ -54,4 +54,10 @@ namespace Arcemu{
 		SetState( GAMEOBJECT_STATE_ALTERNATIVE_OPEN );
 	}
 
+	void GO_Door::Use( uint64 GUID ){
+		if( GetState() == GAMEOBJECT_STATE_CLOSED )
+			Open();
+		else
+			Close();
+	}
 }

@@ -25,9 +25,23 @@ namespace Arcemu{
 	}
 
 	GO_Chest::GO_Chest( uint64 GUID ) : GO_Lootable( GUID ){
+		spell = NULL;
 	}
 
 	GO_Chest::~GO_Chest(){
+	}
+
+	void GO_Chest::InitAI(){
+		GameObject::InitAI();
+
+		if( pInfo->chest.linkedTrapId != 0 ){
+			GameObjectInfo *i = GameObjectNameStorage.LookupEntry( pInfo->chest.linkedTrapId );
+			
+			if( i != NULL ){
+				if( i->trap.spellId != 0 )
+					spell = dbcSpell.LookupEntryForced( i->trap.spellId );
+			}
+		}
 	}
 
 	bool GO_Chest::HasLoot(){
@@ -52,5 +66,18 @@ namespace Arcemu{
 
 	void GO_Chest::Close(){
 		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
+
+
+	void GO_Chest::Use( uint64 GUID ){
+		if( GetState() == GAMEOBJECT_STATE_CLOSED ){
+			Open();
+
+			if( spell != NULL )
+				CastSpell( GUID, spell );
+		}
+		else{
+			Close();
+		}
 	}
 }

@@ -25,9 +25,24 @@ namespace Arcemu{
 	}
 
 	GO_Goober::GO_Goober( uint64 GUID ) : GameObject( GUID ){
+		spell = NULL;
 	}
 
 	GO_Goober::~GO_Goober(){
+	}
+
+
+	void GO_Goober::InitAI(){
+		GameObject::InitAI();
+
+		if( pInfo->goober.linkedTrapId != 0 ){
+			GameObjectInfo *i = GameObjectNameStorage.LookupEntry( pInfo->goober.linkedTrapId );
+			
+			if( i != NULL ){
+				if( i->trap.spellId != 0 )
+					spell = dbcSpell.LookupEntryForced( i->trap.spellId );
+			}
+		}
 	}
 
 	void GO_Goober::Open(){
@@ -39,5 +54,19 @@ namespace Arcemu{
 	void GO_Goober::Close(){
 		sEventMgr.RemoveEvents( this, EVENT_GAMEOBJECT_CLOSE );
 		SetState( GAMEOBJECT_STATE_CLOSED );
+	}
+
+
+	void GO_Goober::Use( uint64 GUID ){
+		if( GetState() == GAMEOBJECT_STATE_CLOSED ){
+			Open();
+
+			if( spell != NULL ){
+				CastSpell( GUID, spell );
+			}
+
+		}else{
+			Close();
+		}
 	}
 }

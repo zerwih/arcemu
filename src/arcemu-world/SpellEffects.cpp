@@ -2572,19 +2572,15 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			if( gameObjTarget == NULL )
 				return;
 
-			if( gameObjTarget->GetState() == GAMEOBJECT_STATE_OPEN )
-				gameObjTarget->Close();
+			gameObjTarget->Use( m_caster->GetGUID() );
 		}
 		break;
 	default://not profession
 		{
-			if(!gameObjTarget )
+			if( gameObjTarget == NULL )
 				return;
 
-			if( gameObjTarget->GetState() == GAMEOBJECT_STATE_OPEN )
-				gameObjTarget->Close();
-			else
-				gameObjTarget->Open();
+			gameObjTarget->Use( m_caster->GetGUID() );
 
 			CALL_GO_SCRIPT_EVENT(gameObjTarget, OnActivate)( p_caster );
 			CALL_INSTANCE_SCRIPT_EVENT( gameObjTarget->GetMapMgr(), OnGameObjectActivate )( gameObjTarget, p_caster ); 

@@ -37,6 +37,9 @@ namespace Arcemu{
 
 
 		~GO_Chest();
+
+
+		void InitAI();
  
 
 		bool IsLootable(){ return true; }
@@ -45,11 +48,16 @@ namespace Arcemu{
 		bool HasLoot();
 
 
+		void Use( uint64 GUID );
+
+
 		void Open();
 
 
 		void Close();
 
+	private:
+		SpellEntry *spell;
 	};
 }
 
