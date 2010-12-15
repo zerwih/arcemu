@@ -2936,7 +2936,10 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 {
 	//these are some creatures that have your faction and do not respawn
 	//number of creatures is actually dmg (the usual formula), sometimes =3 sometimes =1
-	if( u_caster == NULL || !u_caster->IsInWorld() )
+	//if( u_caster == NULL || !u_caster->IsInWorld() )
+	//	return;
+
+	if( ( !m_caster->IsGameObject() && !m_caster->IsUnit() ) || !m_caster->IsInWorld() )
 		return;
 
 	uint32 cr_entry = GetProto()->EffectMiscValue[i];
@@ -2956,17 +2959,19 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 	}
 	else
 	{
-		x = u_caster->GetPositionX();
-		y = u_caster->GetPositionY();
-		z = u_caster->GetPositionZ();
+		x = m_caster->GetPositionX();
+		y = m_caster->GetPositionY();
+		z = m_caster->GetPositionZ();
 	}
 	for(int j= 0;j<damage;j++)
 	{
 		float m_fallowAngle=-((float(M_PI)/2)*j);
-		float tempx = x + (GetRadius(i)*(cosf(m_fallowAngle+u_caster->GetOrientation())));
-		float tempy = y + (GetRadius(i)*(sinf(m_fallowAngle+u_caster->GetOrientation())));
-		Creature * p = u_caster->GetMapMgr()->CreateCreature(cr_entry);
-		//Arcemu::Util::ARCEMU_ASSERT(   p);
+		float tempx = x + (GetRadius(i)*(cosf(m_fallowAngle+m_caster->GetOrientation())));
+		float tempy = y + (GetRadius(i)*(sinf(m_fallowAngle+m_caster->GetOrientation())));
+		Creature * p = m_caster->GetMapMgr()->CreateCreature(cr_entry);
+		
+		Arcemu::Util::ARCEMU_ASSERT( p );
+		
 		p->Load(proto, tempx, tempy, z);
 		p->SetZoneId( m_caster->GetZoneId() );
 
@@ -2974,13 +2979,17 @@ void Spell::SpellEffectSummonWild(uint32 i)  // Summon Wild
 		{
 			p->SetSummonedByGUID( m_caster->GetGUID() );
 			p->SetCreatedByGUID( m_caster->GetGUID() );
-			p->SetFaction(u_caster->GetFaction( ) );
+
+			if( m_caster->IsGameObject() )
+				p->SetFaction( TO_GAMEOBJECT( m_caster )->GetFaction() );
+			else
+				p->SetFaction( TO_UNIT( m_caster )->GetFaction( ) );
 		}
 		else
 		{
 			p->SetFaction(proto->Faction );
 		}
-		p->PushToWorld(u_caster->GetMapMgr());
+		p->PushToWorld( m_caster->GetMapMgr());
 		//make sure they will be desummoned (roxor)
 		sEventMgr.AddEvent(p, &Creature::SummonExpire, EVENT_SUMMON_EXPIRE, GetDuration(), 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 	}
