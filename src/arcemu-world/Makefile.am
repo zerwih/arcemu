@@ -76,13 +76,18 @@ arcemu_world_SOURCES = \
     faction.cpp \
     GameObject.cpp \
     GameObject.h \
+    Object/GameObject/GO_Button.cpp \
+    Object/GameObject/GO_Button.h \
     Object/GameObject/GO_Chest.cpp \
     Object/GameObject/GO_Chest.h \
+    Object/GameObject/GO_Door.cpp \
+    Object/GameObject/GO_Door.h \
     Object/GameObject/GO_FishingHole.cpp \
     Object/GameObject/GO_FishingHole.h \
     Object/GameObject/GO_FishingNode.cpp \
     Object/GameObject/GO_FishingNode.h \
-    Object/GameObject/GO_ILockable.h \
+    Object/GameObject/GO_Goober.cpp
+    Object/GameObject/GO_Goober.h \
     Object/GameObject/GO_Lootable.h \
     Object/GameObject/GO_QuestGiver.cpp \
     Object/GameObject/GO_Questgiver.h \
