@@ -350,6 +350,7 @@ protected:
 	bool HandleGOMove(const char * args, WorldSession * m_session);
 	bool HandleGOState( const char *args, WorldSession *m_session );
 	bool HandleGOFlags( const char *args, WorldSession *m_session );
+	bool HandleGOFaction( const char *args, WorldSession *m_session );
 	////////////////////////////////////////////////////////////////////////////////////////
 
 	bool HandleAddAIAgentCommand(const char* args, WorldSession *m_session);
