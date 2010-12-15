@@ -216,6 +216,7 @@ enum MsTimeVariables
 #include <algorithm>
 #include <cstring>
 #include <climits>
+#include <cfloat>
 #include <cstdlib>
 //#include <iostream>
 

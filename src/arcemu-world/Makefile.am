@@ -86,7 +86,7 @@ arcemu_world_SOURCES = \
     Object/GameObject/GO_FishingHole.h \
     Object/GameObject/GO_FishingNode.cpp \
     Object/GameObject/GO_FishingNode.h \
-    Object/GameObject/GO_Goober.cpp
+    Object/GameObject/GO_Goober.cpp \
     Object/GameObject/GO_Goober.h \
     Object/GameObject/GO_Lootable.h \
     Object/GameObject/GO_QuestGiver.cpp \
