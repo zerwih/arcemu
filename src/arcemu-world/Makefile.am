@@ -53,6 +53,8 @@ arcemu_world_SOURCES = \
     Chat.cpp \
     Chat.h \
     ChatHandler.cpp \
+    CObjectFactory.cpp \
+    CObjectFactory.h \
     CombatHandler.cpp \
     Container.cpp \
     Container.h \
