@@ -40,7 +40,7 @@ bool Pestilence(uint32 i, Spell* pSpell)
 		{
 			if(!(*itr)->IsUnit())
 				continue;
-			Unit* Target = static_cast<Unit*>((*itr));
+			Unit* Target = TO< Unit* >((*itr));
 			if(Main->GetGUID() == Target->GetGUID() && !u_caster->HasAura(63334))
 				continue;
 			if(isAttackable(Target, u_caster) && u_caster->CalcDistance((*itr)) <= (pSpell->GetRadius(i) + inc))
@@ -163,7 +163,7 @@ bool DeathGrip( uint32 i, Spell *s ){
 	
 	if(unitTarget->IsPlayer())
 	{
-		Player *playerTarget = static_cast<Player*>(unitTarget);
+		Player *playerTarget = TO< Player* >(unitTarget);
 		
 		if(playerTarget->m_CurrentTransporter) // Blizzard screwed this up, so we won't.
 			return false;
@@ -255,7 +255,7 @@ bool DeathCoil( uint32 i, Spell *s ){
 		s->u_caster->SpellNonMeleeDamageLog( unitTarget, s->GetProto()->Id, s->damage, true );
 	else if( unitTarget->IsCreature() )
 	{
-		CreatureInfo * ci = static_cast< Creature* >( unitTarget )->GetCreatureInfo();
+		CreatureInfo * ci = TO< Creature* >( unitTarget )->GetCreatureInfo();
 		if( ci->Type == UNIT_TYPE_UNDEAD )
 			s->u_caster->Heal( unitTarget, s->GetProto()->Id, float2int32( s->damage * 1.5f ) );
 	}

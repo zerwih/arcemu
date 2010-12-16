@@ -1104,8 +1104,8 @@ bool ChatHandler::HandleParalyzeCommand(const char* args, WorldSession *m_sessio
 	}
 
 	BlueSystemMessage(m_session, "Rooting target.");
-	BlueSystemMessageToPlr( static_cast< Player* >( plr ), "You have been rooted by %s.", m_session->GetPlayer()->GetName() );
-	sGMLog.writefromsession( m_session, "rooted player %s", static_cast< Player* >( plr )->GetName() );
+	BlueSystemMessageToPlr( TO< Player* >( plr ), "You have been rooted by %s.", m_session->GetPlayer()->GetName() );
+	sGMLog.writefromsession( m_session, "rooted player %s", TO< Player* >( plr )->GetName() );
 	WorldPacket data;
 	data.Initialize(SMSG_FORCE_MOVE_ROOT);
 	data << plr->GetNewGUID();
@@ -1127,8 +1127,8 @@ bool ChatHandler::HandleUnParalyzeCommand(const char* args, WorldSession *m_sess
 	}
 
 	BlueSystemMessage(m_session, "Unrooting target.");
-	BlueSystemMessageToPlr( static_cast< Player* >( plr ), "You have been unrooted by %s.", m_session->GetPlayer()->GetName() );
-	sGMLog.writefromsession( m_session, "unrooted player %s", static_cast< Player* >( plr )->GetName() );
+	BlueSystemMessageToPlr( TO< Player* >( plr ), "You have been unrooted by %s.", m_session->GetPlayer()->GetName() );
+	sGMLog.writefromsession( m_session, "unrooted player %s", TO< Player* >( plr )->GetName() );
 	WorldPacket data;
 	data.Initialize(SMSG_FORCE_MOVE_UNROOT);
 	data << plr->GetNewGUID();
@@ -1775,7 +1775,7 @@ bool ChatHandler::HandleDismissPetCommand(const char* args, WorldSession* m_sess
 		}
 		if(pCrt->IsPet())
 		{
-			pPet = (Pet*)pCrt;
+			pPet = TO< Pet* >(pCrt);
 		}
 		if(!pPet)
 		{
@@ -1826,7 +1826,7 @@ bool ChatHandler::HandlePetLevelCommand(const char* args, WorldSession* m_sessio
 		}
 		if(pCrt->IsPet())
 		{
-			pPet = (Pet*)pCrt;
+			pPet = TO< Pet* >(pCrt);
 		}
 		if(!pPet)
 		{
@@ -2091,7 +2091,7 @@ bool ChatHandler::HandleCastAllCommand(const char* args, WorldSession* m_session
 		{
 			if(plr->GetMapMgr() != m_session->GetPlayer()->GetMapMgr())
 			{
-				sEventMgr.AddEvent( static_cast< Unit* >( plr ), &Unit::EventCastSpell, static_cast< Unit* >( plr ), info, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+				sEventMgr.AddEvent( TO< Unit* >( plr ), &Unit::EventCastSpell, TO< Unit* >( plr ), info, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 			}
 			else
 			{
@@ -3254,10 +3254,10 @@ bool ChatHandler::HandleNpcPossessCommand(const char * args, WorldSession * m_se
 	switch( pTarget->GetTypeId() )
 	{
 		case TYPEID_PLAYER:
-			sGMLog.writefromsession( m_session, "used possess command on PLAYER %s", static_cast< Player* >( pTarget )->GetName() );
+			sGMLog.writefromsession( m_session, "used possess command on PLAYER %s", TO< Player* >( pTarget )->GetName() );
 			break;
 		case TYPEID_UNIT:
-			sGMLog.writefromsession( m_session, "used possess command on CREATURE %s, sqlid %u", static_cast< Creature* >( pTarget )->GetCreatureInfo()->Name, static_cast< Creature* >( pTarget )->GetSQL_id() );
+			sGMLog.writefromsession( m_session, "used possess command on CREATURE %s, sqlid %u", TO< Creature* >( pTarget )->GetCreatureInfo()->Name, TO< Creature* >( pTarget )->GetSQL_id() );
 			break;
 	}
 	return true;
@@ -3696,7 +3696,7 @@ bool ChatHandler::HandleDispelAllCommand(const char * args, WorldSession * m_ses
 		{
 			if(plr->GetMapMgr() != m_session->GetPlayer()->GetMapMgr())
 			{
-				sEventMgr.AddEvent( static_cast< Unit* >( plr ), &Unit::DispelAll, pos ? true : false, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+				sEventMgr.AddEvent( TO< Unit* >( plr ), &Unit::DispelAll, pos ? true : false, EVENT_PLAYER_CHECKFORCHEATS, 100, 1,EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 			}
 			else
 			{

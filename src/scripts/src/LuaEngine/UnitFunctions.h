@@ -327,7 +327,7 @@ namespace luaUnit
 		plr->GetSession()->SendChatPacket(data, 1, lang, plr->GetSession());
 		for(set< Object* >::iterator itr = plr->GetInRangePlayerSetBegin(); itr != plr->GetInRangePlayerSetEnd(); ++itr)
 		{
-			(static_cast< Player* >(*itr))->GetSession()->SendChatPacket(data, 1, lang, plr->GetSession());
+			(TO< Player* >(*itr))->GetSession()->SendChatPacket(data, 1, lang, plr->GetSession());
 		}
 		return 0;
 	}
@@ -1199,7 +1199,7 @@ namespace luaUnit
 		{
 			for (uint8 contslot = INVENTORY_SLOT_BAG_START; contslot != INVENTORY_SLOT_BAG_END; contslot++)
 			{
-				Container * bag = static_cast<Container*>(plr->GetItemInterface()->GetInventoryItem(contslot));
+				Container * bag = TO< Container* >(plr->GetItemInterface()->GetInventoryItem(contslot));
 				for (uint8 bslot = 0; bslot != bag->GetNumSlots(); bslot++)
 				{
 					if (bag->GetItem(bslot) && bag->GetItem(bslot)->GetEntry() == entry)
@@ -1656,7 +1656,7 @@ namespace luaUnit
 
 						//if(qst->count_required_item || qst_giver->GetTypeId() == TYPEID_GAMEOBJECT)	// gameobject quests deactivate
 						//	plr->UpdateNearbyGameObjects();
-						//ScriptSystem->OnQuestEvent(qst, static_cast< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);
+						//ScriptSystem->OnQuestEvent(qst, TO< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);
 					
 						sHookInterface.OnQuestAccept( plr, qst, NULL );
 
@@ -4063,7 +4063,7 @@ namespace luaUnit
 			{
 				if( pItem->IsContainer() )
 				{
-					pContainer = static_cast<Container*>( pItem );
+					pContainer = TO< Container* >( pItem );
 					for( j = 0; j < pContainer->GetProto()->ContainerSlots; ++j )
 					{
 						pItem = pContainer->GetItem( j );

@@ -1211,7 +1211,7 @@ ARCEMU_INLINE bool TargetTypeCheck(Object *obj,uint32 ReqCreatureTypeMask)
 
 	if( obj->IsCreature() )
 	{
-		CreatureInfo* inf = static_cast< Creature* >( obj )->GetCreatureInfo();
+		CreatureInfo* inf = TO< Creature* >( obj )->GetCreatureInfo();
 		if( !( 1 << ( inf->Type - 1 ) & ReqCreatureTypeMask ) )
 			return false;
 	}
@@ -1302,7 +1302,8 @@ enum DISPEL_TYPE
 
 enum MECHANICS
 {
-    MECHANIC_CHARMED = 1,
+	MECHANIC_NONE = 0,
+    MECHANIC_CHARMED, // 1
     MECHANIC_DISORIENTED, // 2
     MECHANIC_DISARMED, // 3
     MECHANIC_DISTRACED, // 4

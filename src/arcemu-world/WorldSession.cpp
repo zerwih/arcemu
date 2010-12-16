@@ -28,30 +28,29 @@ OpcodeHandler WorldPacketHandlers[NUM_MSG_TYPES];
 
 WorldSession::WorldSession(uint32 id, string Name, WorldSocket *sock)
 :
-_player(0),
+m_loggingInPlayer(NULL),
+m_currMsTime(getMSTime()),
+bDeleted(false),
+m_moveDelayTime(0),
+m_clientTimeDelay(0),
+m_bIsWLevelSet(false),
+_player(NULL),
 _socket(sock),
 _accountId(id),
 _accountName(Name),
+has_level_55_char(false),
+_side(-1),
 _logoutTime(0),
 permissions(NULL),
 permissioncount(0),
 _loggingOut(false),
 LoggingOut(false),
 instanceId(0),
-
-m_currMsTime(getMSTime()),
-bDeleted(false),
-m_bIsWLevelSet(false),
+_updatecount(0),
 floodLines(0),
 floodTime(UNIXTIME),
-_updatecount(0),
-m_moveDelayTime(0),
-m_clientTimeDelay(0),
-m_loggingInPlayer(NULL),
 language(0),
-m_muted(0),
-_side(-1),
-has_level_55_char(false)
+m_muted(0)
 
 {
 	memset(movement_packet, 0, sizeof(movement_packet));
@@ -262,15 +261,15 @@ void WorldSession::LogoutPlayer(bool Save)
 				switch( obj->GetTypeId() )
 				{
 				case TYPEID_UNIT:
-					static_cast< Creature* >( obj )->loot.looters.erase( _player->GetLowGUID() );
+					TO< Creature* >( obj )->loot.looters.erase( _player->GetLowGUID() );
 					break;
 				case TYPEID_GAMEOBJECT:
-					GameObject *go = TO_GAMEOBJECT( obj );
+					GameObject *go = TO< GameObject* >( obj );
 					
 					if( !go->IsLootable() )
 						break;
 
-					Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( go );
+					Arcemu::GO_Lootable *pLGO = TO< Arcemu::GO_Lootable* >( go );
 
 					pLGO->loot.looters.erase( _player->GetLowGUID() );
 					break;
@@ -1224,7 +1223,7 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
 	CHECK_INWORLD_RETURN
 	
     uint32 skill_line;
-	uint32 points_remaining=_player->GetTalentPoints(SPEC_SECONDARY);
+	uint32 points_remaining=_player->GetPrimaryProfessionPoints();
 	recv_data >> skill_line;
 
 	// Cheater detection
@@ -1237,14 +1236,14 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
 	_player->_RemoveSkillLine(skill_line);
 
 	//added by Zack : This is probably wrong or already made elsewhere : restore skill learnability
-	if(points_remaining==_player->GetTalentPoints(SPEC_SECONDARY))
+	if(points_remaining==_player->GetPrimaryProfessionPoints())
 	{
 		//we unlearned a skill so we enable a new one to be learned
 		skilllineentry *sk=dbcSkillLine.LookupEntryForced(skill_line);
 		if(!sk)
 			return;
 		if(sk->type==SKILL_TYPE_PROFESSION && points_remaining<2)
-			_player->SetTalentPoints(SPEC_SECONDARY, points_remaining+1);
+			_player->SetPrimaryProfessionPoints(points_remaining+1);
 	}
 }
 

@@ -473,14 +473,14 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			if( !u_caster || !u_caster->IsPet() )
 				return;
 
-			//static_cast<Pet*>(u_caster)->Dismiss( true );
+			//TO< Pet* >(u_caster)->Dismiss( true );
 
 			SpellEntry * se = dbcSpell.LookupEntry(5);
-			if( static_cast< Pet* >( u_caster )->GetPetOwner() == NULL )
+			if( TO< Pet* >( u_caster )->GetPetOwner() == NULL )
 				return;
 
 			SpellCastTargets targets( u_caster->GetGUID() );
-			Spell * sp = new Spell( static_cast< Pet* >( u_caster )->GetPetOwner(), se, true, 0 );
+			Spell * sp = new Spell( TO< Pet* >( u_caster )->GetPetOwner(), se, true, 0 );
 			sp->prepare( &targets );
 			return;
 		}break;
@@ -489,7 +489,7 @@ void Spell::SpellEffectInstantKill(uint32 i)
 			if( !p_caster || !p_caster->IsPlayer() || !unitTarget || !unitTarget->IsPet() )
 				return;
 
-			//static_cast<Pet*>(unitTarget)->Dismiss( true );
+			//TO< Pet* >(unitTarget)->Dismiss( true );
 
 			SpellEntry * se = dbcSpell.LookupEntry(5);
 
@@ -680,7 +680,7 @@ void Spell::SpellEffectSchoolDMG(uint32 i) // dmg school
 							30 times the player's level and caps the maximum damage benefit from shield
 							block value at 34.5 times the player's level. 
 						*/
-						int32 max_blockable_damage = static_cast< int >( p_caster->getLevel() )  * float2int32(34.5f);
+						int32 max_blockable_damage = static_cast< int32 >( p_caster->getLevel() * 34.5f);
 						if ( blockable_damage > max_blockable_damage )
 						{
 							blockable_damage = max_blockable_damage;
@@ -923,7 +923,7 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 	{
 		if( u_caster != NULL && ( u_caster != unitTarget ) )
 		{
-			Creature * c = static_cast< Creature * >( unitTarget );
+			Creature * c = TO< Creature* >( unitTarget );
 			/*
 			Charm (Mind Control, enslave demon): 1
 			Confuse (Blind etc): 2
@@ -1058,8 +1058,8 @@ void Spell::SpellEffectApplyAura(uint32 i)  // Apply Aura
 
 #ifdef GM_Z_DEBUG_DIRECTLY
 	else {
-		if( unitTarget->IsPlayer() && unitTarget->IsInWorld() && static_cast< Player* >( unitTarget )->GetSession() && static_cast< Player* >( unitTarget )->GetSession()->CanUseCommand('z')  ) {
-			sChatHandler.BlueSystemMessage( static_cast< Player* >( unitTarget  )->GetSession(), "[%sSystem%s] |rSpell::SpellEffectApplyAura: %s EffectApplyAuraName [%u] .", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE,
+		if( unitTarget->IsPlayer() && unitTarget->IsInWorld() && TO< Player* >( unitTarget )->GetSession() && TO< Player* >( unitTarget )->GetSession()->CanUseCommand('z')  ) {
+			sChatHandler.BlueSystemMessage( TO< Player* >( unitTarget  )->GetSession(), "[%sSystem%s] |rSpell::SpellEffectApplyAura: %s EffectApplyAuraName [%u] .", MSG_COLOR_WHITE, MSG_COLOR_LIGHTBLUE, MSG_COLOR_SUBWHITE,
 				i );
 		}
 	}
@@ -1138,12 +1138,12 @@ void Spell::SpellEffectPowerDrain(uint32 i)  // Power Drain
 	uint32 curPower = unitTarget->GetUInt32Value(powerField);
 	if( powerField == UNIT_FIELD_POWER1 && unitTarget->IsPlayer() )
 	{
-		Player* mPlayer = static_cast< Player* >( unitTarget );
+		Player* mPlayer = TO< Player* >( unitTarget );
 		if( mPlayer->IsInFeralForm() )
 			return;
 
 		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
-		damage = float2int32( damage * (1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) ) );
+		damage = float2int32( damage * (1 - ( ( TO< Player* >(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) ) );
 	}
 	uint32 amt = damage + ( ( u_caster->GetDamageDoneMod( GetProto()->School ) * 80 ) / 100 );
 	if(amt>curPower)
@@ -1263,7 +1263,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
 					break;
 
-				Player* mPlayer = static_cast< Player* >( unitTarget );
+				Player* mPlayer = TO< Player* >( unitTarget );
 				if( !mPlayer->IsInFeralForm() || (
 					mPlayer->GetShapeShift() != FORM_CAT &&
 					mPlayer->GetShapeShift() != FORM_BEAR &&
@@ -1278,7 +1278,7 @@ void Spell::SpellEffectHeal(uint32 i) // Heal
 			{
 				if (!unitTarget->IsPlayer() || !unitTarget->isAlive())
 					break;
-				Player* mPlayer = static_cast< Player* >( unitTarget );
+				Player* mPlayer = TO< Player* >( unitTarget );
 				if (!mPlayer->IsInFeralForm() ||
 					(mPlayer->GetShapeShift() != FORM_BEAR &&
 					mPlayer->GetShapeShift() != FORM_DIREBEAR))
@@ -1437,11 +1437,11 @@ void Spell::SpellEffectResurrect(uint32 i) // Resurrect (Flat)
 					unitTarget->SetPower( POWER_TYPE_MANA, mana);
 					unitTarget->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
 					unitTarget->setDeathState(ALIVE);
-					static_cast<Creature*>(unitTarget)->UnTag();
-					static_cast<Creature*>(unitTarget)->loot.gold= 0;
-					static_cast<Creature*>(unitTarget)->loot.looters.clear();
-					static_cast<Creature*>(unitTarget)->loot.items.clear();
-					static_cast<Creature*>(unitTarget)->SetLimboState(false); // we can regenerate health now
+					TO< Creature* >(unitTarget)->UnTag();
+					TO< Creature* >(unitTarget)->loot.gold= 0;
+					TO< Creature* >(unitTarget)->loot.looters.clear();
+					TO< Creature* >(unitTarget)->loot.items.clear();
+					TO< Creature* >(unitTarget)->SetLimboState(false); // we can regenerate health now
 				}
 			}
 
@@ -2395,9 +2395,9 @@ void Spell::SpellEffectTriggerMissile(uint32 i) // Trigger Missile
 	// TODO: Following should be / is probably in SpellTarget code
 	for(std::set<Object*>::iterator itr = m_caster->GetInRangeSetBegin(); itr != m_caster->GetInRangeSetEnd(); itr++ )
 	{
-		if(!((*itr)->IsUnit()) || !static_cast<Unit*>((*itr))->isAlive())
+		if(!((*itr)->IsUnit()) || !TO< Unit* >((*itr))->isAlive())
 			continue;
-		Unit *t= static_cast<Unit*>((*itr));
+		Unit *t= TO< Unit* >((*itr));
 
 		float r;
 		float d=m_targets.m_destX-t->GetPositionX();
@@ -2503,7 +2503,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			}else{
 
 				if( gameObjTarget->IsLootable() ){
-					Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( gameObjTarget );
+					Arcemu::GO_Lootable *pLGO = TO< Arcemu::GO_Lootable* >( gameObjTarget );
 					
 					if( pLGO->loot.items.size() == 0 ){
 						if( gameObjTarget->GetMapMgr() != NULL )
@@ -2529,11 +2529,11 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 			uint32 v = gameObjTarget->GetGOReqSkill();
 			bool bAlreadyUsed = false;
 			
-			if( static_cast< Player* >( m_caster )->_GetSkillLineCurrent( SKILL_MINING ) < v ){
+			if( TO< Player* >( m_caster )->_GetSkillLineCurrent( SKILL_MINING ) < v ){
 				//SendCastResult(SPELL_FAILED_LOW_CASTLEVEL);
 				return;
 			}else if( gameObjTarget->IsLootable() ){
-				Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( gameObjTarget );
+				Arcemu::GO_Lootable *pLGO = TO< Arcemu::GO_Lootable* >( gameObjTarget );
 				
 				if( pLGO->loot.items.size() == 0  ){
 					if( gameObjTarget->GetMapMgr() != NULL )
@@ -2609,7 +2609,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 		break;
 	};
 	if( gameObjTarget && gameObjTarget->GetType() == GAMEOBJECT_TYPE_CHEST)
-		static_cast< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), loottype, gameObjTarget->GetMapId() );
+		TO< Player* >( m_caster )->SendLoot( gameObjTarget->GetGUID(), loottype, gameObjTarget->GetMapId() );
 }
 
 void Spell::SpellEffectTransformItem(uint32 i)
@@ -3083,7 +3083,7 @@ void Spell::SpellEffectSkillStep(uint32 i) // Skill Step
 		return;*/
 
 		if( sk->type == SKILL_TYPE_PROFESSION )
-			target->ModTalentPoints(SPEC_SECONDARY, -1 );
+			target->ModPrimaryProfessionPoints( -1 );
 
 		if( skill == SKILL_RIDING )
 			target->_AddSkillLine( skill, max, max );
@@ -3198,7 +3198,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 			sEventMgr.AddEvent( fn, &Arcemu::GO_FishingNode::EventFishHooked, EVENT_GAMEOBJECT_FISH_HOOKED, seconds[ rnd ] * 1000, 1, 0 );
 		}
 		sEventMgr.AddEvent( fn, &Arcemu::GO_FishingNode::EndFishing, true, EVENT_GAMEOBJECT_END_FISHING, 17 * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
-		sEventMgr.AddEvent( TO_UNIT( p_caster ), &Unit::EventStopChanneling, false, EVENT_STOP_CHANNELING, 17 * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
+		sEventMgr.AddEvent( TO< Unit* >( p_caster ), &Unit::EventStopChanneling, false, EVENT_STOP_CHANNELING, 17 * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT );
 
 		p_caster->SetSummonedObject( go );
 	}
@@ -3431,7 +3431,7 @@ void Spell::SpellEffectSummonPet(uint32 i) //summon - pet
 	//felhunter:	 Devour Magic,Paranoia,Spell Lock,	Tainted Blood
 
 	// remove old pet
-	Pet *old = static_cast< Player* >(m_caster)->GetSummon();
+	Pet *old = TO< Player* >(m_caster)->GetSummon();
 	if(old)
 		old->Dismiss();
 
@@ -3463,13 +3463,13 @@ void Spell::SpellEffectLearnPetSpell(uint32 i)
 	{
 	if(unitTarget->IsPet() && unitTarget->GetTypeId() == TYPEID_UNIT)
 	{
-	static_cast< Player* >(m_caster)->AddPetSpell(GetProto()->EffectTriggerSpell[i], unitTarget->GetEntry());
+	TO< Player* >(m_caster)->AddPetSpell(GetProto()->EffectTriggerSpell[i], unitTarget->GetEntry());
 	}
 	}*/
 
 	if(unitTarget && unitTarget->IsPet() && p_caster)
 	{
-		Pet * pPet = static_cast<Pet*>( unitTarget );
+		Pet * pPet = TO< Pet* >( unitTarget );
 		if(pPet->IsSummon())
 			p_caster->AddSummonSpell(unitTarget->GetEntry(), GetProto()->EffectTriggerSpell[i]);
 
@@ -3569,18 +3569,18 @@ void Spell::SpellEffectPowerBurn(uint32 i) // power burn
 
 	if( unitTarget->IsPlayer() )
 	{
-		Player* mPlayer = static_cast< Player* >( unitTarget );
+		Player* mPlayer = TO< Player* >( unitTarget );
 		if( mPlayer->IsInFeralForm() )
 			return;
 
 		// Resilience - reduces the effect of mana drains by (CalcRating*2)%.
-		damage = float2int32( damage * (1 - ( ( static_cast<Player*>(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) ) );
+		damage = float2int32( damage * (1 - ( ( TO< Player* >(unitTarget)->CalcRating( PLAYER_RATING_MODIFIER_SPELL_CRIT_RESILIENCE ) * 2 ) / 100.0f ) ) );
 	}
 	int32 mult = damage;
 	damage = mult * unitTarget->GetMaxPower( POWER_TYPE_MANA ) / 100;
 	if( m_caster->IsUnit() )//Spell ctor has ASSERT( m_caster != NULL ) so there's no need to add NULL checks, even if static analysis reports them.
 	{
-		Unit* caster = static_cast<Unit*>( m_caster );
+		Unit* caster = TO< Unit* >( m_caster );
 		if ( (uint32) damage > caster->GetMaxPower( POWER_TYPE_MANA ) * (mult*2) / 100 ) 
 			damage = caster->GetMaxPower( POWER_TYPE_MANA ) * (mult*2) / 100;
 	}
@@ -3675,7 +3675,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 		if (u_caster && (u_caster != unitTarget))
 		{
 			unitTarget->GetAIInterface()->AttackReaction(u_caster, 1, m_spellInfo->Id);
-			Creature *c = static_cast<Creature*>( unitTarget );
+			Creature *c = TO< Creature* >( unitTarget );
 			if (c->GetProto()->modImmunities & 32768)
 				return;
 		}
@@ -3700,7 +3700,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 		int32 duration = GetDuration();
 		if(unitTarget->IsPlayer())
 		{
-			int32 DurationModifier = static_cast< Player* >( unitTarget )->MechanicDurationPctMod[MECHANIC_INTERRUPTED];
+			int32 DurationModifier = TO< Player* >( unitTarget )->MechanicDurationPctMod[MECHANIC_INTERRUPTED];
 			if(DurationModifier >= - 100)
 				duration = (duration * (100 + DurationModifier)) / 100;
 		}
@@ -3719,7 +3719,7 @@ void Spell::SpellEffectInterruptCast(uint32 i) // Interrupt Cast
 		if(unitTarget->IsPlayer())
 		{               
 			// Check for interruption reducing talents
-			int32 DurationModifier = static_cast< Player* >( unitTarget )->MechanicDurationPctMod[MECHANIC_INTERRUPTED];
+			int32 DurationModifier = TO< Player* >( unitTarget )->MechanicDurationPctMod[MECHANIC_INTERRUPTED];
 
 			if(DurationModifier >= - 100)
 				duration = (duration * (100 + DurationModifier)) / 100;
@@ -3764,16 +3764,16 @@ void Spell::SpellEffectPickpocket(uint32 i) // pickpocket
 	if(!unitTarget || !p_caster || !unitTarget->IsCreature())
 		return;
 
-	Creature *target = static_cast<Creature*>( unitTarget );
+	Creature *target = TO< Creature* >( unitTarget );
 	if(target->IsPickPocketed() || (target->GetCreatureInfo()->Type != UNIT_TYPE_HUMANOID))
 	{
 		SendCastResult(SPELL_FAILED_TARGET_NO_POCKETS);
 		return;
 	}
 
-	lootmgr.FillPickpocketingLoot(&static_cast<Creature*>(unitTarget)->loot,unitTarget->GetEntry());
+	lootmgr.FillPickpocketingLoot(&TO< Creature* >(unitTarget)->loot,unitTarget->GetEntry());
 
-	uint32 _rank = static_cast<Creature*>(unitTarget)->GetCreatureInfo()->Rank;
+	uint32 _rank = TO< Creature* >(unitTarget)->GetCreatureInfo()->Rank;
 	unitTarget->loot.gold = float2int32((_rank+1) * unitTarget->getLevel() * (RandomUInt(5) + 1) * sWorld.getRate(RATE_MONEY));
 
 	p_caster->SendLoot(unitTarget->GetGUID(), LOOT_PICKPOCKETING, unitTarget->GetMapId() );
@@ -3919,7 +3919,7 @@ void Spell::SpellEffectUseGlyph(uint32 i)
 
 void Spell::SpellEffectHealMechanical(uint32 i)
 {
-	if(!unitTarget || !unitTarget->IsCreature() || static_cast<Creature*>(unitTarget)->GetCreatureInfo()->Type != UNIT_TYPE_MECHANICAL)
+	if(!unitTarget || !unitTarget->IsCreature() || TO< Creature* >(unitTarget)->GetCreatureInfo()->Type != UNIT_TYPE_MECHANICAL)
 		return;
 
 	Heal(damage);
@@ -4960,10 +4960,10 @@ void Spell::SpellEffectResurrectNew(uint32 i)
 					unitTarget->SetPower( POWER_TYPE_MANA, mana);
 					unitTarget->SetUInt32Value(UNIT_DYNAMIC_FLAGS, 0);
 					unitTarget->setDeathState(ALIVE);
-					static_cast<Creature*>(unitTarget)->UnTag();
-					static_cast<Creature*>(unitTarget)->loot.gold= 0;
-					static_cast<Creature*>(unitTarget)->loot.looters.clear();
-					static_cast<Creature*>(unitTarget)->loot.items.clear();
+					TO< Creature* >(unitTarget)->UnTag();
+					TO< Creature* >(unitTarget)->loot.gold= 0;
+					TO< Creature* >(unitTarget)->loot.looters.clear();
+					TO< Creature* >(unitTarget)->loot.items.clear();
 				}
 			}
 
@@ -5219,7 +5219,7 @@ void Spell::SpellEffectPlayerPull( uint32 i )
 	if( !unitTarget || !unitTarget->isAlive() || !unitTarget->IsPlayer() )
 		return;
 
-	Player* p_target = static_cast< Player* >( unitTarget );
+	Player* p_target = TO< Player* >( unitTarget );
 
 	// calculate destination
 	float pullD = p_target->CalcDistance( m_caster ) - p_target->GetBoundingRadius() - (u_caster ? u_caster->GetBoundingRadius() : 0) - 1.0f;
@@ -5258,12 +5258,12 @@ void Spell::SpellEffectSpellSteal( uint32 i )
 {
 	if (!unitTarget || !u_caster || !unitTarget->isAlive())
 		return;
-	if(unitTarget->IsPlayer() && p_caster && p_caster != static_cast< Player* >(unitTarget))
+	if(unitTarget->IsPlayer() && p_caster && p_caster != TO< Player* >(unitTarget))
 	{
-		if(static_cast< Player* >(unitTarget)->IsPvPFlagged())
+		if(TO< Player* >(unitTarget)->IsPvPFlagged())
 		{
 			if(p_caster->IsPlayer())
-				static_cast< Player* >( p_caster )->PvPToggle();
+				TO< Player* >( p_caster )->PvPToggle();
 			else
 				p_caster->SetPvPFlag();
 		}
@@ -5379,7 +5379,7 @@ void Spell::SpellEffectRedirectThreat(uint32 i)
 	if (!p_caster || !unitTarget)
 		return;
 
-	if ((unitTarget->IsPlayer() && p_caster->GetGroup() != static_cast<Player *>(unitTarget)->GetGroup()) || (unitTarget->IsCreature() && !unitTarget->IsPet()))
+	if ((unitTarget->IsPlayer() && p_caster->GetGroup() != TO< Player* >(unitTarget)->GetGroup()) || (unitTarget->IsCreature() && !unitTarget->IsPet()))
 		return;
 
 	p_caster->SetMisdirectionTarget(unitTarget->GetGUID());
@@ -5584,7 +5584,7 @@ void Spell::SpellEffectMilling(uint32 i)
 void Spell::SpellEffectRenamePet( uint32 i )
 {
 	if( !unitTarget || !unitTarget->IsPet() || 
-		!static_cast<Pet*>(unitTarget)->GetPetOwner() || static_cast<Pet*>(unitTarget)->GetPetOwner()->getClass() != HUNTER )
+		!TO< Pet* >(unitTarget)->GetPetOwner() || TO< Pet* >(unitTarget)->GetPetOwner()->getClass() != HUNTER )
 		return;
 
 	unitTarget->SetByte( UNIT_FIELD_BYTES_2, 2, PET_RENAME_ALLOWED );
@@ -5688,7 +5688,7 @@ void Spell::SpellEffectDurabilityDamage(uint32 i)
 			{
 				if( pItem->IsContainer() )
 				{
-					pContainer = static_cast<Container*>( pItem );
+					pContainer = TO< Container* >( pItem );
 					for( j = 0; j < pContainer->GetProto()->ContainerSlots; ++j )
 					{
 						pItem = pContainer->GetItem( static_cast<uint16>( j ) );
@@ -5781,7 +5781,7 @@ void Spell::SpellEffectDurabilityDamagePCT(uint32 i)
 			{
 				if( pItem->IsContainer() )
 				{
-					pContainer = static_cast<Container*>( pItem );
+					pContainer = TO< Container* >( pItem );
 					for( j = 0; j < pContainer->GetProto()->ContainerSlots; ++j )
 					{
 						pItem = pContainer->GetItem( static_cast<uint16>( j ) );

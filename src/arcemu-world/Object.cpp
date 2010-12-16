@@ -121,7 +121,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	uint8 updatetype = UPDATETYPE_CREATE_OBJECT;
 	if(IsCorpse())
 	{
-		if(static_cast<Corpse*>(this)->GetDisplayId() == 0)
+		if(TO< Corpse* >(this)->GetDisplayId() == 0)
 			return 0;
 		updatetype = UPDATETYPE_CREATE_YOURSELF;
 	}
@@ -147,7 +147,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 		// gameobject/dynamicobject
 	case TYPEID_GAMEOBJECT:
 		flags = 0x0350;
-		if( static_cast<GameObject*>(this)->GetDisplayId()==3831 ) flags= 0x0252; //Deeprun Tram proper flags as of 3.2.0.
+		if( TO< GameObject* >(this)->GetDisplayId()==3831 ) flags= 0x0252; //Deeprun Tram proper flags as of 3.2.0.
 		break;
 
 	case TYPEID_DYNAMICOBJECT:
@@ -195,7 +195,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 				}break;
 		}
 		//The above 3 checks FAIL to identify transports, thus their flags remain 0x58, and this is BAAAAAAD! Later they don't get position x,y,z,o updates, so they appear randomly by a client-calculated path, they always face north, etc... By: VLack
-		if( flags != 0x0352 && IsGameObject() && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT && !(static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
+		if( flags != 0x0352 && IsGameObject() && TO< GameObject* >(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT && !(TO< GameObject* >(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
 			flags = 0x0352;
 	}
 
@@ -215,7 +215,7 @@ uint32 Object::BuildCreateUpdateBlockForPlayer(ByteBuffer *data, Player *target)
 	updateMask.SetCount( m_valuesCount );
 	_SetCreateBits( &updateMask, target );
 
-	if(IsGameObject() && (static_cast<GameObject*>(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
+	if(IsGameObject() && (TO< GameObject* >(this)->GetOverrides() & GAMEOBJECT_OVERRIDE_PARENTROT) )
 	{
 		updateMask.SetBit(GAMEOBJECT_PARENTROTATION_02);
 		updateMask.SetBit(GAMEOBJECT_PARENTROTATION_03);
@@ -344,7 +344,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 	MovementInfo* moveinfo = NULL;
 	if(IsPlayer())
 	{
-		pThis = static_cast< Player* >( this );
+		pThis = TO< Player* >( this );
 		if(pThis->GetSession())
 			moveinfo = pThis->GetSession()->GetMovementInfo();
 		if(target == this)
@@ -355,7 +355,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 	}
 	Creature * uThis = NULL;
 	if (IsCreature())
-		uThis = static_cast<Creature*>(this);
+		uThis = TO< Creature* >(this);
 
 	if (flags & UPDATEFLAG_LIVING) //0x20
 	{
@@ -547,7 +547,7 @@ void Object::_BuildMovementUpdate(ByteBuffer * data, uint16 flags, uint32 flags2
 	if( flags & UPDATEFLAG_ROTATION ) //0x0200
 	{
 		if( IsGameObject() )
-			*data << static_cast< GameObject* >( this )->m_rotation;
+			*data << TO< GameObject* >( this )->m_rotation;
 		else
 			*data << uint64( 0 ); //?
 	}
@@ -568,7 +568,7 @@ void Object::_BuildValuesUpdate(ByteBuffer * data, UpdateMask *updateMask, Playe
 	{
 		if(IsCreature())
 		{
-			Creature * pThis = static_cast<Creature*>(this);
+			Creature * pThis = TO< Creature* >(this);
 			if(pThis->IsTagged() && (pThis->loot.gold || pThis->loot.items.size()))
 			{
 				// Let's see if we're the tagger or not.
@@ -784,7 +784,7 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 	bool updateMap = false, result = true;
 
 	//It's a good idea to push through EVERY transport position change, no matter how small they are. By: VLack aka. VLsoft
-	if( IsGameObject() && static_cast<GameObject*>(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT )
+	if( IsGameObject() && TO< GameObject* >(this)->GetInfo()->Type == GAMEOBJECT_TYPE_TRANSPORT )
 		updateMap = true;
 
 	//if (m_position.x != newX || m_position.y != newY)
@@ -807,9 +807,9 @@ bool Object::SetPosition( float newX, float newY, float newZ, float newOrientati
 		m_lastMapUpdatePosition.ChangeCoords(newX,newY,newZ,newOrientation);
 		m_mapMgr->ChangeObjectLocation(this);
 
-		if( IsPlayer() && static_cast< Player* >( this )->GetGroup() && static_cast< Player* >( this )->m_last_group_position.Distance2DSq(m_position) > 25.0f ) // distance of 5.0
+		if( IsPlayer() && TO< Player* >( this )->GetGroup() && TO< Player* >( this )->m_last_group_position.Distance2DSq(m_position) > 25.0f ) // distance of 5.0
 		{
-            static_cast< Player* >( this )->GetGroup()->HandlePartialChange( PARTY_UPDATE_FLAG_POSITION, static_cast< Player* >( this ) );
+            TO< Player* >( this )->GetGroup()->HandlePartialChange( PARTY_UPDATE_FLAG_POSITION, TO< Player* >( this ) );
 		}
 	}
 
@@ -866,7 +866,7 @@ void Object::AddToWorld()
 
 	if( IsPlayer() )
 	{
-		Player *plr = static_cast< Player* >( this );
+		Player *plr = TO< Player* >( this );
 		if(mapMgr->pInstance != NULL && !plr->HasFlag(PLAYER_FLAGS, PLAYER_FLAG_GM))
 		{
 			// Player limit?
@@ -1021,9 +1021,9 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 		TO_PLAYER(this)->HandleUpdateFieldChanged(index);
 		if(IsInWorld())
 		{
-			Group* pGroup = static_cast< Player* >( this )->GetGroup();
+			Group* pGroup = TO< Player* >( this )->GetGroup();
 			if( pGroup != NULL )
-				pGroup->HandleUpdateFieldChange( index, static_cast< Player* >( this ) );
+				pGroup->HandleUpdateFieldChange( index, TO< Player* >( this ) );
 		}
 
 #ifdef OPTIMIZED_PLAYER_SAVING
@@ -1031,11 +1031,11 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 		{
 		case UNIT_FIELD_LEVEL:
 		case PLAYER_XP:
-			static_cast< Player* >( this )->save_LevelXP();
+			TO< Player* >( this )->save_LevelXP();
 			break;
 
 		case PLAYER_FIELD_COINAGE:
-			static_cast< Player* >( this )->save_Gold();
+			TO< Player* >( this )->save_Gold();
 			break;
 		}
 #endif
@@ -1046,7 +1046,7 @@ void Object::SetUInt32Value( const uint32 index, const uint32 value )
 			case UNIT_FIELD_POWER2:
 			case UNIT_FIELD_POWER4:
 			case UNIT_FIELD_POWER7:
-				static_cast< Unit* >( this )->SendPowerUpdate(true);
+				TO< Unit* >( this )->SendPowerUpdate(true);
 				break;
 			default:
 				break;
@@ -1104,11 +1104,11 @@ void Object::ModUnsigned32Value(uint32 index, int32 mod)
 		{
 		case UNIT_FIELD_LEVEL:
 		case PLAYER_XP:
-			static_cast< Player* >( this )->save_LevelXP();
+			TO< Player* >( this )->save_LevelXP();
 			break;
 
 		case PLAYER_FIELD_COINAGE:
-			static_cast< Player* >( this )->save_Gold();
+			TO< Player* >( this )->save_Gold();
 			break;
 		}
 #endif
@@ -1119,7 +1119,7 @@ void Object::ModUnsigned32Value(uint32 index, int32 mod)
 			case UNIT_FIELD_POWER2:
 			case UNIT_FIELD_POWER4:
 			case UNIT_FIELD_POWER7:
-				static_cast< Unit* >( this )->SendPowerUpdate(true);
+				TO< Unit* >( this )->SendPowerUpdate(true);
 				break;
 			default:
 				break;
@@ -1167,11 +1167,11 @@ void Object::ModSignedInt32Value(uint32 index, int32 value )
 		{
 		case UNIT_FIELD_LEVEL:
 		case PLAYER_XP:
-			static_cast< Player* >( this )->save_LevelXP();
+			TO< Player* >( this )->save_LevelXP();
 			break;
 
 		case PLAYER_FIELD_COINAGE:
-			static_cast< Player* >( this )->save_Gold();
+			TO< Player* >( this )->save_Gold();
 			break;
 		}
 #endif
@@ -1529,9 +1529,9 @@ void Object::_setFaction()
 	else
 	if(IsGameObject())
 	{
-		factT = dbcFactionTemplate.LookupEntryForced(static_cast<GameObject*>(this)->GetFaction());
+		factT = dbcFactionTemplate.LookupEntryForced(TO< GameObject* >(this)->GetFaction());
 		if( !factT )
-			sLog.outError("Game Object does not have a valid faction. It will make him act stupid in world. Don't blame us, blame yourself for not checking :P, faction %u set to entry %u",static_cast<GameObject*>(this)->GetFaction(),GetEntry() );
+			sLog.outError("Game Object does not have a valid faction. It will make him act stupid in world. Don't blame us, blame yourself for not checking :P, faction %u set to entry %u",TO< GameObject* >(this)->GetFaction(),GetEntry() );
 	}
 
 	if(!factT)
@@ -1732,7 +1732,7 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	if( pVictim->IsPlayer() && pVictim->HasAurasWithNameHash( SPELL_HASH_INCANTER_S_ABSORPTION ) )
 	{
 		float pctmod = 0.0f;
-		Player* pl = static_cast< Player* >( pVictim );
+		Player* pl = TO< Player* >( pVictim );
 		if( pl->HasAura( 44394 ) )
 			pctmod = 0.05f;
 		else if( pl->HasAura( 44395 ) )
@@ -1771,14 +1771,14 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	//------------------------------resistance reducing-----------------------------------------
 	if(res > 0 && this->IsUnit())
 	{
-		static_cast<Unit*>(this)->CalculateResistanceReduction( pVictim, &dmg, spellInfo, 0 );
+		TO< Unit* >(this)->CalculateResistanceReduction( pVictim, &dmg, spellInfo, 0 );
 		if( (int32)dmg.resisted_damage > dmg.full_damage )
 			res = 0;
 		else
 			res = float( dmg.full_damage - dmg.resisted_damage );
 	}
 	//------------------------------special states----------------------------------------------
-	if(pVictim->IsPlayer() && static_cast< Player* >(pVictim)->GodModeCheat == true)
+	if(pVictim->IsPlayer() && TO< Player* >(pVictim)->GodModeCheat == true)
 	{
 		res = float(dmg.full_damage);
 		dmg.resisted_damage = dmg.full_damage;
@@ -1800,14 +1800,14 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 	{
 		int32 dmg2 = float2int32(res);
 
-		pVictim->HandleProc( vproc, static_cast< Unit* >( this ), spellInfo, !allowProc, dmg2, abs_dmg);
+		pVictim->HandleProc( vproc, TO< Unit* >( this ), spellInfo, !allowProc, dmg2, abs_dmg);
 		pVictim->m_procCounter = 0;
-		static_cast< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, !allowProc, dmg2, abs_dmg);
-		static_cast< Unit* >( this )->m_procCounter = 0;
+		TO< Unit* >( this )->HandleProc( aproc, pVictim, spellInfo, !allowProc, dmg2, abs_dmg);
+		TO< Unit* >( this )->m_procCounter = 0;
 	}
 	if( this->IsPlayer() )
 	{
-			static_cast< Player* >( this )->m_casted_amount[spellInfo->School] = ( uint32 )res;
+			TO< Player* >( this )->m_casted_amount[spellInfo->School] = ( uint32 )res;
 	}
 
 	if( !(dmg.full_damage == 0 && abs_dmg) )
@@ -1825,9 +1825,9 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 		//Magic Absorption
 		if( pVictim->IsPlayer() )
 		{
-			if( static_cast< Player* >( pVictim )->m_RegenManaOnSpellResist )
+			if( TO< Player* >( pVictim )->m_RegenManaOnSpellResist )
 			{
-				Player* pl = static_cast< Player* >( pVictim );
+				Player* pl = TO< Player* >( pVictim );
 
 				uint32 maxmana = pl->GetMaxPower( POWER_TYPE_MANA );
 				uint32 amount = uint32( maxmana * pl->m_RegenManaOnSpellResist );
@@ -1835,10 +1835,10 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 				pVictim->Energize( pVictim, 29442, amount, POWER_TYPE_MANA );
 			}
 			// we still stay in combat dude
-			static_cast< Player* >(pVictim)->CombatStatusHandler_ResetPvPTimeout();
+			TO< Player* >(pVictim)->CombatStatusHandler_ResetPvPTimeout();
 		}
 		if( IsPlayer() )
-			static_cast< Player* >(this)->CombatStatusHandler_ResetPvPTimeout();
+			TO< Player* >(this)->CombatStatusHandler_ResetPvPTimeout();
 	}
 	if( spellInfo->School == SCHOOL_SHADOW )
 	{
@@ -1848,8 +1848,8 @@ void Object::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage
 			if( spellID == 32379 || spellID == 32996 || spellID == 48157 || spellID == 48158 ) 
 			{
 				uint32 damage2 = uint32( res + abs_dmg );
-				uint32 absorbed = static_cast< Unit* >( this )->AbsorbDamage( spellInfo->School, &damage2 );
-				DealDamage( static_cast< Unit* >( this ), damage2, 2, 0, spellID );
+				uint32 absorbed = TO< Unit* >( this )->AbsorbDamage( spellInfo->School, &damage2 );
+				DealDamage( TO< Unit* >( this ), damage2, 2, 0, spellID );
 				SendSpellNonMeleeDamageLog( this, this, spellID, damage2, static_cast<uint8>( spellInfo->School ), absorbed, 0, false, 0, false, IsPlayer() );
 			}
 		}
@@ -2165,20 +2165,20 @@ uint32 Object::GetTeam()
 {
 	if (IsPlayer())
 	{
-		return static_cast< Player* >( this )->GetTeam();
+		return TO< Player* >( this )->GetTeam();
 	}
 	if (IsPet())
 	{
-		if (static_cast< Pet* >( this )->GetPetOwner() != NULL)
+		if (TO< Pet* >( this )->GetPetOwner() != NULL)
 		{
-			return static_cast< Pet* >( this )->GetPetOwner()->GetTeam();
+			return TO< Pet* >( this )->GetPetOwner()->GetTeam();
 		}
 	}
-	if (IsUnit() && !IsPlayer() && static_cast< Creature* >( this )->IsTotem() )
+	if (IsUnit() && !IsPlayer() && TO< Creature* >( this )->IsTotem() )
 	{
-		if (static_cast< Creature* >( this )->GetOwner() != NULL)
+		if (TO< Creature* >( this )->GetOwner() != NULL)
 		{
-			return static_cast< Creature* >( this )->GetOwner()->GetTeam();
+			return TO< Creature* >( this )->GetOwner()->GetTeam();
 		}
 	}
 

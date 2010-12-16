@@ -44,145 +44,41 @@ static const uint8 glyphMask[81] = {
 
 Player::Player( uint32 guid )
 :
-m_mailBox(guid),
-#ifdef ENABLE_ACHIEVEMENTS
-m_achievementMgr(this),
-#endif
-m_finishingmovesdodge(false),
 disableAppear(false),
 disableSummon(false),
-SpellHasteRatingBonus(1.0f),
-m_lifetapbonus(0),
-info(NULL), // Playercreate info
-SoulStone(0),
-SoulStoneReceiver(0),
-misdirectionTarget(0),
-bReincarnation(false),
-removeReagentCost(false),
-ignoreShapeShiftChecks(false),
-ignoreAuraStateCheck(false),
-m_furorChance(0),
-m_session(0),
-TrackingSpell(0),
-m_status(0),
-offhand_dmg_mod(0.5),
-m_isMoving(false),
-strafing(false),
-jumping(false),
-moving(false),
-m_ShapeShifted(0),
-m_curTarget(0),
-m_curSelection(0),
-m_lootGuid(0),
-m_Summons(),
-
-m_PetNumberMax(0),
-
-m_onTaxi(false),
-
+taxi_model_id(0),
+lastNode(0),
+m_taxi_ride_time(0),
 m_taxi_pos_x(0),
 m_taxi_pos_y(0),
 m_taxi_pos_z(0),
-m_taxi_ride_time(0),
-taxi_model_id(0),
-lastNode(0),
-
-// Attack related variables
-m_blockfromspellPCT(0),
-m_critfromspell(0),
-m_spellcritfromspell(0),
-m_hitfromspell(0),
-
-m_healthfromspell(0),
-m_manafromspell(0),
-m_healthfromitems(0),
-m_manafromitems(0),
-
-m_talentresettimes(0),
-
-m_nextSave(getMSTime() + sWorld.getIntRate(INTRATE_SAVE)),
-
-m_resurrectMana(0),
-m_resurrectHealth(0),
-
-m_GroupInviter(0),
-
-Lfgcomment(""),
-
-m_Autojoin(false),
-m_AutoAddMem(false),
-LfmDungeonId(0),
-LfmType(0),
-
-m_currentMovement(MOVE_UNROOT),
-m_isGmInvisible(false),
-
-//DK
-m_invitersGuid(0),
-
-//Trade
-mTradeTarget(0),
-
-//Duel
+m_onTaxi(false),
+m_questSharer(0),
+timed_quest_slot(0),
+pctReputationMod(0),
 DuelingWith(NULL),
-m_duelCountdownTimer(0),
-m_duelStatus(0),
-m_duelState(DUEL_STATE_FINISHED),		// finished
-
+m_eyeofkilrogg(NULL),
+m_lootGuid(0),
+m_currentLoot(0),
+bShouldHaveLootableOnCorpse(false),
+offhand_dmg_mod(0.5),
+m_currentMovement(MOVE_UNROOT),
+m_isMoving(false),
+moving(false),
+strafing(false),
+jumping(false),
+m_isGmInvisible(false),
+SpellHasteRatingBonus(1.0f),
+m_furorChance(0),
 //WayPoint
 waypointunit(NULL),
-
-//PVP
-//PvPTimeoutEnabled(false),
-
-m_banned(false),
-
-//Bind position
-m_bind_pos_x(0),
-m_bind_pos_y(0),
-m_bind_pos_z(0),
-m_bind_mapid(0),
-m_bind_zoneid(0),
-
-// Rest
-m_timeLogoff(0),
-m_isResting(0),
-m_restState(0),
-m_restAmount(0),
-m_AllowAreaTriggerPort(true),
-
-// Battleground
-m_bgEntryPointMap(0),
-m_bgEntryPointX(0),
-m_bgEntryPointY(0),
-m_bgEntryPointZ(0),
-m_bgEntryPointO(0),
-m_bgQueueType(0),
-m_bgQueueInstanceId(0),
-m_bgIsQueued(false),
-m_bg(NULL),
-m_bgHasFlag(false),
-m_bgEntryPointInstance(0),
-
-// gm stuff
-//m_invincible(false),
-CooldownCheat(false),
-CastTimeCheat(false),
-PowerCheat(false),
-GodModeCheat(false),
-FlyCheat(false),
-
-//FIX for professions
-weapon_proficiency(0x4000), //2^14
-//FIX for shit like shirt etc
-armor_proficiency(1),
-
+m_nextSave(getMSTime() + sWorld.getIntRate(INTRATE_SAVE)),
+m_lifetapbonus(0),
+PlayerTalkClass(NULL),
 m_bUnlimitedBreath(false),
-m_UnderwaterState(0),
 m_UnderwaterTime(180000),
-m_UnderwaterMaxTime(180000),
-m_UnderwaterLastDmg(getMSTime()),
-
+m_UnderwaterState(0),
+m_lockTransportVariables(false),
 //transport shit
 m_TransporterGUID(0),
 m_TransporterX(0.0f),
@@ -190,42 +86,116 @@ m_TransporterY(0.0f),
 m_TransporterZ(0.0f),
 m_TransporterO(0.0f),
 m_TransporterUnk(0.0f),
-m_lockTransportVariables(false),
-
+m_AllowAreaTriggerPort(true),
+// Battleground
+m_bg(NULL),
+m_bgEntryPointMap(0),
+m_bgEntryPointX(0),
+m_bgEntryPointY(0),
+m_bgEntryPointZ(0),
+m_bgEntryPointO(0),
+m_bgEntryPointInstance(0),
+m_bgHasFlag(false),
+m_bgIsQueued(false),
+m_bgQueueType(0),
+m_bgQueueInstanceId(0),
 // Autoshot variables
-m_AutoShotTarget(0),
-m_onAutoShot(false),
 m_AutoShotDuration(0),
 m_AutoShotAttackTimer(0),
+m_onAutoShot(false),
+m_AutoShotTarget(0),
 m_AutoShotSpell(NULL),
-
-m_AttackMsgTimer(0),
-
-timed_quest_slot(0),
-m_GM_SelectedGO(0),
-
+DetectedRange(0),
 PctIgnoreRegenModifier(0.0f),
 m_retainedrage(0),
-DetectedRange(0),
-m_eyeofkilrogg(0),
-
-m_targetIcon(0),
-bShouldHaveLootableOnCorpse(false),
+SoulStone(0),
+SoulStoneReceiver(0),
+misdirectionTarget(0),
+bReincarnation(false),
+removeReagentCost(false),
+ignoreShapeShiftChecks(false),
+ignoreAuraStateCheck(false),
+m_GM_SelectedGO(0),
+m_ShapeShifted(0),
 m_MountSpellId(0),
 bHasBindDialogOpen(false),
+TrackingSpell(0),
 m_CurrentCharm(0),
 m_CurrentTransporter(NULL),
-m_SummonedObject(NULL),
-m_currentLoot(0),
-pctReputationMod(0),
+// gm stuff
+//m_invincible(false),
+CooldownCheat(false),
+CastTimeCheat(false),
+GodModeCheat(false),
+PowerCheat(false),
+FlyCheat(false),
+Lfgcomment(""),
+LfmDungeonId(0),
+LfmType(0),
+m_Autojoin(false),
+m_AutoAddMem(false),
+m_UnderwaterMaxTime(180000),
+m_UnderwaterLastDmg(getMSTime()),
+m_resurrectHealth(0),
+m_resurrectMana(0),
+m_resurrectInstanceID(0),
+m_resurrectMapId(0),
+m_mailBox(guid),
+m_finishingmovesdodge(false),
 mUpdateCount(0),
 mCreationCount(0),
 mOutOfRangeIdCount(0),
-m_questSharer(0),
-PlayerTalkClass(NULL),
-m_resurrectMapId(0),
-m_resurrectInstanceID(0),
+//Trade
+mTradeTarget(0),
+info(NULL), // Playercreate info
+m_AttackMsgTimer(0),
+//PVP
+//PvPTimeoutEnabled(false),
+m_banned(false),
+m_Summons(),
+m_PetNumberMax(0),
+//DK
+m_invitersGuid(0),
+//Bind position
+m_bind_pos_x(0),
+m_bind_pos_y(0),
+m_bind_pos_z(0),
+m_bind_mapid(0),
+m_bind_zoneid(0),
+//Duel
+m_duelCountdownTimer(0),
+m_duelStatus(0),
+m_duelState(DUEL_STATE_FINISHED),		// finished
+// Rest
+m_timeLogoff(0),
+m_isResting(0),
+m_restState(0),
+m_restAmount(0),
+// Attack related variables
+m_blockfromspellPCT(0),
+m_critfromspell(0),
+m_spellcritfromspell(0),
+m_hitfromspell(0),
+m_healthfromspell(0),
+m_manafromspell(0),
+m_healthfromitems(0),
+m_manafromitems(0),
+//FIX for shit like shirt etc
+armor_proficiency(1),
+//FIX for professions
+weapon_proficiency(0x4000), //2^14
+m_talentresettimes(0),
+m_status(0),
+m_curTarget(0),
+m_curSelection(0),
+m_targetIcon(0),
+m_session(NULL),
+m_GroupInviter(0),
+m_SummonedObject(NULL),
 myCorpseLocation()
+#ifdef ENABLE_ACHIEVEMENTS
+, m_achievementMgr(this)
+#endif
 {
 	m_cache = new PlayerCache;
 	m_cache->SetUInt32Value(CACHE_PLAYER_LOWGUID, guid);
@@ -771,14 +741,14 @@ bool Player::Create(WorldPacket& data )
 	SetFaction(info->factiontemplate );
 
 	if(class_ == DEATHKNIGHT)
-		SetTalentPoints(SPEC_PRIMARY, sWorld.DKStartTalentPoints); // Default is 0 in case you do not want to modify it
+		SetTalentPoints(sWorld.DKStartTalentPoints); // Default is 0 in case you do not want to modify it
 	else
-		SetTalentPoints(SPEC_PRIMARY, 0);
+		SetTalentPoints(0);
 	if(class_ != DEATHKNIGHT || sWorld.StartingLevel > 55)
 	{
 		setLevel(sWorld.StartingLevel );
 		if(sWorld.StartingLevel >= 10 && class_ != DEATHKNIGHT )
-		SetTalentPoints(SPEC_PRIMARY, sWorld.StartingLevel - 9);
+		SetTalentPoints(sWorld.StartingLevel - 9);
 	}
 	else
 	{
@@ -787,7 +757,7 @@ bool Player::Create(WorldPacket& data )
 	}
 	UpdateGlyphs();
 
-	SetTalentPoints(SPEC_SECONDARY, sWorld.MaxProfs);
+	SetPrimaryProfessionPoints(sWorld.MaxProfs);
 
     setRace( race );
     setClass( class_ );
@@ -1176,11 +1146,11 @@ void Player::_EventAttack( bool offhand )
 		//pvp timeout reset
 		if(pVictim->IsPlayer())
 		{
-			if (static_cast< Player* >(pVictim)->cannibalize)
+			if (TO< Player* >(pVictim)->cannibalize)
 			{
 				sEventMgr.RemoveEvents(pVictim, EVENT_CANNIBALIZE);
 				pVictim->SetEmoteState(0);
-				static_cast< Player* >(pVictim)->cannibalize = false;
+				TO< Player* >(pVictim)->cannibalize = false;
 			}
 		}
 
@@ -1274,8 +1244,8 @@ void Player::_EventCharmAttack()
 			//pvp timeout reset
 			/*if(pVictim->IsPlayer())
 			{
-				if( static_cast< Player* >( pVictim )->DuelingWith == NULL)//Dueling doesn't trigger PVP
-					static_cast< Player* >( pVictim )->PvPTimeoutUpdate(false); //update targets timer
+				if( TO< Player* >( pVictim )->DuelingWith == NULL)//Dueling doesn't trigger PVP
+					TO< Player* >( pVictim )->PvPTimeoutUpdate(false); //update targets timer
 
 				if(DuelingWith == NULL)//Dueling doesn't trigger PVP
 					PvPTimeoutUpdate(false); //update casters timer
@@ -1546,9 +1516,9 @@ void Player::EventDeath()
 
 /*  Gives numtps talent points to the player  */
 void Player::GiveTalent(uint32 numtps){
-    uint32 currtps = GetTalentPoints(SPEC_PRIMARY);
+    uint32 currtps = GetTalentPoints();
 	
-    SetTalentPoints(SPEC_PRIMARY, currtps+numtps);
+    SetTalentPoints(currtps+numtps);
 
 	}
  
@@ -1595,7 +1565,7 @@ void Player::GiveXP(uint32 xp, const uint64 &guid, bool allowbonus)
 		levelup = true;
 
 		if(level > 9)
-			ModTalentPoints(SPEC_PRIMARY, 1);
+			ModTalentPoints(1);
 
 		if(level >= GetMaxLevel() )
 			break;
@@ -2170,7 +2140,7 @@ void Player::addSpell(uint32 spell_id)
 		{
 			case SKILL_TYPE_PROFESSION:
 				max=75*((spell->RankNumber)+1);
-				ModTalentPoints(SPEC_SECONDARY, -1 ); // we are learning a profession, so subtract a point.
+				ModPrimaryProfessionPoints( -1 ); // we are learning a profession, so subtract a point.
 				break;
 			case SKILL_TYPE_SECONDARY:
 				max=75*((spell->RankNumber)+1);
@@ -2348,8 +2318,8 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	if( m_bg != NULL && IS_ARENA( m_bg->GetType() ) )
 		in_arena = true;
 
-	if( m_uint32Values[PLAYER_CHARACTER_POINTS2] > sWorld.MaxProfs )
-		m_uint32Values[PLAYER_CHARACTER_POINTS2] = sWorld.MaxProfs;
+	if( GetPrimaryProfessionPoints() > sWorld.MaxProfs )
+		SetPrimaryProfessionPoints( sWorld.MaxProfs );
 
 	//Calc played times
 	uint32 playedt = (uint32)UNIXTIME - m_playedtime[2];
@@ -2428,7 +2398,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 		ss << (uint32)0 << ","; // make sure ammo slot is 0 for these classes, otherwise it can mess up wand shoot
 	else
 		ss << m_uint32Values[PLAYER_AMMO_ID] << ",";
-	ss << m_uint32Values[PLAYER_CHARACTER_POINTS2] << ",";
+	ss << GetPrimaryProfessionPoints() << ",";
 
 	ss << load_health << ","
 	<< load_mana << ","
@@ -5657,7 +5627,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	{
 		if(obj->IsPlayer())
 		{
-			Player *pObj = static_cast< Player* >(obj);
+			Player *pObj = TO< Player* >(obj);
 
 			if(myCorpseInstanceId == GetInstanceID() && obj->GetDistanceSq(myCorpseLocation) <= CORPSE_VIEW_DISTANCE)
 				return !pObj->m_isGmInvisible; // we can see all players within range of our corpse except invisible GMs
@@ -5670,7 +5640,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 		if(myCorpseInstanceId == GetInstanceID())
 		{
-			if(obj->IsCorpse() && static_cast<Corpse*>(obj)->GetOwner() == GetGUID())
+			if(obj->IsCorpse() && TO< Corpse* >(obj)->GetOwner() == GetGUID())
 				return true;
 
 			if(obj->GetDistanceSq(myCorpseLocation) <= CORPSE_VIEW_DISTANCE)
@@ -5698,7 +5668,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 	{
 		case TYPEID_PLAYER:
 			{
-				Player *pObj = static_cast< Player* >(obj);
+				Player *pObj = TO< Player* >(obj);
 
 				if(pObj->m_invisible) // Invisibility - Detection of Players
 				{
@@ -5760,7 +5730,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 		case TYPEID_UNIT:
 			{
-				Unit *uObj = static_cast<Unit *>(obj);
+				Unit *uObj = TO< Unit* >(obj);
 
 				if( uObj->IsSpiritHealer()) // can't see spirit-healers when alive
 					return false;
@@ -5782,7 +5752,7 @@ bool Player::CanSee(Object* obj) // * Invisibility & Stealth Detection - Partha 
 
 		case TYPEID_GAMEOBJECT:
 			{
-				GameObject *gObj = static_cast<GameObject *>(obj);
+				GameObject *gObj = TO< GameObject* >(obj);
 
 				if(gObj->invisible) // Invisibility - Detection of GameObjects
 				{
@@ -5819,9 +5789,9 @@ void Player::AddInRangeObject(Object* pObj)
 		uint32 ntime = getMSTime();
 
 		if (ntime > m_taxi_ride_time)
-			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), ntime - m_taxi_ride_time);
+			m_CurrentTaxiPath->SendMoveForTime( this, TO< Player* >( pObj ), ntime - m_taxi_ride_time);
 		/*else
-			m_CurrentTaxiPath->SendMoveForTime( this, static_cast< Player* >( pObj ), m_taxi_ride_time - ntime);*/
+			m_CurrentTaxiPath->SendMoveForTime( this, TO< Player* >( pObj ), m_taxi_ride_time - ntime);*/
 	}
 
 	Unit::AddInRangeObject(pObj);
@@ -5829,7 +5799,7 @@ void Player::AddInRangeObject(Object* pObj)
 	//if the object is a unit send a move packet if they have a destination
 	if(pObj->IsCreature())
 	{
-		static_cast< Creature* >( pObj )->GetAIInterface()->SendCurrentMove(this);
+		TO< Creature* >( pObj )->GetAIInterface()->SendCurrentMove(this);
     }
 }
 void Player::OnRemoveInRangeObject(Object* pObj)
@@ -5856,7 +5826,7 @@ void Player::OnRemoveInRangeObject(Object* pObj)
 		m_CurrentCharm= 0;
 
 		if( p->m_temp_summon && p->IsCreature() )
-			static_cast< Creature* >( p )->DeleteMe();
+			TO< Creature* >( p )->DeleteMe();
 	}
 
     // We've just gone out of range of our pet :(
@@ -6464,11 +6434,11 @@ void Player::Reset_Talents()
 	uint32 l = getLevel();
 	if( l > 9 )
 	{
-		SetTalentPoints(SPEC_PRIMARY, l - 9);
+		SetTalentPoints(l - 9);
 	}
 	else
 	{
-		SetTalentPoints(SPEC_PRIMARY, 0);
+		SetTalentPoints(0);
 	}
 
 	if( DualWield2H )
@@ -6869,8 +6839,8 @@ void Player::CalcStat( uint32 type )
 	res = pos + (int32)BaseStats[type] - neg;
 	if( res <= 0 )
 		res = 1;
-	pos += ( res * (int32) static_cast< Player* >( this )->TotalStatModPctPos[type] ) / 100;
-	neg += ( res * (int32) static_cast< Player* >( this )->TotalStatModPctNeg[type] ) / 100;
+	pos += ( res * (int32) TO< Player* >( this )->TotalStatModPctPos[type] ) / 100;
+	neg += ( res * (int32) TO< Player* >( this )->TotalStatModPctNeg[type] ) / 100;
 	res = pos + BaseStats[type] - neg;
 	if( res <= 0 )
 		res = 1;
@@ -7126,7 +7096,7 @@ void Player::AddItemsToWorld()
 			{
 				for(uint32 e= 0; e < pItem->GetProto()->ContainerSlots; e++)
 				{
-					Item *item = (static_cast<Container*>( pItem ))->GetItem(static_cast<int16>( e ));
+					Item *item = (TO< Container* >( pItem ))->GetItem(static_cast<int16>( e ));
 					if(item)
 					{
 						item->PushToWorld(m_mapMgr);
@@ -7163,7 +7133,7 @@ void Player::RemoveItemsFromWorld()
 			{
 				for(uint32 e= 0; e < pItem->GetProto()->ContainerSlots; e++)
 				{
-					Item *item = (static_cast<Container*>( pItem ))->GetItem( static_cast<int16>( e ));
+					Item *item = (TO< Container* >( pItem ))->GetItem( static_cast<int16>( e ));
 					if(item && item->IsInWorld())
 					{
 						item->RemoveFromWorld();
@@ -8247,7 +8217,7 @@ void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
 	SetPower( POWER_TYPE_MANA, Info->Mana );
 
 	// Calculate talentpoints
-	uint32 TalentPoints = GetTalentPoints(SPEC_PRIMARY);
+	uint32 TalentPoints = GetTalentPoints();
 
 	if (Level >= PreviousLevel) {
 		// Level is increased - talent points are only added, so no reset
@@ -8258,7 +8228,7 @@ void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
 			// Only add talent points for new levels above 9
 			TalentPoints += Level - 9;
 		}
-		SetTalentPoints(SPEC_PRIMARY, TalentPoints);
+		SetTalentPoints(TalentPoints);
 	} else {
 		uint32 removed = 0;
 		if (Level >= 10) {
@@ -8274,7 +8244,7 @@ void Player::ApplyLevelInfo(LevelInfo* Info, uint32 Level)
 		} else {
 			// Remove calculated amount of free talent points
 			TalentPoints -= removed;
-			SetTalentPoints(SPEC_PRIMARY, TalentPoints);
+			SetTalentPoints(TalentPoints);
 		}
 	}
 
@@ -8662,10 +8632,10 @@ void Player::BuildFlagUpdateForNonGroupSet(uint32 index, uint32 flag)
 		iter++;
         if(curObj->IsPlayer())
         {
-            Group* pGroup = static_cast< Player* >( curObj )->GetGroup();
+            Group* pGroup = TO< Player* >( curObj )->GetGroup();
             if( !pGroup && pGroup != GetGroup())
             {
-                BuildFieldUpdatePacket( static_cast< Player* >( curObj ), index, flag );
+                BuildFieldUpdatePacket( TO< Player* >( curObj ), index, flag );
             }
         }
     }
@@ -9055,7 +9025,7 @@ void Player::CompleteLoading()
 		CastSpell(this, glyph->SpellID, true);
 	}
 	//sEventMgr.AddEvent(this,&Player::SendAllAchievementData,EVENT_SEND_ACHIEVEMNTS_TO_PLAYER,ACHIEVEMENT_SEND_DELAY,1,0);
-	sEventMgr.AddEvent(static_cast< Unit* >(this),&Unit::UpdatePowerAmm,EVENT_SEND_PACKET_TO_PLAYER_AFTER_LOGIN,LOGIN_CIENT_SEND_DELAY,1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	sEventMgr.AddEvent(TO< Unit* >(this),&Unit::UpdatePowerAmm,EVENT_SEND_PACKET_TO_PLAYER_AFTER_LOGIN,LOGIN_CIENT_SEND_DELAY,1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
 void Player::OnWorldPortAck()
@@ -9556,7 +9526,7 @@ void Player::CalcDamage()
 		uint32 cr = 0;
 		if( it )
 		{
-			if( static_cast< Player* >( this )->m_wratings.size() )
+			if( TO< Player* >( this )->m_wratings.size() )
 			{
 				std::map<uint32, uint32>::iterator itr = m_wratings.find( it->GetProto()->SubClass );
 				if( itr != m_wratings.end() )
@@ -9568,7 +9538,7 @@ void Player::CalcDamage()
 
 		/////////////// OFF HAND START
 		cr = 0;
-		it = static_cast< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
+		it = TO< Player* >( this )->GetItemInterface()->GetInventoryItem(EQUIPMENT_SLOT_OFFHAND);
 		if(it)
 		{
 			if(!disarmed)
@@ -9880,7 +9850,7 @@ void Player::Possess(Unit * pTarget)
 	if(pTarget->m_temp_summon)
 		return;
 
-	if( !( pTarget->IsPet() && static_cast< Pet* >( pTarget ) == GetSummon() ) )
+	if( !( pTarget->IsPet() && TO< Pet* >( pTarget ) == GetSummon() ) )
 	{
 		list<uint32> avail_spells;
 		//Steam Tonks
@@ -9971,7 +9941,7 @@ void Player::UnPossess()
 	if(pTarget->m_temp_summon)
 		return;
 
-	if( !( pTarget->IsPet() && static_cast< Pet* >( pTarget ) == GetSummon() ) )
+	if( !( pTarget->IsPet() && TO< Pet* >( pTarget ) == GetSummon() ) )
 	{
 		data.Initialize( SMSG_PET_SPELLS );
 		data << uint64(0);
@@ -11802,7 +11772,7 @@ void Player::RemoveTempEnchantsOnArena()
 		{
 			if( it->IsContainer() )
 			{
-				Container *bag = static_cast<Container*>( it );
+				Container *bag = TO< Container* >( it );
 				for( uint32 ci = 0; ci < bag->GetProto()->ContainerSlots; ++ci )
 				{
 					it = bag->GetItem( static_cast<int16>( ci ));
@@ -12571,7 +12541,7 @@ void Player::LearnTalent(uint32 talentid, uint32 rank, bool isPreviewed ){
 				}
 			}
 
-			SetTalentPoints(SPEC_PRIMARY, CurTalentPoints-1);
+			SetTalentPoints(CurTalentPoints-1);
 			m_specs[m_talentActiveSpec].AddTalent(talentid, uint8(rank));
 			smsg_TalentsInfo(false);
 		}
@@ -12699,7 +12669,7 @@ void Player::OutPacketToSet(uint16 Opcode, uint16 Len, const void * Data, bool s
 
 	for( std::set< Object* >::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr )
 	{
-        Player *p = static_cast< Player* >( *itr );
+        Player *p = TO< Player* >( *itr );
         
         if( gm ){
             if( p->GetSession()->GetPermissionCount() > 0 )
@@ -12733,7 +12703,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 		{
             for( std::set< Object* >::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr )
 			{
-                Player *p = static_cast< Player* >( *itr );
+                Player *p = TO< Player* >( *itr );
 
 				if( p->GetSession() && p->GetSession()->GetPermissionCount() > 0 && p->GetTeam() == myteam)
 					p->SendPacket(data);
@@ -12743,7 +12713,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 		{
 			for( std::set< Object* >::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr )
 			{
-                Player *p = static_cast< Player* >( *itr );
+                Player *p = TO< Player* >( *itr );
 
 				if( p->GetSession() && p->GetTeam() == myteam && !p->Social_IsIgnoring( GetLowGUID() ))
 					p->SendPacket(data);
@@ -12756,7 +12726,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 		{
 			for( std::set< Object* >::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr )
 			{
-                Player *p = static_cast< Player* >( *itr );
+                Player *p = TO< Player* >( *itr );
 
 				if( p->GetSession() && p->GetSession()->GetPermissionCount() > 0)
 					p->SendPacket(data);
@@ -12766,7 +12736,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool bToSelf,bool myteam_only)
 		{
 			for( std::set< Object* >::iterator itr = m_inRangePlayers.begin(); itr != m_inRangePlayers.end(); ++itr )
 			{
-                Player *p = static_cast< Player* >( *itr );
+                Player *p = TO< Player* >( *itr );
 
 				if( p->GetSession() &&  !( p->Social_IsIgnoring( GetLowGUID() )) )
 					p->SendPacket(data);
@@ -12818,7 +12788,7 @@ uint32 Player::CheckDamageLimits( uint32 dmg, uint32 spellid )
 void Player::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32 unitEvent, uint32 spellId, bool no_remove_auras ){
 	if( !pVictim || !pVictim->isAlive() || !pVictim->IsInWorld() || !IsInWorld() )
 		return;
-	if( pVictim->IsPlayer() && static_cast< Player* >( pVictim )->GodModeCheat == true )
+	if( pVictim->IsPlayer() && TO< Player* >( pVictim )->GodModeCheat == true )
 		return;
 	if( pVictim->bInvincible )
 		return;
@@ -12904,7 +12874,7 @@ void Player::DealDamage(Unit *pVictim, uint32 damage, uint32 targetEvent, uint32
 			m_bg->HookOnUnitKill( this, pVictim );
 
 			if( pVictim->IsPlayer() )
-				m_bg->HookOnPlayerKill( this, static_cast< Player* >( pVictim ) );
+				m_bg->HookOnPlayerKill( this, TO< Player* >( pVictim ) );
 		}
 
 		if( pVictim->IsPlayer() ){
@@ -13184,7 +13154,7 @@ void Player::Die( Unit *pAttacker, uint32 damage, uint32 spellid ){
 
 	/* Stop players from casting */
 	for( std::set< Object* >::iterator itr = GetInRangePlayerSetBegin() ; itr != GetInRangePlayerSetEnd() ; itr ++ ){
-		Unit *attacker = static_cast< Unit* >( *itr );
+		Unit *attacker = TO< Unit* >( *itr );
 		
 		if( attacker->GetCurrentSpell() != NULL){
 			if ( attacker->GetCurrentSpell()->m_targets.m_unitTarget == GetGUID())
@@ -13434,7 +13404,7 @@ void Player::AcceptQuest( uint64 guid, uint32 quest_id ){
 	if( GetQuestLogForEntry( qst->id ) )
 		return;
 
-	if( qst_giver->IsCreature() && static_cast< Creature* >( qst_giver )->m_escorter != NULL )
+	if( qst_giver->IsCreature() && TO< Creature* >( qst_giver )->m_escorter != NULL )
 	{
 		m_session->SystemMessage("You cannot accept this quest at this time.");
 		return;
@@ -13525,7 +13495,7 @@ void Player::AcceptQuest( uint64 guid, uint32 quest_id ){
 	if(qst->count_required_item || qst_giver->IsGameObject())	// gameobject quests deactivate
 		UpdateNearbyGameObjects();
 
-	//ScriptSystem->OnQuestEvent(qst, static_cast< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);
+	//ScriptSystem->OnQuestEvent(qst, TO< Creature* >( qst_giver ), _player, QUEST_EVENT_ON_ACCEPT);
 
 	sQuestMgr.OnQuestAccepted(this,qst,qst_giver);
 

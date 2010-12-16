@@ -115,7 +115,7 @@ class AttumenTheHuntsmanAI : public MoonScriptBossAI
 				SetAllowMelee(false);
 				SetAllowSpell(false);
 				Emote("Come Midnight, let's disperse this petty rabble!", Text_Yell, 9168);
-				MoonScriptBossAI* midnight = static_cast< MoonScriptBossAI* >( GetLinkedCreature() );
+				MoonScriptBossAI* midnight = TO< MoonScriptBossAI* >( GetLinkedCreature() );
 				midnight->SetPhase(2);
 				midnight->MoveTo(this);
 				midnight->SetAllowMelee(false);
@@ -143,7 +143,7 @@ class MidnightAI : public MoonScriptBossAI
 	{
 		if(GetLinkedCreature() && GetLinkedCreature()->IsAlive() )
 		{
-			static_cast< MoonScriptCreatureAI* >( GetLinkedCreature() )->Emote("Well done Midnight!", Text_Yell, 9173);
+			TO< MoonScriptCreatureAI* >( GetLinkedCreature() )->Emote("Well done Midnight!", Text_Yell, 9173);
 		}
 		ParentClass::OnTargetDied(pTarget);
 	}
@@ -165,7 +165,7 @@ class MidnightAI : public MoonScriptBossAI
 			else if( GetLinkedCreature() && GetLinkedCreature()->IsAlive() && GetHealthPercent() <= 25 && !IsCasting() )
 			{
 				SetPhase(2);
-				MoonScriptBossAI* attumen = static_cast< MoonScriptBossAI* >( GetLinkedCreature() );
+				MoonScriptBossAI* attumen = TO< MoonScriptBossAI* >( GetLinkedCreature() );
 				MoveTo( attumen );
 				SetAllowMelee(false);
 				attumen->SetPhase(2);
@@ -178,7 +178,7 @@ class MidnightAI : public MoonScriptBossAI
 		{
 			if( GetLinkedCreature() && GetLinkedCreature()->IsAlive() )
 			{
-				MoonScriptBossAI* attumen = static_cast< MoonScriptBossAI* >( GetLinkedCreature() );
+				MoonScriptBossAI* attumen = TO< MoonScriptBossAI* >( GetLinkedCreature() );
 				if( GetRange(attumen) <= 15 )
 				{
 					attumen->Regenerate();
@@ -463,7 +463,7 @@ public:
 								itr != _unit->GetInRangePlayerSetEnd(); ++itr)
 							{
 								Player *RandomTarget = NULL;
-								RandomTarget = static_cast< Player* >(*itr);
+								RandomTarget = TO< Player* >(*itr);
 								if(RandomTarget && RandomTarget->isAlive())
 									TargetTable.push_back(RandomTarget);
 								RandomTarget = NULL;
@@ -1282,7 +1282,7 @@ public:
 			itr != _unit->GetInRangePlayerSetEnd(); ++itr)
 		{
 			Player *RandomTarget = NULL;
-			RandomTarget = static_cast< Player* >(*itr);
+			RandomTarget = TO< Player* >(*itr);
 			if(RandomTarget && RandomTarget->isAlive() && isHostile(_unit, (*itr)))
 				Target_List.push_back(RandomTarget);
 			RandomTarget = NULL;
@@ -1497,7 +1497,7 @@ public:
 			{
 				if(*itr)
 				{
-					Player *plr = static_cast< Player* >(*itr);
+					Player *plr = TO< Player* >(*itr);
 					if(plr->GetItemInterface()->GetItemCount(22589) > 0 ||
 					plr->GetItemInterface()->GetItemCount(22630) > 0 || 
 					plr->GetItemInterface()->GetItemCount(22631) > 0 || 
@@ -1743,7 +1743,7 @@ public:
 		for(; hostileItr != _unit->GetInRangePlayerSetEnd(); ++hostileItr) 
 		{ 
 			Player *RandomTarget = NULL;
-			RandomTarget = static_cast< Player* >(*hostileItr);
+			RandomTarget = TO< Player* >(*hostileItr);
 
 			if (RandomTarget && RandomTarget->isAlive() && _unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0)
 				Targets.push_back(RandomTarget);
@@ -1910,7 +1910,7 @@ public:
 			for(set< Object* >::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 			{ 
 				Player *RandomTarget = NULL;
-				RandomTarget = static_cast< Player* >(*itr);
+				RandomTarget = TO< Player* >(*itr);
 
 				if ( ( RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast ) || (_unit->GetAIInterface()->getThreatByPtr(RandomTarget) > 0 && isHostile(_unit, RandomTarget)))
 					TargetTable.push_back(RandomTarget);
@@ -2254,7 +2254,7 @@ public:
 			if(isHostile(_unit, (*itr)))
 			{
 				Player *RandomTarget = NULL;
-				RandomTarget = static_cast< Player* >(*itr);
+				RandomTarget = TO< Player* >(*itr);
 				if (RandomTarget && RandomTarget->isAlive() && isHostile(_unit, RandomTarget))
 					TargetTable.push_back(RandomTarget);
 			}
@@ -3181,7 +3181,7 @@ public:
 			for(set< Object* >::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 			{ 
 				Player *RandomTarget = NULL;
-				RandomTarget = static_cast< Player* >(*itr);
+				RandomTarget = TO< Player* >(*itr);
 
 				if (RandomTarget && RandomTarget->isAlive() && _unit->GetDistance2dSq(RandomTarget) >= mindist2cast*mindist2cast && _unit->GetDistance2dSq(RandomTarget) <= maxdist2cast*maxdist2cast)
 					TargetTable.push_back(RandomTarget);
@@ -3303,7 +3303,7 @@ public:
 		std::vector<Unit* > TargetTable;
 		for(set< Object* >::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 		{
-			if(isHostile(_unit, (*itr)) && (static_cast< Player* >(*itr))->isAlive())
+			if(isHostile(_unit, (*itr)) && (TO< Player* >(*itr))->isAlive())
 			{
 				Player *RandomTarget = NULL;
 				RandomTarget = TO_PLAYER(*itr);
@@ -3445,7 +3445,7 @@ public:
 			for(set< Object* >::iterator itr = _unit->GetInRangePlayerSetBegin(); itr != _unit->GetInRangePlayerSetEnd(); ++itr) 
 			{ 
 				Unit *RandomTarget = NULL;
-				RandomTarget = static_cast< Unit* >(*itr);
+				RandomTarget = TO< Unit* >(*itr);
 
 				if (RandomTarget && RandomTarget->isAlive() && isHostile(_unit, (*itr)))
 					TargetTable.push_back(RandomTarget);

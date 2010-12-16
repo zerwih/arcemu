@@ -191,10 +191,10 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 	{
 		bValid = false;
 
-		GameObject *go = TO_GAMEOBJECT( quest_giver );
+		GameObject *go = TO< GameObject* >( quest_giver );
 		Arcemu::GO_QuestGiver *questgiver = NULL;
 		if( go->GetType() == GAMEOBJECT_TYPE_QUESTGIVER ){
-			questgiver = static_cast< Arcemu::GO_QuestGiver* >( go );
+			questgiver = TO< Arcemu::GO_QuestGiver* >( go );
 			if( questgiver->HasQuests() )
 				bValid = true;
 		}
@@ -207,16 +207,16 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 	} 
 	else if( quest_giver->IsCreature() )
 	{
-		bValid = static_cast< Creature* >( quest_giver )->HasQuests();
+		bValid = TO< Creature* >( quest_giver )->HasQuests();
 		if(bValid)
 		{
-			q_begin = static_cast<Creature*>(quest_giver)->QuestsBegin();
-			q_end = static_cast<Creature*>(quest_giver)->QuestsEnd();
+			q_begin = TO< Creature* >(quest_giver)->QuestsBegin();
+			q_end = TO< Creature* >(quest_giver)->QuestsEnd();
 		}
 	}
     else if( quest_giver->IsItem() )
     {
-        if( static_cast< Item* >( quest_giver )->GetProto()->QuestId )
+        if( TO< Item* >( quest_giver )->GetProto()->QuestId )
             bValid = true;
     }
 	//This will be handled at quest share so nothing important as status
@@ -234,7 +234,7 @@ uint32 QuestMgr::CalcStatus(Object* quest_giver, Player* plr)
 
     if(quest_giver->IsItem())
     {
-        Quest *pQuest = QuestStorage.LookupEntry( static_cast<Item*>(quest_giver)->GetProto()->QuestId );
+        Quest *pQuest = QuestStorage.LookupEntry( TO< Item* >(quest_giver)->GetProto()->QuestId );
         QuestRelation qr;
         qr.qst = pQuest;
         qr.type = 1;
@@ -268,10 +268,10 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 	{
 		bValid = false;
 
-		GameObject *go = TO_GAMEOBJECT( quest_giver );
+		GameObject *go = TO< GameObject* >( quest_giver );
 		Arcemu::GO_QuestGiver *questgiver = NULL;
 		if( go->GetType() == GAMEOBJECT_TYPE_QUESTGIVER ){
-			questgiver = static_cast< Arcemu::GO_QuestGiver* >( go );
+			questgiver = TO< Arcemu::GO_QuestGiver* >( go );
 			if( questgiver->HasQuests() )
 				bValid = true;
 		}
@@ -285,11 +285,11 @@ uint32 QuestMgr::ActiveQuestsCount(Object* quest_giver, Player* plr)
 	} 
 	else if(quest_giver->IsCreature())
 	{
-		bValid = static_cast<Creature*>(quest_giver)->HasQuests();
+		bValid = TO< Creature* >(quest_giver)->HasQuests();
 		if(bValid)
 		{
-			q_begin = static_cast<Creature*>(quest_giver)->QuestsBegin();
-			q_end   = static_cast<Creature*>(quest_giver)->QuestsEnd();
+			q_begin = TO< Creature* >(quest_giver)->QuestsBegin();
+			q_end   = TO< Creature* >(quest_giver)->QuestsEnd();
 		}
 	}
 
@@ -556,7 +556,7 @@ void QuestMgr::BuildRequestItems(WorldPacket *data, Quest* qst, Object* qst_give
 void QuestMgr::BuildQuestComplete(Player*plr, Quest* qst)
 {
 	uint32 xp ;
-	uint32 currtalentpoints = plr->GetTalentPoints(SPEC_PRIMARY);
+	uint32 currtalentpoints = plr->GetTalentPoints();
 	uint32 rewardtalents = qst->rewardtalents;
 	uint32 playerlevel = plr->getLevel();
 	
@@ -616,10 +616,10 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 	{
 		bValid = false;
 
-		GameObject *go = TO_GAMEOBJECT( qst_giver );
+		GameObject *go = TO< GameObject* >( qst_giver );
 		Arcemu::GO_QuestGiver *questgiver = NULL;
 		if( go->GetType() == GAMEOBJECT_TYPE_QUESTGIVER ){
-			questgiver = static_cast< Arcemu::GO_QuestGiver* >( go );
+			questgiver = TO< Arcemu::GO_QuestGiver* >( go );
 			if( questgiver->HasQuests() )
 				bValid = true;
 		}
@@ -632,11 +632,11 @@ void QuestMgr::BuildQuestList(WorldPacket *data, Object* qst_giver, Player *plr,
 	} 
 	else if(qst_giver->IsCreature())
 	{
-		bValid = static_cast<Creature*>(qst_giver)->HasQuests();
+		bValid = TO< Creature* >(qst_giver)->HasQuests();
 		if(bValid)
 		{
-			st = static_cast<Creature*>(qst_giver)->QuestsBegin();
-			ed = static_cast<Creature*>(qst_giver)->QuestsEnd();
+			st = TO< Creature* >(qst_giver)->QuestsBegin();
+			ed = TO< Creature* >(qst_giver)->QuestsEnd();
 		}
 	}
 
@@ -1037,10 +1037,10 @@ void QuestMgr::GiveQuestRewardReputation(Player* plr, Quest* qst, Object *qst_gi
 
 			// Let's do this properly. Determine the faction of the creature, and give reputation to his faction.
 			if( qst_giver->IsCreature() )
-				if( static_cast<Creature*>(qst_giver)->m_factionDBC != NULL )
-					fact = static_cast<Creature*>(qst_giver)->m_factionDBC->ID;
+				if( TO< Creature* >(qst_giver)->m_factionDBC != NULL )
+					fact = TO< Creature* >(qst_giver)->m_factionDBC->ID;
 			if( qst_giver->IsGameObject() )
-				fact = static_cast<GameObject*>(qst_giver)->GetFaction();
+				fact = TO< GameObject* >(qst_giver)->GetFaction();
 		}
 		else
 		{
@@ -1102,7 +1102,7 @@ void QuestMgr::OnQuestFinished(Player* plr, Quest* qst, Object *qst_giver, uint3
 	
 	if(qst_giver->IsCreature())
 	{
-		if(!static_cast<Creature*>(qst_giver)->HasQuest(qst->id, 2))
+		if(!TO< Creature* >(qst_giver)->HasQuest(qst->id, 2))
 		{
 			//sCheatLog.writefromsession(plr->GetSession(), "tried to finish quest from invalid npc.");
 			plr->GetSession()->Disconnect();
@@ -1732,7 +1732,7 @@ void QuestMgr::BuildQuestFailed(WorldPacket* data, uint32 questid)
 bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 {
 	if(qst_giver->IsGameObject() ){
-		GameObject *go = TO_GAMEOBJECT( qst_giver );
+		GameObject *go = TO< GameObject* >( qst_giver );
 		if( go->GetType() != GAMEOBJECT_TYPE_QUESTGIVER )
 			return false;
 
@@ -1762,10 +1762,10 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 			
 			bValid = false;
 			
-			GameObject *go = TO_GAMEOBJECT( qst_giver );
+			GameObject *go = TO< GameObject* >( qst_giver );
 			Arcemu::GO_QuestGiver *questgiver = NULL;
 			if( go->GetType() == GAMEOBJECT_TYPE_QUESTGIVER ){
-				questgiver = static_cast< Arcemu::GO_QuestGiver* >( go );
+				questgiver = TO< Arcemu::GO_QuestGiver* >( go );
 				if( questgiver->HasQuests() )
 					bValid = true;
 			}
@@ -1778,11 +1778,11 @@ bool QuestMgr::OnActivateQuestGiver(Object *qst_giver, Player *plr)
 		} 
 		else if(qst_giver->IsCreature())
 		{
-			bValid = static_cast<Creature*>(qst_giver)->HasQuests();
+			bValid = TO< Creature* >(qst_giver)->HasQuests();
 			if(bValid)
 			{
-				q_begin = static_cast<Creature*>(qst_giver)->QuestsBegin();
-				q_end   = static_cast<Creature*>(qst_giver)->QuestsEnd();
+				q_begin = TO< Creature* >(qst_giver)->QuestsBegin();
+				q_end   = TO< Creature* >(qst_giver)->QuestsEnd();
 			}
 		}
 
