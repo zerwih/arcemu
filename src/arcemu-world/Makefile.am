@@ -93,6 +93,8 @@ arcemu_world_SOURCES = \
     Object/GameObject/GO_Lootable.h \
     Object/GameObject/GO_QuestGiver.cpp \
     Object/GameObject/GO_Questgiver.h \
+    Object/GameObject/Ritual.cpp \
+    Object/GameObject/Ritual.h \
     Object/GameObject/GO_Ritual.cpp \
     Object/GameObject/GO_Ritual.h \
     Object/GameObject/GO_SpellFocus.cpp \

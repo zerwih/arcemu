@@ -37,12 +37,26 @@ namespace Arcemu{
 		~GO_Ritual();
 
 		void InitAI();
-		
-		uint32 *m_ritualmembers;
-		uint32 m_ritualcaster;
-		uint32  m_ritualtarget;
-		uint16 m_ritualspell;
 
+
+		////////////////////////////////////////////////////////////
+		//CRitual* GetRitual() const
+		//  Returns a pointer to the Ritual object
+		//
+		//Parameters
+		//  None
+		//
+		//Return Value
+		//  Returns a pointer to the Ritual object
+		//
+		//
+		///////////////////////////////////////////////////////////
+		CRitual* GetRitual() const{
+			return Ritual;
+		}
+
+	private:		
+		CRitual *Ritual;
 	};
 
 }
