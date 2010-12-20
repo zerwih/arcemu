@@ -38,6 +38,8 @@ namespace Arcemu{
 
 		~GO_FishingNode();
 
+		void OnPushToWorld();
+
 		///////////////////////////////////////////////////////////////////////
 		//bool UseNode()
 		//  Uses the fishing node.

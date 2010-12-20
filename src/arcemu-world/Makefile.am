@@ -97,6 +97,8 @@ arcemu_world_SOURCES = \
     Object/GameObject/Ritual.h \
     Object/GameObject/GO_Ritual.cpp \
     Object/GameObject/GO_Ritual.h \
+    Object/GameObject/GO_SpellCaster.cpp \
+    Object/GameObject/GO_SpellCaster.h \
     Object/GameObject/GO_SpellFocus.cpp \
     Object/GameObject/GO_SpellFocus.h \
     Object/GameObject/GO_Trap.cpp \

@@ -131,6 +131,7 @@ template< class T, class U > T TO( U u ){ return static_cast< T >( u ); }
 #include "Object/GameObject/GO_Trap.h"
 #include "Object/GameObject/GO_FishingHole.h"
 #include "Object/GameObject/GO_Goober.h"
+#include "Object/GameObject/GO_SpellCaster.h"
 #include "Object/GameObject/GO_SpellFocus.h"
 #include "Object/GameObject/GO_FishingNode.h"
 #include "Object/GameObject/CRitual.h"
