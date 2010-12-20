@@ -42,13 +42,13 @@ WarsongGulch::WarsongGulch(MapMgr * mgr, uint32 id, uint32 lgroup, uint32 t) : C
 	/* take note: these are swapped around for performance bonus */
 	// warsong flag - horde base
 	m_homeFlags[0] = SpawnGameObject(179831, 489, 915.367f, 1433.78f, 346.089f, 3.17301f, 0, 210, 2.5f);
-	m_homeFlags[0]->SetState(  1);
+	m_homeFlags[0]->SetState( GAMEOBJECT_STATE_CLOSED );
 	m_homeFlags[0]->SetType(GAMEOBJECT_TYPE_FLAGSTAND);
 	m_homeFlags[0]->SetAnimProgress(  100);
 
 	// silverwing flag - alliance base
 	m_homeFlags[1] = SpawnGameObject(179830, 489, 1540.29f, 1481.34f, 352.64f, 3.17301f, 0,1314, 2.5f);
-	m_homeFlags[1]->SetState(  1);
+	m_homeFlags[1]->SetState( GAMEOBJECT_STATE_CLOSED );
 	m_homeFlags[1]->SetType(GAMEOBJECT_TYPE_FLAGSTAND);
 	m_homeFlags[1]->SetAnimProgress(  100);
 
@@ -482,7 +482,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179871, 489, 1449.9296875f, 1470.70971679688f, 342.634552001953f, -1.64060950279236f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.73135370016098f);
 		m_buffs[x]->SetParentRotation(3, -0.681998312473297f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -490,7 +490,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179899, 489, 1005.17071533203f, 1447.94567871094f, 335.903228759766f, 1.64060950279236f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.73135370016098f);
 		m_buffs[x]->SetParentRotation(3, 0.681998372077942f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -498,7 +498,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179904, 489, 1317.50573730469f, 1550.85070800781f, 313.234375f, -0.26179963350296f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.130526319146156f);
 		m_buffs[x]->SetParentRotation(3, -0.991444826126099f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -506,7 +506,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179906, 489, 1110.45129394531f, 1353.65563964844f, 316.518096923828f, -0.68067866563797f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.333806991577148f);
 		m_buffs[x]->SetParentRotation(3, -0.94264143705368f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -514,7 +514,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179905, 489, 1320.09375f, 1378.78967285156f, 314.753234863281f, 1.18682384490967f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.559192895889282f);
 		m_buffs[x]->SetParentRotation(3, 0.829037606716156f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -522,7 +522,7 @@ void WarsongGulch::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(179907, 489, 1139.68774414063f, 1560.28771972656f, 306.843170166016f, -2.4434609413147f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.939692616462708f);
 		m_buffs[x]->SetParentRotation(3, -0.342020124197006f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -606,7 +606,7 @@ void WarsongGulch::OnStart()
 	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
 	{
 		(*itr)->SetFlags(  64);
-		(*itr)->SetState(  0);
+		(*itr)->SetState( GAMEOBJECT_STATE_OPEN );
 	}
 
 	DespawnGates(5000);

@@ -151,7 +151,7 @@ void ArathiBasin::SpawnBuff(uint32 x)
 
 		m_buffs[x]->SetParentRotation(2, BuffRotations[x][0]);
 		m_buffs[x]->SetParentRotation(3, BuffRotations[x][1]);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		m_buffs[x]->PushToWorld(m_mapMgr);
@@ -189,7 +189,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 
 		m_controlPoints[Id]->SetParentRotation(2, ControlPointRotations[Id][0]);
 		m_controlPoints[Id]->SetParentRotation(3, ControlPointRotations[Id][1]);
-		m_controlPoints[Id]->SetState(  1);
+		m_controlPoints[Id]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_controlPoints[Id]->SetType(  static_cast<uint8>( gi->Type ));
 		m_controlPoints[Id]->SetAnimProgress(  100);
 		m_controlPoints[Id]->Activate();
@@ -262,7 +262,7 @@ void ArathiBasin::SpawnControlPoint(uint32 Id, uint32 Type)
 
 		m_controlPointAuras[Id]->SetParentRotation(2, ControlPointRotations[Id][0]);
 		m_controlPointAuras[Id]->SetParentRotation(3, ControlPointRotations[Id][1]);
-		m_controlPointAuras[Id]->SetState(  1);
+		m_controlPointAuras[Id]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_controlPointAuras[Id]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_controlPointAuras[Id]->SetAnimProgress(  100);
 		m_controlPointAuras[Id]->PushToWorld(m_mapMgr);
@@ -382,7 +382,7 @@ void ArathiBasin::OnStart()
 	for(list<GameObject*>::iterator itr = m_gates.begin(); itr != m_gates.end(); ++itr)
 	{
 		(*itr)->SetFlags(  64);
-		(*itr)->SetState(  0);
+		(*itr)->SetState( GAMEOBJECT_STATE_OPEN );
 	}
 
 	/* correct? - burlex */

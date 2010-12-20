@@ -95,7 +95,7 @@ bool GameObject::CreateFromProto(uint32 entry,uint32 mapid, float x, float y, fl
 	SetParentRotation(3, r3);
 	UpdateRotation();
     SetAnimProgress( 0 );
-	SetState( 1 );
+	SetState( GAMEOBJECT_STATE_CLOSED );
 	SetDisplayId(pInfo->DisplayID );
 	SetType( static_cast<uint8>( pInfo->Type ));
 

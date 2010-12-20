@@ -510,7 +510,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 								if( pLock->lockmisc[i] == LOCKTYPE_MINING || pLock->lockmisc[i] == LOCKTYPE_HERBALISM ){
 								//we still have loot inside.
 									if( pLGO->HasLoot() ){
-										pLGO->SetState( 1 );
+										pLGO->SetState( GAMEOBJECT_STATE_CLOSED );
 										// TODO : redo this temporary fix, because for some reason hasloot is true even when we loot everything
 										// my guess is we need to set up some even that rechecks the GO in 10 seconds or something
 										//pGO->Despawn( 600000 + ( RandomUInt( 300000 ) ) );
@@ -522,7 +522,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 								}
 							}else{
 								if( pLGO->HasLoot() ){
-									pGO->SetState(  1);
+									pGO->SetState( GAMEOBJECT_STATE_CLOSED );
 									return;
 								}
 								pGO->Despawn(0, sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 180000 + ( RandomUInt( 180000 ) ) : (IS_INSTANCE(pGO->GetMapId()) ? 0 : 900000 + ( RandomUInt( 600000 ) ) ) );
@@ -531,7 +531,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 						}else //other type of locks that i don't bother to split atm ;P
 						{
 							if( pLGO->HasLoot() ){
-								pGO->SetState(  1);
+								pGO->SetState( GAMEOBJECT_STATE_CLOSED );
 								return;
 							}
 							pGO->Despawn(0, sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 180000 + ( RandomUInt( 180000 ) ) : (IS_INSTANCE(pGO->GetMapId()) ? 0 : 900000 + ( RandomUInt( 600000 ) ) ) );
@@ -540,7 +540,7 @@ void WorldSession::HandleLootReleaseOpcode( WorldPacket & recv_data )
 					}
 				}else{
 					if( pLGO->HasLoot() ){
-						pGO->SetState(  1);
+						pGO->SetState( GAMEOBJECT_STATE_CLOSED );
 						return;
 					}
 					pGO->Despawn(0, sQuestMgr.GetGameObjectLootQuest(pGO->GetEntry()) ? 180000 + ( RandomUInt( 180000 ) ) : (IS_INSTANCE(pGO->GetMapId()) ? 0 : 900000 + ( RandomUInt( 600000 ) ) ) );
@@ -2139,7 +2139,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recv_data)
 			return;
 
 		Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( pGameObject );
-		pGameObject->SetState( 0);
+		pGameObject->SetState( GAMEOBJECT_STATE_OPEN );
 		pLoot = &pLGO->loot;
 	}
 

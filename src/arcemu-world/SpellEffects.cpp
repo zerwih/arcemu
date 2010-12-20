@@ -2468,7 +2468,7 @@ void Spell::SpellEffectOpenLock(uint32 i) // Open Lock
 					{
 						v = lock->minlockskill[j];
 						gameObjTarget->SetFlags(  0);
-						gameObjTarget->SetState(  1);
+						gameObjTarget->SetState( GAMEOBJECT_STATE_CLOSED );
 						//Add Fill GO loot here
 						if( gameObjTarget->IsLootable() ){
 							Arcemu::GO_Lootable *pLGO = static_cast< Arcemu::GO_Lootable* >( gameObjTarget );
@@ -3180,7 +3180,7 @@ void Spell::SpellEffectSummonObject(uint32 i)
 
 		go->CreateFromProto( entry, mapid, posx, posy, posz, orient );
 		go->SetFlags( 0 );
-		go->SetState( 0 );
+		go->SetState( GAMEOBJECT_STATE_OPEN );
 		go->SetUInt64Value( OBJECT_FIELD_CREATED_BY, m_caster->GetGUID() );
 		go->SetFaction( u_caster->GetFaction() );
 		go->Phase(PHASE_SET, u_caster->GetPhase());

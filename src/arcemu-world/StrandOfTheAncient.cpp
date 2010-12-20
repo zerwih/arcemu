@@ -455,7 +455,7 @@ void StrandOfTheAncient::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(184977, mapid, 1449.9296875f, 1470.70971679688f, 342.634552001953f, -1.64060950279236f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.73135370016098f);
 		m_buffs[x]->SetParentRotation(3, -0.681998312473297f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -463,7 +463,7 @@ void StrandOfTheAncient::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(184971, mapid, 1005.17071533203f, 1447.94567871094f, 335.903228759766f, 1.64060950279236f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.73135370016098f);
 		m_buffs[x]->SetParentRotation(3, 0.681998372077942f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
@@ -471,7 +471,7 @@ void StrandOfTheAncient::SpawnBuff(uint32 x)
 		m_buffs[x] = SpawnGameObject(184965, mapid, 1317.50573730469f, 1550.85070800781f, 313.234375f, -0.26179963350296f, 0, 114, 1);
 		m_buffs[x]->SetParentRotation(2, 0.130526319146156f);
 		m_buffs[x]->SetParentRotation(3, -0.991444826126099f);
-		m_buffs[x]->SetState(  1);
+		m_buffs[x]->SetState( GAMEOBJECT_STATE_CLOSED );
 		m_buffs[x]->SetType(GAMEOBJECT_TYPE_TRAP);
 		m_buffs[x]->SetAnimProgress(  100);
 		break;
