@@ -62,28 +62,28 @@ void lua_engine::report(lua_State * L)
 	}
 }
 
-void lua_engine::scriptload_searchdir(char* Dirname, std::set<string>& store)
+void lua_engine::scriptload_searchdir(char * Dirname, std::set<string>& store)
 {
-#ifdef WIN32
-	Log.Success("LuaEngine", "Scanning Directory %s", Dirname);
+#ifdef WIN32 
+	Log.Success("LuaEngine", "Scanning Directory \"%s\"", Dirname);
 	HANDLE hFile;
-	WIN32_FIND_DATA FindData;
-	memset(&FindData,0,sizeof(FindData));
+	WIN32_FIND_DATAA FindData;
+	memset(&FindData,0,sizeof(WIN32_FIND_DATAA));
 
 	char SearchName[MAX_PATH];
 	        
 	strcpy(SearchName,Dirname);
-	strcat(SearchName,"\\*.*");
+	strcat(SearchName, "\\*.*" );
 
-	hFile = FindFirstFile(SearchName,&FindData);
-	FindNextFile(hFile, &FindData);
+	hFile = FindFirstFileA(SearchName,&FindData);
+	FindNextFileA(hFile, &FindData);
 	    
-	while( FindNextFile(hFile, &FindData) )
+	while( FindNextFileA(hFile, &FindData) )
 	{
-		if( FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) //Credits for this 'if' go to Cebernic from ArcScripts Team. Thanks, you saved me some work ;-)
+		if( (FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)  && !(FindData.dwFileAttributes & FILE_ATTRIBUTE_HIDDEN) ) //Credits for this 'if' go to Cebernic from ArcScripts Team. Thanks, you saved me some work ;-)
 		{
 			strcpy(SearchName,Dirname);
-			strcat(SearchName,"\\");
+			strcat(SearchName, "\\" );
 			strcat(SearchName,FindData.cFileName);
 			scriptload_searchdir(SearchName, store);
 		}
@@ -93,18 +93,18 @@ void lua_engine::scriptload_searchdir(char* Dirname, std::set<string>& store)
 			fname += "\\";
 			fname += FindData.cFileName;
 
-			int len = strlen(fname.c_str());
+			int len = fname.length();
 			int i=0;
 			char ext[MAX_PATH];
 					  
 			while(len > 0)
 			{  
 				ext[i++] = fname[--len];
-				if(fname[len] == '.')
+				if(fname[len] == '.' )
 		  			break;
 	  		}
 	  		ext[i++] = '\0';
-	  		if ( !_stricmp(ext,"aul.") )
+	  		if ( !_stricmp(ext,"aul." ) )
 				store.insert(fname);
 		}
 	}
@@ -152,7 +152,8 @@ void lua_engine::loadScripts()
 {
 	std::set<string> found_scripts;
 	Log.Notice("LuaEngine", "Scanning Script-Directories...");
-	scriptload_searchdir( (char*)"scripts", found_scripts);
+	char * script_dir = "scripts";
+	scriptload_searchdir( script_dir, found_scripts);
 	Log.Notice("LuaEngine","Found %u Lua scripts.", found_scripts.size() );
 	//Read our scripts and cache their data.
 	//We protect scripts while they are being modified.
@@ -189,7 +190,7 @@ void lua_engine::loadScripts()
 		else
 			Log.Success("LuaEngine","loaded %s",it->first.c_str() );
 	}
-	Log.Success("LuaEngine", "Successfully loaded %u scripts.");
+	Log.Success("LuaEngine", "Successfully loaded %u scripts.", cnt);
 }
 
 void lua_engine::BeginLuaFunctionCall(lua_function ref)
@@ -246,7 +247,7 @@ void lua_engine::EndLuaFunctionCall(int res)
 void lua_engine::startupEngine()
 {
 	Log.Notice("LuaEngineMgr", "Spawning Lua Engine...");
-#ifdef WIN32
+/*#ifdef WIN32
 	Log.Color(TGREEN);
 	printf(" \_\_                        \_\_  \_\_                  \_\_\_\_\_\_                 \n");
 	//Log.Color(TGREEN);
@@ -268,12 +269,13 @@ void lua_engine::startupEngine()
 	Log.Color(TNORMAL);
 	#else
 	Log.Color(TGREEN);
-	printf("~~~LuaHypArc~~~");
+	
 	#endif
 	Log.Line("");
-	Log.Notice("LuaEngineMgr", "LuaHypArc Lua Engine %s: Loaded", ARCH);
 	Log.Color(TNORMAL);
-	Log.Line("");
+	Log.Line("");*/
+	Log.Notice("LuaEngineMgr","~~~LuaHypArc~~~");
+	Log.Notice("LuaEngineMgr", "LuaHypArc Lua Engine %s: Loaded", ARCH);
 
 	//Initialize our compiler.
 	LUA_COMPILER = new LUA_INSTANCE;
