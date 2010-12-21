@@ -286,6 +286,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Destructible.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../StdAfx.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -465,6 +468,7 @@
     <ClInclude Include="..\..\src\arcemu-world\CObjectFactory.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Chest.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Destructible.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingHole.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_FishingNode.h" />

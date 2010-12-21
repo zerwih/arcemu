@@ -33,7 +33,9 @@ enum GO_STATE{
 
 enum GO_FLAGS{
 	GAMEOBJECT_FLAG_NONSELECTABLE  =  1,
-	GAMEOBJECT_FLAG_LOCKED         =  2
+	GAMEOBJECT_FLAG_LOCKED         =  2,
+    GAMEOBJECT_FLAG_DAMAGED        = 0x200,
+    GAMEOBJECT_FLAG_DESTROYED      = 0x400
 };
 
 enum GAMEOBJECT_OVERRIDES //by VLack
@@ -379,13 +381,13 @@ struct GameObjectInfo{
             uint32 creditProxyCreature;                     //1
             uint32 empty1;                                  //2
             uint32 intactEvent;                             //3
-            uint32 empty2;                                  //4
+            uint32 DamagedDisplayID;                        //4
             uint32 damagedNumHits;                          //5
             uint32 empty3;                                  //6
             uint32 empty4;                                  //7
             uint32 empty5;                                  //8
             uint32 damagedEvent;                            //9
-            uint32 empty6;                                  //10
+            uint32 DestroyedDisplayID;                      //10
             uint32 empty7;                                  //11
             uint32 empty8;                                  //12
             uint32 empty9;                                  //13
@@ -647,6 +649,12 @@ public:
 
 	void SetFlags( uint32 flags ){ SetUInt32Value( GAMEOBJECT_FLAGS, flags ); }
 	uint32 GetFlags(){ return GetUInt32Value( GAMEOBJECT_FLAGS ); }
+	bool HasFlags( uint32 flags ){
+		if( HasFlag( GAMEOBJECT_FLAGS, flags ) != 0 )
+			return true;
+		else
+			return false;
+	}
 
 	uint32 GetOverrides() { return m_overrides; }
 

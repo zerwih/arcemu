@@ -351,6 +351,8 @@ protected:
 	bool HandleGOState( const char *args, WorldSession *m_session );
 	bool HandleGOFlags( const char *args, WorldSession *m_session );
 	bool HandleGOFaction( const char *args, WorldSession *m_session );
+	bool HandleGODamage( const char *args, WorldSession *m_session ); // heavenly GM command ^^
+	bool HandleGORebuild( const char *args, WorldSession *m_session );
 	////////////////////////////////////////////////////////////////////////////////////////
 
 	bool HandleAddAIAgentCommand(const char* args, WorldSession *m_session);

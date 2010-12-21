@@ -499,6 +499,9 @@
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.cpp" />
     <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\CRitual.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellCaster.cpp" />
+    <ClCompile Include="..\..\src\arcemu-world\Object\GameObject\GO_Destructible.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\arcemu-world\Channel.h">
@@ -783,6 +786,9 @@
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Door.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Button.h" />
     <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Goober.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_SpellCaster.h" />
+    <ClInclude Include="..\..\src\arcemu-world\object\gameobject\CRitual.h" />
+    <ClInclude Include="..\..\src\arcemu-world\Object\GameObject\GO_Destructible.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\..\src\arcemu-world\resources.rc" />
