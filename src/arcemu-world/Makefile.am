@@ -82,6 +82,8 @@ arcemu_world_SOURCES = \
     Object/GameObject/GO_Button.h \
     Object/GameObject/GO_Chest.cpp \
     Object/GameObject/GO_Chest.h \
+    Object/GameObject/GO_Destructible.cpp \
+    Object/GameObject/GO_Destructible.h \
     Object/GameObject/GO_Door.cpp \
     Object/GameObject/GO_Door.h \
     Object/GameObject/GO_FishingHole.cpp \
@@ -93,8 +95,8 @@ arcemu_world_SOURCES = \
     Object/GameObject/GO_Lootable.h \
     Object/GameObject/GO_QuestGiver.cpp \
     Object/GameObject/GO_Questgiver.h \
-    Object/GameObject/Ritual.cpp \
-    Object/GameObject/Ritual.h \
+    Object/GameObject/CRitual.cpp \
+    Object/GameObject/CRitual.h \
     Object/GameObject/GO_Ritual.cpp \
     Object/GameObject/GO_Ritual.h \
     Object/GameObject/GO_SpellCaster.cpp \
