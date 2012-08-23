@@ -19,6 +19,7 @@
  */
 
 #include "StdAfx.h"
+#include "RealmsConfigParser.h"
 
 #define BANNER "ArcEmu %s %s/%s-%s-%s :: World Server"
 
@@ -96,7 +97,7 @@ struct Addr
 
 static const char* default_config_file = CONFDIR "/world.conf";
 static const char* default_optional_config_file = CONFDIR "/optional.conf";
-static const char* default_realm_config_file = CONFDIR "/realms.conf";
+static const char* default_realm_config_file = CONFDIR "/realms.conf.xml";
 
 bool bServerShutdown = false;
 bool StartConsoleListener();
@@ -170,7 +171,7 @@ bool Master::Run(int argc, char** argv)
 		return true;
 	}
 
-	if(do_check_conf)
+	if( do_check_conf )
 	{
 		Log.Notice("Config", "Checking config file: %s", config_file);
 		if(Config.MainConfig.SetSource(config_file, true))
@@ -179,7 +180,9 @@ bool Master::Run(int argc, char** argv)
 			Log.Error("Config", "Encountered one or more errors.");
 
 		Log.Notice("Config", "Checking config file: %s", realm_config_file);
-		if(Config.RealmConfig.SetSource(realm_config_file, true))
+		RealmsConfigParser realmsConfigParser;
+
+		if( realmsConfigParser.parseFile( realm_config_file )  )
 			Log.Success("Config", "Passed without errors.");
 		else
 			Log.Error("Config", "Encountered one or more errors.");
@@ -227,8 +230,10 @@ bool Master::Run(int argc, char** argv)
 		return false;
 	}
 
-	if(Config.RealmConfig.SetSource(realm_config_file))
-		Log.Notice("Config", ">> " CONFDIR "/realms.conf loaded");
+	RealmsConfigParser realmsConfigParser;
+
+	if( realmsConfigParser.parseFile( realm_config_file ) )
+		Log.Notice("Config", ">> " CONFDIR "/realms.conf.xml loaded");
 	else
 	{
 		sLog.Error("Config", ">> error occurred loading " CONFDIR "/realms.conf");
@@ -374,6 +379,7 @@ bool Master::Run(int argc, char** argv)
 
 	/* Connect to realmlist servers / logon servers */
 	new LogonCommHandler();
+	sLogonCommHandler.setRealmsConfig( realmsConfigParser.getData() );
 	sLogonCommHandler.Startup();
 
 	// Create listener

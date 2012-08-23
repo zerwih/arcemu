@@ -369,12 +369,12 @@ void LogonCommHandler::LoadRealmConfiguration()
 {
 	LogonServer* ls = new LogonServer;
 	ls->ID = idhigh++;
-	ls->Name = Config.RealmConfig.GetStringDefault("LogonServer", "Name", "UnkLogon");
-	ls->Address = Config.RealmConfig.GetStringDefault("LogonServer", "Address", "127.0.0.1");
-	ls->Port = Config.RealmConfig.GetIntDefault("LogonServer", "Port", 8093);
+	ls->Name = realmsConfig.logon.name;
+	ls->Address = realmsConfig.logon.address;
+	ls->Port = realmsConfig.logon.port;
 	servers.insert(ls);
 
-	uint32 realmcount = Config.RealmConfig.GetIntDefault("LogonServer", "RealmCount", 1);
+	uint32 realmcount = realmsConfig.logon.realmCount;
 	if(realmcount == 0)
 	{
 		LOG_ERROR("   >> no realms found. this server will not be online anywhere!");
@@ -383,14 +383,16 @@ void LogonCommHandler::LoadRealmConfiguration()
 	{
 		for(uint32 i = 1; i < realmcount + 1; ++i)
 		{
+			RealmsConfigData::RealmSettings &realmSettings = realmsConfig.realms[ i - 1 ];
+
 			Realm* realm = new Realm;
-			realm->Name = Config.RealmConfig.GetStringVA("Name", "SomeRealm", "Realm%u", i);
-			realm->Address = Config.RealmConfig.GetStringVA("Address", "127.0.0.1:8129", "Realm%u", i);
+			realm->Name = realmSettings.name;
+			realm->Address = realmSettings.addressAndPort;
 			realm->flags = 0;
-			realm->TimeZone = Config.RealmConfig.GetIntVA("TimeZone", 1, "Realm%u", i);
-			realm->Population = Config.RealmConfig.GetFloatVA("Population", 0, "Realm%u", i);
+			realm->TimeZone = realmSettings.timezone;
+			realm->Population = realmSettings.population;
 			realm->Lock = static_cast<uint8>(Config.RealmConfig.GetIntVA("Lock", 0, "Realm%u", i));
-			string rt = Config.RealmConfig.GetStringVA("Icon", "Normal", "Realm%u", i);
+			std::string rt = realmSettings.icon;
 			uint32 type;
 
 			// process realm type

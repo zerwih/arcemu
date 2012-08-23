@@ -21,6 +21,8 @@
 #ifndef LOGONCOMMHANDLER_H
 #define LOGONCOMMHANDLER_H
 
+#include "RealmsConfig.h"
+
 typedef struct
 {
 	uint32 ID;
@@ -100,6 +102,7 @@ class LogonCommHandler : public Singleton<LogonCommHandler>
 		void IPBan_Remove(const char* ip);
 
 		void LoadRealmConfiguration();
+		void setRealmsConfig( const RealmsConfigData &data ){ realmsConfig = data; }
 		void AddServer(string Name, string Address, uint32 Port);
 
 		ARCEMU_INLINE uint32 GetRealmType() { return _realmType; }
@@ -128,6 +131,10 @@ class LogonCommHandler : public Singleton<LogonCommHandler>
 		const string* GetForcedPermissions(string & username);
 
 		void TestConsoleLogon(string & username, string & password, uint32 requestnum);
+	
+	private:
+		RealmsConfigData realmsConfig;
+
 };
 
 #define sLogonCommHandler LogonCommHandler::getSingleton()
