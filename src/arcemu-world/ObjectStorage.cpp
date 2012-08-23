@@ -748,7 +748,7 @@ void ObjectMgr::StoreBroadCastGroupKey()
 // cebernic: plz feedback
 {
 	// init
-	if(!sWorld.BCSystemEnable)
+	if( !sWorld.getOptionalConfig().commonScheduler.autoBroadcast )
 	{
 		Log.Notice("ObjectMgr", "BCSystem Disabled.");
 		return;
@@ -773,7 +773,7 @@ void ObjectMgr::StoreBroadCastGroupKey()
 	if(keyGroup.empty())
 	{
 		Log.Notice("ObjectMgr", "BCSystem error! worldbroadcast empty? fill it first!");
-		sWorld.BCSystemEnable = false;
+		sWorld.broadcastOn( false );
 		return;
 	}
 	else

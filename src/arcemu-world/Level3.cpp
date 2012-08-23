@@ -1679,7 +1679,7 @@ bool ChatHandler::HandleModifyLevelCommand(const char* args, WorldSession* m_ses
 	if(plr == 0) return true;
 
 	uint32 Level = args ? atol(args) : 0;
-	if(Level == 0 || Level > sWorld.m_levelCap)
+	if(Level == 0 || Level > sWorld.getOptionalConfig().optional.levelCap )
 	{
 		RedSystemMessage(m_session, "A level (numeric) is required to be specified after this command.");
 		return true;

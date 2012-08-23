@@ -22,16 +22,17 @@
                   name         = "4"
                   msg          = "6" />
 
-  <extra instant_80 = "0"
-         portals    = "0" />
+  <extra instant_80   = "0"
+         portals      = "0"
+         pvp_token_id = "0" />
 
   <game_master list_only_active_gms = "0"
                hide_permissions     = "0" />
 
-  <common_schedule auto_broadcast                = "0"
-                   broadcast_interval            = "10"
-                   broadcast_trigger_percent_cap = "2"
-                   broadcast_order_mode          = "0" />
+  <common_scheduler auto_broadcast                = "0"
+                    broadcast_interval            = "10"
+                    broadcast_trigger_percent_cap = "2"
+                    broadcast_order_mode          = "0" />
 
   <class_options death_knight_pre_req = "1"
                  death_knight_limit   = "1" />

@@ -862,11 +862,11 @@ bool ChatHandler::HandleModifyGoldCommand(const char* args, WorldSession* m_sess
 	}
 
 	// Check they don't have more than the max gold
-	if(sWorld.GoldCapEnabled)
+	if( sWorld.getOptionalConfig().goldSettings.enableCap )
 	{
-		if((chr->GetGold() + newgold) > sWorld.GoldLimit)
+		if((chr->GetGold() + newgold) > sWorld.getOptionalConfig().goldSettings.cap )
 		{
-			RedSystemMessage(m_session, "Maximum amount of gold is %u and %s already has %u", (sWorld.GoldLimit / 10000), chr->GetName(), (chr->GetGold() / 10000));
+			RedSystemMessage(m_session, "Maximum amount of gold is %u and %s already has %u", (sWorld.getOptionalConfig().goldSettings.cap / 10000), chr->GetName(), (chr->GetGold() / 10000));
 			return true;
 		}
 	}

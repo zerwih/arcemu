@@ -198,20 +198,14 @@ void HonorHandler::OnPlayerKilled(Player* pPlayer, Player* pVictim)
 				data << pvppoints << pVictim->GetGUID() << uint32(pVictim->GetPVPRank());
 				pAffectedPlayer->GetSession()->SendPacket(&data);
 
-				int PvPToken = 0;
-				Config.OptionalConfig.GetInt("Extra", "PvPToken", &PvPToken);
+				int PvPToken = sWorld.getOptionalConfig().extra.pvpTokenId;
 				if(PvPToken > 0)
 				{
-					int PvPTokenID = 0;
-					Config.OptionalConfig.GetInt("Extra", "PvPTokenID", &PvPTokenID);
-					if(PvPTokenID > 0)
+					Item* PvPTokenItem = objmgr.CreateItem(PvPToken, pAffectedPlayer);
+					if(PvPTokenItem)
 					{
-						Item* PvPTokenItem = objmgr.CreateItem(PvPTokenID, pAffectedPlayer);
-						if(PvPTokenItem)
-						{
-							PvPTokenItem->SoulBind();
-							pAffectedPlayer->GetItemInterface()->AddItemToFreeSlot(PvPTokenItem);
-						}
+						PvPTokenItem->SoulBind();
+						pAffectedPlayer->GetItemInterface()->AddItemToFreeSlot(PvPTokenItem);
 					}
 				}
 				if(pAffectedPlayer->GetZoneId() == 3518)

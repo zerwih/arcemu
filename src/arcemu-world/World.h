@@ -21,6 +21,8 @@
 #ifndef __WORLD_H
 #define __WORLD_H
 
+#include "OptionalConfig.h"
+
 #define IS_INSTANCE( a ) ( ( a > 1 ) && ( a != 530 ) && ( a != 571 ) )
 
 class Object;
@@ -539,11 +541,6 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		uint32 SocketSendBufSize;
 		uint32 SocketRecvBufSize;
 
-		int32 StartingLevel;
-		uint32 ExtraTalents;
-		uint32 MaxProfs;
-		uint32 DKStartTalentPoints;
-
 		uint32 PeakSessionCount;
 		uint32 ArenaQueueDiff;
 		bool SendStatsOnJoin;
@@ -569,16 +566,6 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		bool show_gm_in_who_list;
 		uint32 map_unload_time;
 
-		bool interfaction_chat;
-		bool interfaction_group;
-		bool interfaction_guild;
-		bool interfaction_trade;
-		bool interfaction_friend;
-		bool interfaction_misc;
-		bool crossover_chars;
-		bool antiMasterLootNinja;
-		bool gamemaster_listOnlyActiveGMs;
-		bool gamemaster_hidePermissions;
 		bool gamemaster_startonGMIsland;
 		bool gamemaster_disableachievements;
 
@@ -587,24 +574,12 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		int Arena_Progress;
 
 
-		// broadcast system config
-		bool BCSystemEnable;
-		int BCInterval;
-		int BCTriggerPercentCap;
-		int BCOrderMode;
-
-		bool realmAllowTBCcharacters;
-
 		std::string announce_tag;
 		bool GMAdminTag;
 		bool NameinAnnounce;
 		bool NameinWAnnounce;
 		bool announce_output;
 
-		int announce_tagcolor;
-		int announce_gmtagcolor;
-		int announce_namecolor;
-		int announce_msgcolor;
 		string ann_namecolor;
 		string ann_gmtagcolor;
 		string ann_tagcolor;
@@ -703,17 +678,9 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		bool m_reqGmForCommands;
 		bool m_lfgForNonLfg;
 		list<SpellEntry*> dummyspells;
-		uint32 m_levelCap;
-		uint32 m_genLevelCap;
 		bool m_limitedNames;
 		bool m_useAccountData;
-		bool m_AdditionalFun;
 		std::map<WMOAreaTableTripple, WMOAreaTableEntry*> m_WMOAreaTableTripples;
-
-		// Gold Cap
-		bool GoldCapEnabled;
-		uint32 GoldLimit;
-		uint32 GoldStartAmount;
 
 		char* m_banTable;
 
@@ -760,6 +727,12 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 			return perfcounter.GetCurrentRAMUsage();
 		}
 
+		void setOptionalConfig( const OptionalConfigData &config ){ optionalConfig = config; }
+		const OptionalConfigData& getOptionalConfig() const{ return optionalConfig; }
+		void broadcastOn( bool b ){ optionalConfig.commonScheduler.autoBroadcast = b; }
+
+	private:
+		OptionalConfigData optionalConfig;
 };
 
 #define sWorld World::getSingleton()

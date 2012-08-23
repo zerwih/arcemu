@@ -1458,9 +1458,9 @@ void Guild::WithdrawMoney(WorldSession* pClient, uint32 uAmount)
 		return;
 
 	// Check they dont have more than the max gold
-	if(sWorld.GoldCapEnabled)
+	if( sWorld.getOptionalConfig().goldSettings.enableCap )
 	{
-		if((pClient->GetPlayer()->GetGold() + uAmount) > sWorld.GoldLimit)
+		if((pClient->GetPlayer()->GetGold() + uAmount) > sWorld.getOptionalConfig().goldSettings.cap )
 		{
 			pClient->GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_TOO_MUCH_GOLD);
 			return;

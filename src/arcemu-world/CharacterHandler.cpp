@@ -372,7 +372,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
 	}
 
 	// Check if player got Death Knight already on this realm.
-	if(Config.OptionalConfig.GetBoolDefault("ClassOptions" , "DeathKnightLimit" , true) && has_dk
+	if( sWorld.getOptionalConfig().classOptions.DKLimit && has_dk
 	        && (class_ == DEATHKNIGHT))
 	{
 		OutPacket(SMSG_CHAR_CREATE, 1, CHAR_CREATE_UNIQUE_CLASS_LIMIT);
@@ -410,7 +410,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
 
 	//Same Faction limitation only applies to PVP and RPPVP realms :)
 	uint32 realmType = sLogonCommHandler.GetRealmType();
-	if(!HasGMPermissions() && realmType == REALMTYPE_PVP && _side >= 0 && !sWorld.crossover_chars)  // ceberwow fixed bug
+	if(!HasGMPermissions() && realmType == REALMTYPE_PVP && _side >= 0 && !sWorld.getOptionalConfig().interfaction.crossoverChars )
 	{
 		if((pNewChar->IsTeamAlliance() && (_side == 1)) || (pNewChar->IsTeamHorde() && (_side == 0)))
 		{
@@ -423,7 +423,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
 
 	//Check if player has a level 55 or higher character on this realm and allow him to create DK.
 	//This check can be turned off in optional.conf
-	if(Config.OptionalConfig.GetBoolDefault("ClassOptions" , "DeathKnightPreReq" , false) && !has_level_55_char
+	if( sWorld.getOptionalConfig().classOptions.DKPrerequisites && !has_level_55_char
 	        && (class_ == DEATHKNIGHT))
 	{
 		pNewChar->ok_to_remove = true;
@@ -938,7 +938,7 @@ void WorldSession::FullLogin(Player* plr)
 
 		OutPacket(SMSG_TRIGGER_CINEMATIC, 4, &introid);
 
-		if(sWorld.m_AdditionalFun)    //cebernic: tells people who 's newbie :D
+		if( sWorld.getOptionalConfig().optional.additionalFun )    //tells people who 's newbie :D
 		{
 			const int classtext[] = {0, 5, 6, 8, 9, 11, 0, 4, 3, 7, 0, 10};
 			sWorld.SendLocalizedWorldText(true, "{65}", classtext[(uint32)plr->getClass() ] , plr->GetName() , (plr->IsTeamHorde() ? "{63}" : "{64}"));

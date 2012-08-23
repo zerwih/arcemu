@@ -20,6 +20,7 @@
 
 #include "StdAfx.h"
 #include "RealmsConfigParser.h"
+#include "OptionalConfigParser.h"
 
 #define BANNER "ArcEmu %s %s/%s-%s-%s :: World Server"
 
@@ -96,7 +97,7 @@ struct Addr
 #define DEF_VALUE_NOT_SET 0xDEADBEEF
 
 static const char* default_config_file = CONFDIR "/world.conf";
-static const char* default_optional_config_file = CONFDIR "/optional.conf";
+static const char* default_optional_config_file = CONFDIR "/optional.conf.xml";
 static const char* default_realm_config_file = CONFDIR "/realms.conf.xml";
 
 bool bServerShutdown = false;
@@ -180,15 +181,17 @@ bool Master::Run(int argc, char** argv)
 			Log.Error("Config", "Encountered one or more errors.");
 
 		Log.Notice("Config", "Checking config file: %s", realm_config_file);
+		
 		RealmsConfigParser realmsConfigParser;
-
 		if( realmsConfigParser.parseFile( realm_config_file )  )
 			Log.Success("Config", "Passed without errors.");
 		else
 			Log.Error("Config", "Encountered one or more errors.");
 
 		Log.Notice("Config", "Checking config file:: %s", optional_config_file);
-		if(Config.OptionalConfig.SetSource(optional_config_file, true))
+		
+		OptionalConfigParser optionalConfigParser;
+		if( optionalConfigParser.parseFile( optional_config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
 			Log.Error("Config", "Encountered one or more errors.");
@@ -221,11 +224,12 @@ bool Master::Run(int argc, char** argv)
 		return false;
 	}
 
-	if(Config.OptionalConfig.SetSource(optional_config_file))
-		Log.Notice("Config", ">> " CONFDIR "/optional.conf loaded");
+	OptionalConfigParser optionalConfigParser;
+	if( optionalConfigParser.parseFile( optional_config_file ) )
+		Log.Notice("Config", ">> " CONFDIR "/optional.conf.xml loaded");
 	else
 	{
-		sLog.Error("Config", ">> error occurred loading " CONFDIR "/optional.conf");
+		sLog.Error("Config", ">> error occurred loading " CONFDIR "/optional.conf.xml");
 		sLog.Close();
 		return false;
 	}
@@ -236,7 +240,7 @@ bool Master::Run(int argc, char** argv)
 		Log.Notice("Config", ">> " CONFDIR "/realms.conf.xml loaded");
 	else
 	{
-		sLog.Error("Config", ">> error occurred loading " CONFDIR "/realms.conf");
+		sLog.Error("Config", ">> error occurred loading " CONFDIR "/realms.conf.xml");
 		sLog.Close();
 		return false;
 	}
@@ -278,6 +282,7 @@ bool Master::Run(int argc, char** argv)
 
 	new EventMgr;
 	new World;
+	sWorld.setOptionalConfig( optionalConfigParser.getData() );
 
 	// optional time stamp in logs
 	bool useTimeStamp = Config.MainConfig.GetBoolDefault("log", "TimeStamp", false);

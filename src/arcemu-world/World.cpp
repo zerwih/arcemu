@@ -20,6 +20,7 @@
 
 #include "StdAfx.h"
 #include <CrashHandler.h>
+#include "OptionalConfigParser.h"
 
 initialiseSingleton(World);
 
@@ -50,15 +51,6 @@ World::World()
 	mAcceptedConnections = 0;
 	gm_skip_attunement = false;
 	show_gm_in_who_list = true;
-	interfaction_chat = false;
-	interfaction_group = false;
-	interfaction_guild = false;
-	interfaction_trade = false;
-	interfaction_friend = false;
-	interfaction_misc = false;
-	crossover_chars = true;
-	gamemaster_listOnlyActiveGMs = false;
-	gamemaster_hidePermissions = false;
 	gamemaster_startonGMIsland = true;
 	gamemaster_disableachievements = false;
 	GMAdminTag = true;
@@ -66,17 +58,12 @@ World::World()
 	NameinWAnnounce = false;
 	announce_output = true;
 	map_unload_time = 0;
-	antiMasterLootNinja = false;
 
 	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;
 	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
 
-	m_levelCap = PLAYER_LEVEL_CAP;
-	m_genLevelCap = PLAYER_LEVEL_CAP;
-	StartingLevel = 1;
 	m_limitedNames = false;
 	m_banTable = NULL;
-	DKStartTalentPoints = 0;
 
 	TotalTrafficInKB = 0.0;
 	TotalTrafficOutKB = 0.0;
@@ -1212,7 +1199,10 @@ void World::Rehash(bool load)
 	if(load)
 	{
 		Config.MainConfig.SetSource(CONFDIR "/world.conf", true);
-		Config.OptionalConfig.SetSource(CONFDIR "/optional.conf", true);
+
+		OptionalConfigParser optionalConfigParser;
+		optionalConfigParser.parseFile( CONFDIR "/optional.conf.xml" );
+		optionalConfig = optionalConfigParser.getData();
 	}
 	if(!ChannelMgr::getSingletonPtr())
 		new ChannelMgr;
@@ -1353,26 +1343,14 @@ void World::Rehash(bool load)
 	flood_seconds = Config.MainConfig.GetIntDefault("FloodProtection", "Seconds", 0);
 	flood_message = Config.MainConfig.GetBoolDefault("FloodProtection", "SendMessage", false);
 	show_gm_in_who_list = Config.MainConfig.GetBoolDefault("Server", "ShowGMInWhoList", true);
-	interfaction_chat = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionChat", false);
-	interfaction_group = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionGroup", false);
-	interfaction_guild = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionGuild", false);
-	interfaction_trade = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionTrade", false);
-	interfaction_friend = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionFriends", false);
-	interfaction_misc = Config.OptionalConfig.GetBoolDefault("Interfaction", "InterfactionMisc", false);
-	crossover_chars = Config.OptionalConfig.GetBoolDefault("Interfaction", "CrossOverCharacters", false);
-	gamemaster_listOnlyActiveGMs = Config.OptionalConfig.GetBoolDefault("GameMaster", "ListOnlyActiveGMs", false);
-	gamemaster_hidePermissions = Config.OptionalConfig.GetBoolDefault("GameMaster", "HidePermissions", false);
 	gamemaster_startonGMIsland = Config.MainConfig.GetBoolDefault("GameMaster", "StartOnGMIsland", true);
 	gamemaster_disableachievements = Config.MainConfig.GetBoolDefault( "GameMaster", "DisableAchievements", false );
-	
-	m_levelCap = Config.OptionalConfig.GetIntDefault("Optional", "LevelCap", PLAYER_LEVEL_CAP);
-	m_genLevelCap = Config.OptionalConfig.GetIntDefault("Optional", "GenLevelCap", PLAYER_LEVEL_CAP);
-	StartingLevel = Config.OptionalConfig.GetIntDefault("Optional", "StartingLevel", 1);
-	if( StartingLevel > static_cast< int32 >( m_levelCap ) )
-		StartingLevel = static_cast< int32 >( m_levelCap );
 
-	antiMasterLootNinja = Config.OptionalConfig.GetBoolDefault("Optional", "AntiMasterLootNinja", false);
-	realmAllowTBCcharacters = Config.OptionalConfig.GetBoolDefault("Optional", "AllowTBC", true);
+	if( optionalConfig.optional.levelCap > PLAYER_LEVEL_CAP )
+		optionalConfig.optional.levelCap = PLAYER_LEVEL_CAP;
+
+	if( optionalConfig.optional.startingLevel > optionalConfig.optional.levelCap )
+		optionalConfig.optional.startingLevel = optionalConfig.optional.levelCap;
 
 	Arena_Season = Config.MainConfig.GetIntDefault("Arena", "Season", 1);
 	Arena_Progress = Config.MainConfig.GetIntDefault("Arena", "Progress", 1);
@@ -1382,42 +1360,35 @@ void World::Rehash(bool load)
 	NameinAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinAnnounce", true);
 	NameinWAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinWAnnounce", true);
 	announce_output = Config.MainConfig.GetBoolDefault("Announce", "ShowInConsole", true);
-	announce_tagcolor = Config.OptionalConfig.GetIntDefault("Color", "AnnTagColor", 2);
-	announce_gmtagcolor = Config.OptionalConfig.GetIntDefault("Color", "AnnGMTagColor", 1);
-	announce_namecolor = Config.OptionalConfig.GetIntDefault("Color", "AnnNameColor", 4);
-	announce_msgcolor = Config.OptionalConfig.GetIntDefault("Color", "AnnMsgColor", 10);
-	AnnounceColorChooser(announce_tagcolor, announce_gmtagcolor, announce_namecolor, announce_msgcolor);
+	
+	AnnounceColorChooser( optionalConfig.announceColor.tag,
+                          optionalConfig.announceColor.GMAdminTag,
+						  optionalConfig.announceColor.name,
+						  optionalConfig.announceColor.msg );
 
-	// broadcast system
-	BCTriggerPercentCap = Config.OptionalConfig.GetIntDefault("CommonSchedule", "BroadCastTriggerPercentCap", 100);
-	BCInterval = Config.OptionalConfig.GetIntDefault("CommonSchedule", "BroadCastInterval", 1);
-	BCSystemEnable = Config.OptionalConfig.GetBoolDefault("CommonSchedule", "AutoBroadCast", false);
-	BCOrderMode = Config.OptionalConfig.GetIntDefault("CommonSchedule", "BroadCastOrderMode", 0);
+	if( optionalConfig.commonScheduler.broadcastInterval < 10 )
+		optionalConfig.commonScheduler.broadcastInterval = 10;
+	else
+	if( optionalConfig.commonScheduler.broadcastInterval > 1440 )
+		optionalConfig.commonScheduler.broadcastInterval = 1440;
 
-	if(BCInterval < 10) BCInterval = 10;
-	else if(BCInterval > 1440) BCInterval = 1440;
-	if(BCTriggerPercentCap >= 99) BCTriggerPercentCap = 98;
-	else if(BCTriggerPercentCap <= 1) BCTriggerPercentCap = 0;
-	if(BCOrderMode < 0) BCOrderMode = 0;
-	else if(BCOrderMode > 1) BCOrderMode = 1;
+	if( optionalConfig.commonScheduler.broadcastTriggerPercentCap > 98 )
+		optionalConfig.commonScheduler.broadcastTriggerPercentCap = 98;
+	else
+	if( optionalConfig.commonScheduler.broadcastTriggerPercentCap < 2 )
+		optionalConfig.commonScheduler.broadcastTriggerPercentCap = 0;
 
+	if( optionalConfig.commonScheduler.broadcastOrderMode > 1 )
+		optionalConfig.commonScheduler.broadcastOrderMode = 1;
 
 	if(!flood_lines || !flood_seconds)
 		flood_lines = flood_seconds = 0;
 
-	m_AdditionalFun = Config.OptionalConfig.GetBoolDefault("Optional", "AdditionalFun", false);
-	MaxProfs = (uint32)Config.OptionalConfig.GetIntDefault("Optional", "MaxProfessions", 2);
+	if( optionalConfig.goldSettings.cap != 0 )
+		optionalConfig.goldSettings.cap *= 10000;
 
-	// Max Gold Settings
-	GoldCapEnabled = Config.OptionalConfig.GetBoolDefault("GoldSettings", "EnableGoldCap", true);
-	GoldLimit = Config.OptionalConfig.GetIntDefault("GoldSettings", "MaximumGold", 214000);
-	if(GoldLimit)
-		GoldLimit *= 10000; // Convert into gsc (gold, silver, copper)
-	GoldStartAmount = Config.OptionalConfig.GetIntDefault("GoldSettings", "StartingGold", 0);
-	if(GoldStartAmount)
-		GoldStartAmount *= 10000;
-
-	DKStartTalentPoints = Config.OptionalConfig.GetIntDefault("Optional", "DKStartingTalents", 0);
+	if( optionalConfig.goldSettings.startingGold != 0 )
+		optionalConfig.goldSettings.startingGold *= 10000;
 
 	map_unload_time = Config.MainConfig.GetIntDefault("Server", "MapUnloadTime", MAP_CELL_DEFAULT_UNLOAD_TIME);
 	if(map_unload_time == 0)

@@ -745,14 +745,14 @@ bool Player::Create(WorldPacket & data)
 	SetFaction(info->factiontemplate);
 
 	if(class_ == DEATHKNIGHT)
-		SetTalentPointsForAllSpec(sWorld.DKStartTalentPoints); // Default is 0 in case you do not want to modify it
+		SetTalentPointsForAllSpec( sWorld.getOptionalConfig().optional.DKStartingTalent ); // Default is 0 in case you do not want to modify it
 	else
 		SetTalentPointsForAllSpec(0);
-	if(class_ != DEATHKNIGHT || sWorld.StartingLevel > 55)
+	if(class_ != DEATHKNIGHT || sWorld.getOptionalConfig().optional.startingLevel > 55)
 	{
-		setLevel(sWorld.StartingLevel);
-		if(sWorld.StartingLevel >= 10 && class_ != DEATHKNIGHT)
-			SetTalentPointsForAllSpec(sWorld.StartingLevel - 9);
+		setLevel( sWorld.getOptionalConfig().optional.startingLevel );
+		if( sWorld.getOptionalConfig().optional.startingLevel >= 10 && class_ != DEATHKNIGHT)
+			SetTalentPointsForAllSpec( sWorld.getOptionalConfig().optional.startingLevel - 9);
 	}
 	else
 	{
@@ -761,7 +761,7 @@ bool Player::Create(WorldPacket & data)
 	}
 	UpdateGlyphs();
 
-	SetPrimaryProfessionPoints(sWorld.MaxProfs);
+	SetPrimaryProfessionPoints( sWorld.getOptionalConfig().optional.maxProfessions );
 
 	setRace(race);
 	setClass(class_);
@@ -804,10 +804,10 @@ bool Player::Create(WorldPacket & data)
 	SetNextLevelXp(400);
 	SetUInt32Value(PLAYER_FIELD_BYTES, 0x08);
 	SetCastSpeedMod(1.0f);
-	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.m_levelCap);
+	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.getOptionalConfig().optional.levelCap );
 
 	// Gold Starting Amount
-	SetGold(sWorld.GoldStartAmount);
+	SetGold( sWorld.getOptionalConfig().goldSettings.startingGold );
 
 
 	for(uint32 x = 0; x < 7; x++)
@@ -2246,8 +2246,8 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 	if(m_bg != NULL && IS_ARENA(m_bg->GetType()))
 		in_arena = true;
 
-	if(GetPrimaryProfessionPoints() > sWorld.MaxProfs)
-		SetPrimaryProfessionPoints(sWorld.MaxProfs);
+	if(GetPrimaryProfessionPoints() > sWorld.getOptionalConfig().optional.maxProfessions )
+		SetPrimaryProfessionPoints( sWorld.getOptionalConfig().optional.maxProfessions );
 
 	//Calc played times
 	uint32 playedt = (uint32)UNIXTIME - m_playedtime[2];
@@ -2944,7 +2944,7 @@ void Player::LoadFromDBProc(QueryResultVector & results)
 	EventModelChange();
 
 	SetCastSpeedMod(1.0f);
-	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.m_levelCap);
+	SetUInt32Value(PLAYER_FIELD_MAX_LEVEL, sWorld.getOptionalConfig().optional.levelCap );
 	SetFaction(info->factiontemplate);
 	if(cfaction)
 	{
@@ -3632,8 +3632,8 @@ void Player::OnPushToWorld()
 	if(m_FirstLogin)
 	{
 		if(class_ == DEATHKNIGHT)
-			startlevel = static_cast<uint8>(max(55, sWorld.StartingLevel));
-		else startlevel = static_cast<uint8>(sWorld.StartingLevel);
+			startlevel = static_cast<uint8>( max( (unsigned short)( 55 ), sWorld.getOptionalConfig().optional.startingLevel ));
+		else startlevel = static_cast<uint8>( sWorld.getOptionalConfig().optional.startingLevel );
 
 		sHookInterface.OnFirstEnterWorld(this);
 		LevelInfo* Info = objmgr.GetLevelInfo(getRace(), getClass(), startlevel);
@@ -5016,8 +5016,8 @@ float Player::GetDodgeChance()
 	float chance = 0.0f;
 	uint32 level = getLevel();
 
-	if(level > sWorld.m_genLevelCap)
-		level = sWorld.m_genLevelCap;
+	if(level > sWorld.getOptionalConfig().optional.genLevelCap )
+		level = sWorld.getOptionalConfig().optional.genLevelCap;
 
 	if( level > PLAYER_LEVEL_CAP )
 		level = PLAYER_LEVEL_CAP;
@@ -11134,7 +11134,7 @@ void Player::Social_AddFriend(const char* name, const char* note)
 	}
 
 	// team check
-	if(info->team != GetTeamInitial()  && m_session->permissioncount == 0 && !sWorld.interfaction_friend)
+	if(info->team != GetTeamInitial()  && m_session->permissioncount == 0 && !sWorld.getOptionalConfig().interfaction.friends )
 	{
 		data << uint8(FRIEND_ENEMY) << uint64(info->guid);
 		m_session->SendPacket(&data);

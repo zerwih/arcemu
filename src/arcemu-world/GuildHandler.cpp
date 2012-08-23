@@ -85,7 +85,7 @@ void WorldSession::HandleInviteToGuild(WorldPacket & recv_data)
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S, "", GUILD_PERMISSIONS);
 		return;
 	}
-	else if(plyr->GetTeam() != _player->GetTeam() && _player->GetSession()->GetPermissionCount() == 0 && !sWorld.interfaction_guild)
+	else if(plyr->GetTeam() != _player->GetTeam() && _player->GetSession()->GetPermissionCount() == 0 && !sWorld.getOptionalConfig().interfaction.guild )
 	{
 		Guild::SendGuildCommandResult(this, GUILD_INVITE_S, "", GUILD_NOT_ALLIED);
 		return;
@@ -931,7 +931,7 @@ void WorldSession::HandleCharterOffer(WorldPacket & recv_data)
 		return;
 	}
 
-	if(pTarget == 0 || pTarget->GetTeam() != _player->GetTeam() || (pTarget == _player && !sWorld.interfaction_guild))
+	if(pTarget == 0 || pTarget->GetTeam() != _player->GetTeam() || (pTarget == _player && !sWorld.getOptionalConfig().interfaction.guild ))
 	{
 		SendNotification(_player->GetSession()->LocalizedWorldSrv(77));
 		return;

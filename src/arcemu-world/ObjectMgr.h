@@ -651,7 +651,7 @@ class SERVER_DECL ObjectMgr : public Singleton < ObjectMgr >, public EventableOb
 		// func sync at MAKE_TASK(ObjectMgr, StoreBroadCastGroupKey)[world.cpp]
 		{
 			if(m_BCEntryStorage.empty()) return -1;
-			uint32 RandomCap = (uint32)sWorld.BCTriggerPercentCap;
+			uint32 RandomCap = (uint32)sWorld.getOptionalConfig().commonScheduler.broadcastTriggerPercentCap;
 
 			vector<uint32> Entries;
 			BCEntryStorage::iterator it = m_BCEntryStorage.upper_bound(RandomUInt(RandomCap) + 1);

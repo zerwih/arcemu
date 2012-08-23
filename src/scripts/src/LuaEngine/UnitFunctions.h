@@ -3768,7 +3768,7 @@ class LuaUnit
 		{
 			if(!ptr) return 0;
 			uint32 level = CHECK_ULONG(L, 1);
-			if(level <= sWorld.m_levelCap && level > 0)
+			if(level <= sWorld.getOptionalConfig().optional.levelCap && level > 0)
 			{
 				if(ptr->IsPlayer())
 				{
@@ -4986,7 +4986,7 @@ class LuaUnit
 			{
 				Guild::SendGuildCommandResult(sender->GetSession(), GUILD_INVITE_S, plyr->GetName(), ALREADY_INVITED_TO_GUILD);
 			}
-			else if(plyr->GetTeam() != sender->GetTeam() && sender->GetSession()->GetPermissionCount() == 0 && !sWorld.interfaction_guild)
+			else if(plyr->GetTeam() != sender->GetTeam() && sender->GetSession()->GetPermissionCount() == 0 && !sWorld.getOptionalConfig().interfaction.guild )
 			{
 				Guild::SendGuildCommandResult(sender->GetSession(), GUILD_INVITE_S, "", GUILD_NOT_ALLIED);
 			}

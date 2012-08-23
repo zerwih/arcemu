@@ -961,9 +961,9 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
 	uint32 price = GetSellPriceForItem(it, quantity);
 
 	// Check they don't have more than the max gold
-	if(sWorld.GoldCapEnabled)
+	if( sWorld.getOptionalConfig().goldSettings.enableCap )
 	{
-		if((_player->GetGold() + price) > sWorld.GoldLimit)
+		if((_player->GetGold() + price) > sWorld.getOptionalConfig().goldSettings.cap )
 		{
 			_player->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_TOO_MUCH_GOLD);
 			return;

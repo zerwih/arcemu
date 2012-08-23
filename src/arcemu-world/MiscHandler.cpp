@@ -301,7 +301,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & recv_data)
 		if(money)
 		{
 			// Check they don't have more than the max gold
-			if(sWorld.GoldCapEnabled && (GetPlayer()->GetGold() + money) > sWorld.GoldLimit)
+			if( sWorld.getOptionalConfig().goldSettings.enableCap &&
+				(GetPlayer()->GetGold() + money) > sWorld.getOptionalConfig().goldSettings.cap )
 			{
 				GetPlayer()->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_TOO_MUCH_GOLD);
 			}
@@ -350,7 +351,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & recv_data)
 			for(vector<Player*>::iterator itr2 = targets.begin(); itr2 != targets.end(); ++itr2)
 			{
 				// Check they don't have more than the max gold
-				if(sWorld.GoldCapEnabled && ((*itr2)->GetGold() + share) > sWorld.GoldLimit)
+				if( sWorld.getOptionalConfig().goldSettings.enableCap &&
+					((*itr2)->GetGold() + share) > sWorld.getOptionalConfig().goldSettings.cap )
 				{
 					(*itr2)->GetItemInterface()->BuildInventoryChangeError(NULL, NULL, INV_ERR_TOO_MUCH_GOLD);
 				}
@@ -712,7 +714,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
 		}
 
 		// Team check
-		if(!gm && plr->GetTeam() != team && !plr->GetSession()->HasGMPermissions() && !sWorld.interfaction_misc)
+		if(!gm && plr->GetTeam() != team && !plr->GetSession()->HasGMPermissions() && !sWorld.getOptionalConfig().interfaction.misc )
 			continue;
 
 		++total_count;

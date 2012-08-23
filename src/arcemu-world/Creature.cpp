@@ -429,7 +429,7 @@ void Creature::generateLoot()
 	loot.gold = proto->money;
 
 	// Master Looting Ninja Checker
-	if(sWorld.antiMasterLootNinja)
+	if( sWorld.getOptionalConfig().optional.antiMasterLootNinja )
 	{
 		Player* looter = objmgr.GetPlayer((uint32)this->TaggerGuid);
 		if(looter && looter->GetGroup() && looter->GetGroup()->GetMethod() == PARTY_LOOT_MASTER)
