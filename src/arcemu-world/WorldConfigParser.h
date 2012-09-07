@@ -15,6 +15,7 @@ public:
 	bool isConfig( _xmlNode *node );
 
 	const WorldConfigData& getWorldConfigData() const{ return data; }
+	void setRequiredVersion( const std::string &s ){ requiredVersion = s; }
 
 private:
 	bool parseWorldDBStuff( _xmlNode *node );
@@ -45,6 +46,7 @@ private:
 	bool parseLimitStuff( _xmlNode *node );
 
 	WorldConfigData data;
+	std::string requiredVersion;
 };
 
 #endif

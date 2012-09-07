@@ -13,6 +13,7 @@ public:
 
 	bool parseFile( const std::string &name );
 	const LogonConfigData& getData() const{ return data; }
+	void setRequiredVersion( const std::string &s ){ requiredVersion = s; }
 
 private:
 	bool isConfig( _xmlNode *node );
@@ -23,6 +24,7 @@ private:
 	bool parseSecurityPart( _xmlNode *node );
 
 	LogonConfigData data;
+	std::string requiredVersion;
 };
 
 #endif

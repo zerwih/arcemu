@@ -24,6 +24,9 @@
 #include "WorldConfigParser.h"
 
 #define BANNER "ArcEmu %s %s/%s-%s-%s :: World Server"
+const char *REQ_OPTIONAL_CFG_VER = "1";
+const char *REQ_REALMS_CFG_VER   = "1";
+const char *REQ_WORLD_CFG_VER    = "1";
 
 #ifndef WIN32
 #include <sched.h>
@@ -177,6 +180,7 @@ bool Master::Run(int argc, char** argv)
 		Log.Notice("Config", "Checking config file: %s", config_file);
 		
 		WorldConfigParser worldConfigParser;
+		worldConfigParser.setRequiredVersion( REQ_WORLD_CFG_VER );
 		if( worldConfigParser.parseFile( config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
@@ -185,6 +189,7 @@ bool Master::Run(int argc, char** argv)
 		Log.Notice("Config", "Checking config file: %s", realm_config_file);
 		
 		RealmsConfigParser realmsConfigParser;
+		realmsConfigParser.setRequiredVersion( REQ_REALMS_CFG_VER );
 		if( realmsConfigParser.parseFile( realm_config_file )  )
 			Log.Success("Config", "Passed without errors.");
 		else
@@ -193,6 +198,7 @@ bool Master::Run(int argc, char** argv)
 		Log.Notice("Config", "Checking config file:: %s", optional_config_file);
 		
 		OptionalConfigParser optionalConfigParser;
+		optionalConfigParser.setRequiredVersion( REQ_OPTIONAL_CFG_VER );
 		if( optionalConfigParser.parseFile( optional_config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
@@ -219,6 +225,7 @@ bool Master::Run(int argc, char** argv)
 	Log.Success("Config", "Loading Config Files...");
 	
 	WorldConfigParser worldConfigParser;
+	worldConfigParser.setRequiredVersion( REQ_WORLD_CFG_VER );
 	if( worldConfigParser.parseFile( config_file ) )
 		Log.Notice("Config", ">> " CONFDIR "/world.conf.xml loaded");
 	else
@@ -229,6 +236,7 @@ bool Master::Run(int argc, char** argv)
 	}
 
 	OptionalConfigParser optionalConfigParser;
+	optionalConfigParser.setRequiredVersion( REQ_OPTIONAL_CFG_VER );
 	if( optionalConfigParser.parseFile( optional_config_file ) )
 		Log.Notice("Config", ">> " CONFDIR "/optional.conf.xml loaded");
 	else
@@ -239,7 +247,7 @@ bool Master::Run(int argc, char** argv)
 	}
 
 	RealmsConfigParser realmsConfigParser;
-
+	realmsConfigParser.setRequiredVersion( REQ_REALMS_CFG_VER );
 	if( realmsConfigParser.parseFile( realm_config_file ) )
 		Log.Notice("Config", ">> " CONFDIR "/realms.conf.xml loaded");
 	else

@@ -26,6 +26,7 @@
 #include "../arcemu-shared/arcemu_getopt.h"
 
 #define BANNER "ArcEmu %s %s/%s-%s (%s) :: Logon Server"
+const char *REQ_LOGON_CFG_VER = "1";
 
 #ifndef WIN32
 #include <sched.h>
@@ -300,7 +301,8 @@ void LogonServer::Run(int argc, char** argv)
 	{
 		LOG_BASIC("Checking config file: %s", config_file);
 		
-		LogonConfigParser parser;		
+		LogonConfigParser parser;
+		parser.setRequiredVersion( REQ_LOGON_CFG_VER );
 		if( parser.parseFile( "configs/logon.conf.xml" ) )
 			LOG_BASIC("  Passed without errors.");
 		else

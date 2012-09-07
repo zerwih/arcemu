@@ -79,7 +79,7 @@ bool LogonConfigParser::isConfig( _xmlNode *node )
 	prop = xmlGetProp( node, BAD_CAST "version" );
 	if( prop == NULL )
 		return false;
-	if( xmlStrcmp( prop, BAD_CAST "1" ) )
+	if( xmlStrcmp( prop, BAD_CAST requiredVersion.c_str() ) )
 		return false;
 
 	return true;
