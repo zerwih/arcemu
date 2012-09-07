@@ -1,6 +1,10 @@
 #ifndef OPTIONAL_CONFIG_H
 #define OPTIONAL_CONFIG_H
 
+#ifndef SERVER_DECL
+#define SERVER_DECL
+#endif
+
 struct SERVER_DECL OptionalConfigData
 {
 	struct OptionalStuff

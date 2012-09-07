@@ -2,6 +2,7 @@
 #define OPTIONAL_CONFIG_PARSER_H
 
 #include "OptionalConfig.h"
+#include <string>
 
 struct _xmlNode;
 
