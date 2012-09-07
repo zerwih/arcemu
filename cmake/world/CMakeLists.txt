@@ -294,7 +294,7 @@ ENDIF()
 set_target_properties(${PROJECT_NAME} PROPERTIES ENABLE_EXPORTS TRUE)
 
 add_dependencies( ${PROJECT_NAME} shared g3dlite vmaplib detour recast)
-target_link_libraries( ${PROJECT_NAME} shared  g3dlite vmaplib detour recast ${PCRE_LIBRARIES} )
+target_link_libraries( ${PROJECT_NAME} shared  g3dlite vmaplib detour recast ${PCRE_LIBRARIES} ${LIBXML2_LIBRARIES} )
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
 
 

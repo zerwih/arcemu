@@ -130,18 +130,21 @@ IF( NOT WIN32 )
 	find_package(OpenSSL REQUIRED)
 	find_package(Threads REQUIRED)
 	find_package(MySQL REQUIRED)
+	find_package(LibXML2 REQUIRED)
 ELSE()
 	add_subdirectory(zlib)
 	add_subdirectory(pcre)
 	SET(MYSQL_LIBRARY "")
+	SET(LIBXML2_LIBRARIES "")
 ENDIF()
 
 IF(WIN32)	#On windows, we have to specify the includes for libeay and mysql libs.
 	SET( GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS} 
 	${DEPENDENCY_INCLUDE_ROOT}/openssl
 	${DEPENDENCY_INCLUDE_ROOT}/mysql )
-ELSE()	#On apple n linux, mysql.h should have been found.
+ELSE()	#On apple and linux, mysql and libxml2 should have been found.
 	SET( GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS} ${MYSQL_INCLUDE_DIR} )
+	SET( GLOBAL_INCLUDE_DIRS ${GLOBAL_INCLUDE_DIRS} ${LIBXML2_INCLUDE_DIR} )
 ENDIF()
 
 #For windows, link to libeay and libmysql

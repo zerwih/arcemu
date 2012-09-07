@@ -44,7 +44,7 @@ IF( CMAKE_GENERATOR MATCHES Visual*)
 	ADD_NATIVE_PRECOMPILED_HEADER(${PROJECT_NAME} LogonStdAfx.h ${prefix}/LogonStdAfx.cpp)
 ENDIF()
 #Link our shared lib.
-target_link_libraries( ${PROJECT_NAME} shared ${ZLIB_LIBRARIES} ${PCRE_LIBRARIES} )
+target_link_libraries( ${PROJECT_NAME} shared ${ZLIB_LIBRARIES} ${PCRE_LIBRARIES} ${LIBXML2_LIBRARIES} )
 #Provide make install rules.
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
 
