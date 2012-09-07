@@ -85,7 +85,7 @@ void MapCell::SetActivity(bool state)
 		if(_unloadpending)
 			CancelPendingUnload();
 
-		if(sWorld.Collision)
+		if( sWorld.getWorldConfig().server.collision )
 		{
 			CollideInterface.ActivateTile(_mapmgr->GetMapId(), _x / 8, _y / 8);
 		}
@@ -102,7 +102,7 @@ void MapCell::SetActivity(bool state)
 		if(!_unloadpending && CanUnload())
 			QueueUnloadPending();
 
-		if(sWorld.Collision)
+		if( sWorld.getWorldConfig().server.collision )
 		{
 			CollideInterface.DeactivateTile(_mapmgr->GetMapId(), _x / 8, _y / 8);
 		}
@@ -279,7 +279,7 @@ void MapCell::QueueUnloadPending()
 
 	_unloadpending = true;
 	Log.Debug("MapCell", "Queueing pending unload of cell %u %u", _x, _y);
-	sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), sWorld.map_unload_time * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
+	sEventMgr.AddEvent(_mapmgr, &MapMgr::UnloadCell, (uint32)_x, (uint32)_y, MAKE_CELL_EVENT(_x, _y), sWorld.getWorldConfig().server.mapUnloadTime * 1000, 1, EVENT_FLAG_DO_NOT_EXECUTE_IN_WORLD_CONTEXT);
 }
 
 void MapCell::CancelPendingUnload()

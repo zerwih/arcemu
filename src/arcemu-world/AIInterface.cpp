@@ -550,7 +550,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 		}
 	}
 
-	if(sWorld.Collision)
+	if(sWorld.getWorldConfig().server.collision)
 	{
 
 		if(m_Unit->GetMapMgr() != NULL && getNextTarget() != NULL)
@@ -831,7 +831,7 @@ void AIInterface::_UpdateCombat(uint32 p_time)
 					float distance = m_Unit->CalcDistance(getNextTarget());
 					bool los = true;
 
-					if(sWorld.Collision)
+					if(sWorld.getWorldConfig().server.collision)
 					{
 						los = CollideInterface.CheckLOS(m_Unit->GetMapId(), m_Unit->GetPositionNC(), getNextTarget()->GetPositionNC());
 					}
@@ -1001,7 +1001,7 @@ void AIInterface::AttackReaction(Unit* pUnit, uint32 damage_dealt, uint32 spellI
 	if(m_AIState == STATE_EVADE || !pUnit || !pUnit->isAlive() || m_Unit->IsDead() || ( m_Unit == pUnit ) || ( m_AIType == AITYPE_PASSIVE ) || disable_combat )
 		return;
 
-	if(sWorld.Collision && pUnit->IsPlayer())
+	if(sWorld.getWorldConfig().server.collision && pUnit->IsPlayer())
 	{
 		if(m_Unit->GetMapMgr() != NULL)
 		{
@@ -1215,7 +1215,7 @@ Unit* AIInterface::FindTarget()
 				continue;
 			if(distance > dist)
 			{
-				if(sWorld.Collision)
+				if(sWorld.getWorldConfig().server.collision)
 				{
 					if(CollideInterface.CheckLOS(m_Unit->GetMapId(), m_Unit->GetPositionNC(), tmpPlr->GetPositionNC()))
 					{
@@ -1263,7 +1263,7 @@ Unit* AIInterface::FindTarget()
 
 		if(dist <= _CalcAggroRange(pUnit))
 		{
-			if(sWorld.Collision)
+			if(sWorld.getWorldConfig().server.collision)
 			{
 				if(m_Unit->GetMapMgr()->InLineOfSight(m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2, pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ() + 2))
 				{
@@ -1312,7 +1312,7 @@ Unit* AIInterface::FindTarget()
 
 			if(dist <= _CalcAggroRange(pUnit))
 			{
-				if(sWorld.Collision)
+				if(sWorld.getWorldConfig().server.collision)
 				{
 					if(m_Unit->GetMapMgr()->InLineOfSight(m_Unit->GetPositionX(), m_Unit->GetPositionY(), m_Unit->GetPositionZ() + 2, pUnit->GetPositionX(), pUnit->GetPositionY(), pUnit->GetPositionZ() + 2))
 					{
@@ -2483,7 +2483,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float Fy;
 			float Fz;
 
-			if(sWorld.DisableFearMovement)
+			if(sWorld.getWorldConfig().server.disableFearMovement)
 			{
 				if(m_Unit->GetMapId() == 529 || m_Unit->GetMapId() == 566 ||
 				   m_Unit->GetMapId() == 489 || m_Unit->GetMapId() == 572 ||
@@ -2521,7 +2521,7 @@ void AIInterface::_UpdateMovement(uint32 p_time)
 			float wl = m_Unit->GetMapMgr()->GetLiquidHeight(Fx, Fy);
 //			uint8 wt = m_Unit->GetMapMgr()->GetWaterType(Fx, Fy);
 
-			if(sWorld.Collision)
+			if(sWorld.getWorldConfig().server.collision)
 			{
 				Fz = CollideInterface.GetHeight(m_Unit->GetMapId(), Fx, Fy, m_Unit->GetPositionZ() + 2.0f);
 				if(Fz == NO_WMO_HEIGHT)

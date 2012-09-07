@@ -22,6 +22,7 @@
 #define __WORLD_H
 
 #include "OptionalConfig.h"
+#include "WorldConfig.h"
 
 #define IS_INSTANCE( a ) ( ( a > 1 ) && ( a != 530 ) && ( a != 571 ) )
 
@@ -370,8 +371,6 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 			return m_gmTicketSystem;
 		};
 
-		ARCEMU_INLINE std::string getGmClientChannel() { return GmClientChannel; }
-
 		void SetMotd(const char* motd) { m_motd = motd; }
 		ARCEMU_INLINE const char* GetMotd() const { return m_motd.c_str(); }
 
@@ -485,8 +484,6 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		typedef std::map< uint32, uint32> SpellPricesMap;
 		SpellPricesMap mPrices;
 
-		ARCEMU_INLINE uint32 GetTimeOut() {return TimeOut;}
-
 		struct NameGenData
 		{
 			string name;
@@ -527,106 +524,29 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 
 		Mutex queueMutex;
 
-		uint32 mQueueUpdateInterval;
 		bool m_useIrc;
 
 		void SaveAllPlayers();
 
-		string MapPath;
-		string vMapPath;
-		bool UnloadMapFiles;
-		bool BreathingEnabled;
-		bool SpeedhackProtection;
 		uint32 mAcceptedConnections;
 		uint32 SocketSendBufSize;
 		uint32 SocketRecvBufSize;
 
 		uint32 PeakSessionCount;
 		uint32 ArenaQueueDiff;
-		bool SendStatsOnJoin;
 		SessionSet gmList;
-		bool Collision;
-		bool DisableFearMovement;
 
 		void ShutdownClasses();
 		void DeleteObject(Object* obj);
 
-		uint32 compression_threshold;
-
 		void	SetKickAFKPlayerTime(uint32 idletimer) {m_KickAFKPlayers = idletimer;}
 		uint32	GetKickAFKPlayerTime() {return m_KickAFKPlayers;}
-
-		uint32 GetRealmType() { return realmtype; }
-
-		uint32 flood_lines;
-		uint32 flood_seconds;
-		bool flood_message;
-		bool gm_skip_attunement;
-
-		bool show_gm_in_who_list;
-		uint32 map_unload_time;
-
-		bool gamemaster_startonGMIsland;
-		bool gamemaster_disableachievements;
-
-		//Arena Settings
-		int Arena_Season;
-		int Arena_Progress;
-
-
-		std::string announce_tag;
-		bool GMAdminTag;
-		bool NameinAnnounce;
-		bool NameinWAnnounce;
-		bool announce_output;
 
 		string ann_namecolor;
 		string ann_gmtagcolor;
 		string ann_tagcolor;
 		string ann_msgcolor;
 		void AnnounceColorChooser(int tagcolor, int gmtagcolor, int namecolor, int msgcolor);
-
-		bool antihack_teleport;
-		bool antihack_speed;
-		bool antihack_flight;
-		uint32 flyhack_threshold;
-		bool no_antihack_on_gm;
-
-		bool instance_TakeGroupLeaderID;
-		bool instance_SlidingExpiration;
-		int instance_DailyHeroicInstanceResetHour;
-		bool instance_CheckTriggerPrerequisites;
-
-		// battleground settings
-		struct BGSettings{
-			uint32 AV_MIN;
-			uint32 AV_MAX;
-			uint32 AB_MIN;
-			uint32 AB_MAX;
-			uint32 WSG_MIN;
-			uint32 WSG_MAX;
-			uint32 EOTS_MIN;
-			uint32 EOTS_MAX;
-			uint32 SOTA_MIN;
-			uint32 SOTA_MAX;
-			uint32 IOC_MIN;
-			uint32 IOC_MAX;
-		}bgsettings;
-
-
-		// damage/hp/mp cap settings
-		struct
-		{
-			bool enable;
-			uint32 autoattackDamageCap;
-			uint32 spellDamageCap;
-			uint32 healthCap;
-			uint32 manaCap;
-			bool disconnect;
-			bool broadcast;
-		} m_limits;
-
-		int GMTTimeZone;
 
 		void CharacterEnumProc(QueryResultVector & results, uint32 AccountId);
 		void LoadAccountDataProc(QueryResultVector & results, uint32 AccountId);
@@ -663,10 +583,6 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		bool m_gmTicketSystem;
 		std::string m_motd;
 
-		uint32 realmtype;
-
-		uint32 TimeOut;
-
 		uint32 m_StartTime;
 		uint32 m_queueUpdateTimer;
 
@@ -674,20 +590,11 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 
 		uint32	m_KickAFKPlayers;//don't lag the server if you are useless anyway :P
 	public:
-		std::string GmClientChannel;
-		bool m_reqGmForCommands;
-		bool m_lfgForNonLfg;
+
+
 		list<SpellEntry*> dummyspells;
-		bool m_limitedNames;
-		bool m_useAccountData;
 		std::map<WMOAreaTableTripple, WMOAreaTableEntry*> m_WMOAreaTableTripples;
 
-		char* m_banTable;
-
-		static float m_movementCompressThreshold;
-		static float m_movementCompressThresholdCreatures;
-		static uint32 m_movementCompressRate;
-		static uint32 m_movementCompressInterval;
 		/*
 		 * Traffic meter stuff
 		 */
@@ -728,11 +635,14 @@ class SERVER_DECL World : public Singleton<World>, public EventableObject
 		}
 
 		void setOptionalConfig( const OptionalConfigData &config ){ optionalConfig = config; }
+		void setWorldConfig( const WorldConfigData &config ){ worldConfig = config; }
 		const OptionalConfigData& getOptionalConfig() const{ return optionalConfig; }
+		const WorldConfigData& getWorldConfig() const{ return worldConfig; }
 		void broadcastOn( bool b ){ optionalConfig.commonScheduler.autoBroadcast = b; }
 
 	private:
 		OptionalConfigData optionalConfig;
+		WorldConfigData worldConfig;
 };
 
 #define sWorld World::getSingleton()

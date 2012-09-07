@@ -25,8 +25,8 @@ LogonCommHandler::LogonCommHandler()
 {
 	idhigh = 1;
 	next_request = 1;
-	pings = !Config.MainConfig.GetBoolDefault("LogonServer", "DisablePings", false);
-	string logon_pass = Config.MainConfig.GetStringDefault("LogonServer", "RemotePassword", "r3m0t3");
+	pings = !sWorld.getWorldConfig().security.disablePings;
+	std::string logon_pass = sWorld.getWorldConfig().security.remotePassword;
 
 	// sha1 hash it
 	Sha1Hash hash;
@@ -37,7 +37,7 @@ LogonCommHandler::LogonCommHandler()
 	memcpy(sql_passhash, hash.GetDigest(), 20);
 
 	// player limit
-	pLimit = Config.MainConfig.GetIntDefault("Server", "PlayerLimit", 500);
+	pLimit = sWorld.getWorldConfig().server.playerLimit;
 	if(pLimit == 0) pLimit = 1;
 	server_population = 0;
 

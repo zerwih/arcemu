@@ -17,7 +17,11 @@
 
   <log level                    = "0"
        packet_logging           = "0"
-       disable_crashdump_report = "0" />
+       disable_crashdump_report = "0"
+       cheaters                 = "0"
+       gm_commands              = "0"
+       timestamp                = "0" />
+
 
   <server player_limit             = "100"
           motd                     = "Welcome to the World of Warcraft!"
@@ -83,10 +87,6 @@
   <terrain map_path    = "maps"
            vmap_path   = "vmaps"
            unload_maps = "1" />
-
-  <additional_logs cheaters    = "0"
-                   gm_commands = "0"
-                   time_stamp  = "0" />
 
   <mail reload_delay                    = "0"
         disable_postage_costs           = "0"

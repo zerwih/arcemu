@@ -29,7 +29,7 @@ LoginErrorCode VerifyName(const char* name, size_t nlen)
 	static const char* bannedCharacters = "\t\v\b\f\a\n\r\\\"\'\? <>[](){}_=+-|/!@#$%^&*~`.,0123456789\0";
 	static const char* allowedCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-	if(sWorld.m_limitedNames)
+	if(sWorld.getWorldConfig().server.limitedNames)
 	{
 		if(nlen == 0)
 			return E_CHAR_NAME_NO_NAME;
@@ -536,8 +536,6 @@ uint8 WorldSession::DeleteCharacter(uint32 guid)
 		/*if( _socket != NULL )
 			sPlrLog.write("Account: %s | IP: %s >> Deleted player %s", GetAccountName().c_str(), GetSocket()->GetRemoteIP().c_str(), name.c_str());*/
 
-		sPlrLog.writefromsession(this, "deleted character %s (GUID: %u)", name.c_str(), (uint32)guid);
-
 		CharacterDatabase.WaitExecute("DELETE FROM characters WHERE guid = %u", (uint32)guid);
 
 		Corpse* c = objmgr.GetCorpseByOwner((uint32)guid);
@@ -624,8 +622,6 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket & recv_data)
 	// correct capitalization
 	CapitalizeString(name);
 	objmgr.RenamePlayerInfo(pi, pi->name, name.c_str());
-
-	sPlrLog.writefromsession(this, "a rename was pending. renamed character %s (GUID: %u) to %s.", pi->name, pi->guid, name.c_str());
 
 	// If we're here, the name is okay.
 	free(pi->name);
@@ -786,7 +782,7 @@ void WorldSession::FullLogin(Player* plr)
 	float VZ;
 
 	// GMs should start on GM Island and be bound there
-	if(HasGMPermissions() && plr->m_FirstLogin && sWorld.gamemaster_startonGMIsland)
+	if(HasGMPermissions() && plr->m_FirstLogin && sWorld.getWorldConfig().gm.startOnGMIsland )
 	{
 		VMapId = 1;
 		VO = 0;
@@ -1104,6 +1100,5 @@ bool ChatHandler::HandleRenameCommand(const char* args, WorldSession* m_session)
 
 	GreenSystemMessage(m_session, "Changed name of '%s' to '%s'.", name1, name2);
 	sGMLog.writefromsession(m_session, "renamed character %s (GUID: %u) to %s", name1, pi->guid, name2);
-	sPlrLog.writefromsession(m_session, "GM renamed character %s (GUID: %u) to %s", name1, pi->guid, name2);
 	return true;
 }

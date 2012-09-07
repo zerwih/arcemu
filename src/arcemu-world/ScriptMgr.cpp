@@ -155,8 +155,6 @@ void ScriptMgr::LoadScripts()
 	Path = PREFIX;
 	Path += '/';
 #ifdef WIN32
-	/*Path = Config.MainConfig.GetStringDefault( "Script", "BinaryLocation", "script_bin" );
-	Path += "\\";*/
 	FileMask = ".dll";
 #else
 #ifndef __APPLE__

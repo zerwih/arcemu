@@ -22,10 +22,10 @@
 #define _MASTER_H
 
 #include "Common.h"
-//#include "Singleton.h"
 #include "Config/ConfigEnv.h"
 #include "Database/DatabaseEnv.h"
 #include "MainServerDefines.h"
+#include "WorldConfig.h"
 
 #ifndef _VERSION
 # define _VERSION "3.3.5a"
@@ -69,7 +69,7 @@ class Master : public Singleton<Master>
 		bool m_restartEvent;
 
 	private:
-		bool _StartDB();
+		bool _StartDB( const WorldConfigData &worldConfig );
 		void _StopDB();
 		bool CheckDBVersion();
 

@@ -388,7 +388,7 @@ void WorldSocket::InformationRetreiveCallback(WorldPacket & recvData, uint32 req
 	for(i = 0; i < 8; ++i)
 		pSession->SetAccountData(i, NULL, true, 0);
 
-	if(sWorld.m_useAccountData)
+	if( sWorld.getWorldConfig().server.useAccountData )
 	{
 		QueryResult* pResult = CharacterDatabase.Query("SELECT * FROM account_data WHERE acct = %u", AccountID);
 		if(pResult == NULL)

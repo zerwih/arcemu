@@ -192,7 +192,6 @@ void ObjectMgr::LoadExtraCreatureProtoStuff()
 	}
 
 	// Load AI Agents
-	if(Config.MainConfig.GetBoolDefault("Server", "LoadAIAgents", true))
 	{
 		QueryResult* result = WorldDatabase.Query("SELECT * FROM ai_agents");
 		CreatureProto* cn;
@@ -719,7 +718,7 @@ void Storage_LoadAdditionalTables()
 	ExtraMapCreatureTables.insert(string("creature_spawns"));
 	ExtraMapGameObjectTables.insert(string("gameobject_spawns"));
 
-	string strData = Config.MainConfig.GetStringDefault("Startup", "LoadAdditionalTables", "");
+	std::string strData = sWorld.getWorldConfig().startup.loadAdditionalTables;
 	if(strData.empty())
 		return;
 

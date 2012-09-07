@@ -451,7 +451,7 @@ bool Spell::AddTarget(uint32 i, uint32 TargetType, Object* obj)
 
 	//final checks, require line of sight unless range/radius is 50000 yards
 	SpellRange* r = dbcSpellRange.LookupEntry(m_spellInfo->rangeIndex);
-	if(sWorld.Collision && r->maxRange < 50000 && GetRadius(i) < 50000 && !obj->IsItem())
+	if( sWorld.getWorldConfig().server.collision && r->maxRange < 50000 && GetRadius(i) < 50000 && !obj->IsItem())
 	{
 		float x = m_caster->GetPositionX(), y = m_caster->GetPositionY(), z = m_caster->GetPositionZ() + 0.5f;
 
@@ -636,7 +636,7 @@ bool Spell::GenerateTargets(SpellCastTargets* t)
 				t->m_destZ = m_caster->GetMapMgr()->GetLandHeight(t->m_destX, t->m_destY, m_caster->GetPositionZ() + 2.0f);
 				t->m_targetMask = TARGET_FLAG_DEST_LOCATION;
 			}
-			while(sWorld.Collision && !CollideInterface.CheckLOS(m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), t->m_destX, t->m_destY, t->m_destZ));
+			while( sWorld.getWorldConfig().server.collision && !CollideInterface.CheckLOS(m_caster->GetMapId(), m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), t->m_destX, t->m_destY, t->m_destZ));
 			result = true;
 		}
 		else if(TargetType & SPELL_TARGET_AREA)  //targetted aoe

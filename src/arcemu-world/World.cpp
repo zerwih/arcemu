@@ -21,16 +21,12 @@
 #include "StdAfx.h"
 #include <CrashHandler.h>
 #include "OptionalConfigParser.h"
+#include "WorldConfigParser.h"
 
 initialiseSingleton(World);
 
 DayWatcherThread* dw = NULL;
 CommonScheduleThread* cs = NULL;
-
-float World::m_movementCompressThreshold;
-float World::m_movementCompressThresholdCreatures;
-uint32 World::m_movementCompressRate;
-uint32 World::m_movementCompressInterval;
 
 World::World()
 {
@@ -39,31 +35,16 @@ World::World()
 	m_allowMovement = true;
 	m_gmTicketSystem = true;
 
-	GmClientChannel = "";
-
 	m_StartTime = 0;
 	eventholder = new EventableObjectHolder(WORLD_INSTANCE);
 	m_holder = eventholder;
 	m_event_Instanceid = eventholder->GetInstanceID();
 
-	mQueueUpdateInterval = 10000;
 	PeakSessionCount = 0;
 	mAcceptedConnections = 0;
-	gm_skip_attunement = false;
-	show_gm_in_who_list = true;
-	gamemaster_startonGMIsland = true;
-	gamemaster_disableachievements = false;
-	GMAdminTag = true;
-	NameinAnnounce = false;
-	NameinWAnnounce = false;
-	announce_output = true;
-	map_unload_time = 0;
 
 	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;
 	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
-
-	m_limitedNames = false;
-	m_banTable = NULL;
 
 	TotalTrafficInKB = 0.0;
 	TotalTrafficOutKB = 0.0;
@@ -433,7 +414,7 @@ bool World::SetInitialWorldSettings()
 
 	Log.Success("World", "Database loaded in %ums.", getMSTime() - start_time);
 
-	if(Collision)
+	if( worldConfig.server.collision )
 	{
 		CollideInterface.Init();
 	}
@@ -473,8 +454,8 @@ bool World::SetInitialWorldSettings()
 	new AuctionMgr;
 	sAuctionMgr.LoadAuctionHouses();
 
-	m_queueUpdateTimer = mQueueUpdateInterval;
-	if(Config.MainConfig.GetBoolDefault("Startup", "BackgroundLootLoading", true))
+	m_queueUpdateTimer = worldConfig.server.queueUpdateInterval;
+	if( worldConfig.startup.backgroundLootLoading )
 	{
 		Log.Notice("World", "Backgrounding loot loading...");
 
@@ -717,7 +698,7 @@ void World::SendWorldText(const char* text, WorldSession* self)
 
 	SendGlobalMessage(&data, self);
 
-	if(announce_output)
+	if( sWorld.getWorldConfig().announce.showInConsole )
 	{
 		sLog.outString("> %s", text);
 	}
@@ -924,7 +905,7 @@ void World::UpdateQueuedSessions(uint32 diff)
 {
 	if(diff >= m_queueUpdateTimer)
 	{
-		m_queueUpdateTimer = mQueueUpdateInterval;
+		m_queueUpdateTimer = worldConfig.server.queueUpdateInterval;
 		queueMutex.Acquire();
 
 		if(mQueuedSessions.size() == 0)
@@ -1092,7 +1073,7 @@ void TaskList::spawn()
 	thread_count.SetVal(0);
 
 	uint32 threadcount;
-	if(Config.MainConfig.GetBoolDefault("Startup", "EnableMultithreadedLoading", true))
+	if( sWorld.getWorldConfig().startup.backgroundLootLoading )
 	{
 		// get processor count
 #ifndef WIN32
@@ -1198,8 +1179,10 @@ void World::Rehash(bool load)
 {
 	if(load)
 	{
-		Config.MainConfig.SetSource(CONFDIR "/world.conf", true);
-
+		WorldConfigParser worldConfigParser;
+		worldConfigParser.parseFile( CONFDIR "/world.conf.xml" );
+		worldConfig = worldConfigParser.getWorldConfigData();
+		
 		OptionalConfigParser optionalConfigParser;
 		optionalConfigParser.parseFile( CONFDIR "/optional.conf.xml" );
 		optionalConfig = optionalConfigParser.getData();
@@ -1210,90 +1193,19 @@ void World::Rehash(bool load)
 	if(!MailSystem::getSingletonPtr())
 		new MailSystem;
 
-	channelmgr.seperatechannels = Config.MainConfig.GetBoolDefault("Server", "SeperateChatChannels", false);
-	MapPath = Config.MainConfig.GetStringDefault("Terrain", "MapPath", "maps");
-	vMapPath = Config.MainConfig.GetStringDefault("Terrain", "vMapPath", "vmaps");
-	UnloadMapFiles = Config.MainConfig.GetBoolDefault("Terrain", "UnloadMapFiles", true);
-	BreathingEnabled = Config.MainConfig.GetBoolDefault("Server", "EnableBreathing", true);
-	SendStatsOnJoin = Config.MainConfig.GetBoolDefault("Server", "SendStatsOnJoin", true);
-	compression_threshold = Config.MainConfig.GetIntDefault("Server", "CompressionThreshold", 1000);
+	channelmgr.seperatechannels = worldConfig.server.separateChatChannels;
 
-	// load regeneration rates.
-	setRate(RATE_HEALTH, Config.MainConfig.GetFloatDefault("Rates", "Health", 1)); // health
-	setRate(RATE_POWER1, Config.MainConfig.GetFloatDefault("Rates", "Power1", 1)); // mana
-	setRate(RATE_POWER2, Config.MainConfig.GetFloatDefault("Rates", "Power2", 1)); // rage
-	setRate(RATE_POWER3, Config.MainConfig.GetFloatDefault("Rates", "Power3", 1)); // focus
-	setRate(RATE_POWER4, Config.MainConfig.GetFloatDefault("Rates", "Power4", 1)); // energy
-	setRate(RATE_POWER7, Config.MainConfig.GetFloatDefault("Rates", "Power7", 1)); // runic power (rate unused)
-	setRate( RATE_VEHICLES_POWER_REGEN, Config.MainConfig.GetFloatDefault( "Rates", "VehiclePower", 1.0f ) ); // Vehicle power regeneration
-	setRate(RATE_DROP0, Config.MainConfig.GetFloatDefault("Rates", "DropGrey", 1));
-	setRate(RATE_DROP1, Config.MainConfig.GetFloatDefault("Rates", "DropWhite", 1));
-	setRate(RATE_DROP2, Config.MainConfig.GetFloatDefault("Rates", "DropGreen", 1));
-	setRate(RATE_DROP3, Config.MainConfig.GetFloatDefault("Rates", "DropBlue", 1));
-	setRate(RATE_DROP4, Config.MainConfig.GetFloatDefault("Rates", "DropPurple", 1));
-	setRate(RATE_DROP5, Config.MainConfig.GetFloatDefault("Rates", "DropOrange", 1));
-	setRate(RATE_DROP6, Config.MainConfig.GetFloatDefault("Rates", "DropArtifact", 1));
-	setRate(RATE_XP, Config.MainConfig.GetFloatDefault("Rates", "XP", 1));
-	setRate(RATE_RESTXP, Config.MainConfig.GetFloatDefault("Rates", "RestXP", 1));
-	setRate(RATE_QUESTXP, Config.MainConfig.GetFloatDefault("Rates", "QuestXP", 1));
-	setRate(RATE_EXPLOREXP, Config.MainConfig.GetFloatDefault("Rates", "ExploreXP", 1));
-	setIntRate(INTRATE_SAVE, Config.MainConfig.GetIntDefault("Rates", "Save", 1));
-	setRate(RATE_MONEY, Config.MainConfig.GetFloatDefault("Rates", "DropMoney", 1.0f));
-	setRate(RATE_QUESTREPUTATION, Config.MainConfig.GetFloatDefault("Rates", "QuestReputation", 1.0f));
-	setRate(RATE_KILLREPUTATION, Config.MainConfig.GetFloatDefault("Rates", "KillReputation", 1.0f));
-	setRate(RATE_HONOR, Config.MainConfig.GetFloatDefault("Rates", "Honor", 1.0f));
-	setRate(RATE_SKILLCHANCE, Config.MainConfig.GetFloatDefault("Rates", "SkillChance", 1.0f));
-	setRate(RATE_SKILLRATE, Config.MainConfig.GetFloatDefault("Rates", "SkillRate", 1.0f));
-	setIntRate(INTRATE_COMPRESSION, Config.MainConfig.GetIntDefault("Rates", "Compression", 1));
-	setIntRate(INTRATE_PVPTIMER, Config.MainConfig.GetIntDefault("Rates", "PvPTimer", 300000));
-	ArenaQueueDiff = Config.MainConfig.GetIntDefault("Rates", "ArenaQueueDiff", 150);
-	setRate(RATE_ARENAPOINTMULTIPLIER2X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier2x", 1.0f));
-	setRate(RATE_ARENAPOINTMULTIPLIER3X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier3x", 1.0f));
-	setRate(RATE_ARENAPOINTMULTIPLIER5X, Config.MainConfig.GetFloatDefault("Rates", "ArenaMultiplier5x", 1.0f));
-	SetPlayerLimit(Config.MainConfig.GetIntDefault("Server", "PlayerLimit", 1000));
-	SetMotd(Config.MainConfig.GetStringDefault("Server", "Motd", "Arcemu Default MOTD").c_str());
-	mQueueUpdateInterval = Config.MainConfig.GetIntDefault("Server", "QueueUpdateInterval", 5000);
-	SetKickAFKPlayerTime(Config.MainConfig.GetIntDefault("Server", "KickAFKPlayers", 0));
-	sLog.SetFileLoggingLevel(Config.MainConfig.GetIntDefault("LogLevel", "File", 0));
-	gm_skip_attunement = Config.MainConfig.GetBoolDefault("Server", "SkipAttunementsForGM", true);
-	Collision = Config.MainConfig.GetBoolDefault("Server", "Collision", 0);
-	DisableFearMovement = Config.MainConfig.GetBoolDefault("Server", "DisableFearMovement", 0);
-	SocketRecvBufSize = Config.MainConfig.GetIntDefault("WorldSocket", "RecvBufSize", WORLDSOCKET_RECVBUF_SIZE);
-	SocketSendBufSize = Config.MainConfig.GetIntDefault("WorldSocket", "SendBufSize", WORLDSOCKET_SENDBUF_SIZE);
+	SetPlayerLimit( worldConfig.server.playerLimit );
+	SetMotd( worldConfig.server.motd.c_str() );
 
-	bool log_enabled = Config.MainConfig.GetBoolDefault("Log", "Cheaters", false);
-	if(Anticheat_Log->IsOpen())
-	{
-		if(!log_enabled)
-			Anticheat_Log->Close();
-	}
-	else if(log_enabled)
-		Anticheat_Log->Open();
-
-	log_enabled = Config.MainConfig.GetBoolDefault("Log", "GMCommands", false);
-	if(GMCommand_Log->IsOpen())
-	{
-		if(!log_enabled)
-			GMCommand_Log->Close();
-	}
-	else if(log_enabled)
-		GMCommand_Log->Open();
-
-	log_enabled = Config.MainConfig.GetBoolDefault("Log", "Player", false);
-	if(Player_Log->IsOpen())
-	{
-		if(!log_enabled)
-			Player_Log->Close();
-	}
+	if( !worldConfig.server.kickAFKPlayers )
+		SetKickAFKPlayerTime( 0 );
 	else
-	{
-		if(log_enabled)
-			Player_Log->Open();
-	}
+		SetKickAFKPlayerTime( 5 );
 
 #ifdef WIN32
 	DWORD current_priority_class = GetPriorityClass(GetCurrentProcess());
-	bool high = Config.MainConfig.GetBoolDefault("Server", "AdjustPriority", false);
+	bool high = worldConfig.server.adjustPriority;
 
 	if(high)
 	{
@@ -1307,44 +1219,91 @@ void World::Rehash(bool load)
 	}
 #endif
 
-	if(!Config.MainConfig.GetString("GMClient", "GmClientChannel", &GmClientChannel))
+	worldConfig.server.connectionTimeout *= 1000;
+
+	if( worldConfig.server.mapUnloadTime  == 0)
 	{
-		GmClientChannel = "";
+		LOG_ERROR("MapUnloadTime is set to 0. This will NEVER unload MapCells!!! Overriding it to default value of %u", MAP_CELL_DEFAULT_UNLOAD_TIME);
+		worldConfig.server.mapUnloadTime = MAP_CELL_DEFAULT_UNLOAD_TIME;
 	}
 
-	m_reqGmForCommands = !Config.MainConfig.GetBoolDefault("Server", "AllowPlayerCommands", false);
-	m_lfgForNonLfg = Config.MainConfig.GetBoolDefault("Server", "EnableLFGJoin", false);
+	SocketRecvBufSize = WORLDSOCKET_RECVBUF_SIZE;
+	SocketSendBufSize = WORLDSOCKET_SENDBUF_SIZE;	
 
-	realmtype = Config.MainConfig.GetBoolDefault("Server", "RealmType", false);
-	TimeOut = uint32(1000 * Config.MainConfig.GetIntDefault("Server", "ConnectionTimeout", 180));
-	GMTTimeZone = Config.MainConfig.GetIntDefault("Server", "TimeZone", 0);
+	// load regeneration rates.
+	setRate( RATE_HEALTH, worldConfig.rates.hp ); // health
+	setRate( RATE_POWER1, worldConfig.rates.mana ); // mana
+	setRate( RATE_POWER2, worldConfig.rates.rage ); // rage
+	setRate( RATE_POWER3, worldConfig.rates.focus ); // focus
+	setRate( RATE_POWER4, worldConfig.rates.energy ); // energy
+	setRate( RATE_POWER7, 1.0f ); // runic power (rate unused)
+	setRate( RATE_VEHICLES_POWER_REGEN, 1.0f ); // Vehicle power regeneration
+
+	setRate( RATE_DROP0, worldConfig.rates.dropGrey );
+	setRate( RATE_DROP1, worldConfig.rates.dropWhite );
+	setRate( RATE_DROP2, worldConfig.rates.dropGreen );
+	setRate( RATE_DROP3, worldConfig.rates.dropBlue );
+	setRate( RATE_DROP4, worldConfig.rates.dropPurple );
+	setRate( RATE_DROP5, worldConfig.rates.dropOrange );
+	setRate( RATE_DROP6, worldConfig.rates.dropArtifact );
+
+	setRate( RATE_XP, worldConfig.rates.XP );
+	setRate( RATE_RESTXP, worldConfig.rates.restXP );
+	setRate( RATE_QUESTXP, worldConfig.rates.questXP );
+	setRate( RATE_EXPLOREXP, worldConfig.rates.exploreXP );
+	setIntRate( INTRATE_SAVE, worldConfig.server.playerAutoSaveInterval );
+	setRate( RATE_MONEY, worldConfig.rates.dropMoney );
+	setRate( RATE_QUESTREPUTATION, worldConfig.rates.reputation );
+	setRate( RATE_KILLREPUTATION, worldConfig.rates.killReputation );
+	setRate( RATE_HONOR, worldConfig.rates.honor );
+	setRate( RATE_SKILLCHANCE, worldConfig.rates.skillChance );
+	setRate( RATE_SKILLRATE, worldConfig.rates.skillRate );
+	setIntRate( INTRATE_COMPRESSION, worldConfig.rates.compression );
+	setIntRate( INTRATE_PVPTIMER, worldConfig.rates.pvpTimer );
+	ArenaQueueDiff = worldConfig.rates.arenaQueueDiff;
+	setRate( RATE_ARENAPOINTMULTIPLIER2X, worldConfig.rates.arenaMultiplier2x );
+	setRate( RATE_ARENAPOINTMULTIPLIER3X, worldConfig.rates.arenaMultiplier3x );
+	setRate( RATE_ARENAPOINTMULTIPLIER5X, worldConfig.rates.arenaMultiplier5x );
+
+	sLog.SetFileLoggingLevel( worldConfig.log.level );
+	
+	if(Anticheat_Log->IsOpen())
+	{
+		if( !sWorld.getWorldConfig().log.logCheaters )
+			Anticheat_Log->Close();
+	}
+	else if( sWorld.getWorldConfig().log.logCheaters )
+		Anticheat_Log->Open();
+
+	if(GMCommand_Log->IsOpen())
+	{
+		if(!sWorld.getWorldConfig().log.logGMCommands)
+			GMCommand_Log->Close();
+	}
+	else if(sWorld.getWorldConfig().log.logGMCommands)
+		GMCommand_Log->Open();
+
 
 	uint32 config_flags = 0;
-	if(Config.MainConfig.GetBoolDefault("Mail", "DisablePostageCostsForGM", true))
+	if( sWorld.getWorldConfig().mail.disableGMPostageCost )
 		config_flags |= MAIL_FLAG_NO_COST_FOR_GM;
 
-	if(Config.MainConfig.GetBoolDefault("Mail", "DisablePostageCosts", false))
+	if( sWorld.getWorldConfig().mail.disablePostageCost )
 		config_flags |= MAIL_FLAG_DISABLE_POSTAGE_COSTS;
 
-	if(Config.MainConfig.GetBoolDefault("Mail", "DisablePostageDelayItems", true))
+	if( sWorld.getWorldConfig().mail.disablePostageDelayItems )
 		config_flags |= MAIL_FLAG_DISABLE_HOUR_DELAY_FOR_ITEMS;
 
-	if(Config.MainConfig.GetBoolDefault("Mail", "DisableMessageExpiry", false))
+	if( sWorld.getWorldConfig().mail.disableMessageExpiry )
 		config_flags |= MAIL_FLAG_NO_EXPIRY;
 
-	if(Config.MainConfig.GetBoolDefault("Mail", "EnableInterfactionMail", true))
+	if( sWorld.getWorldConfig().mail.enableInterfactionMail )
 		config_flags |= MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION;
 
-	if(Config.MainConfig.GetBoolDefault("Mail", "EnableInterfactionForGM", true))
+	if( sWorld.getWorldConfig().mail.enableGMInterfactionMail )
 		config_flags |= MAIL_FLAG_CAN_SEND_TO_OPPOSITE_FACTION_GM;
 
 	sMailSystem.config_flags = config_flags;
-	flood_lines = Config.MainConfig.GetIntDefault("FloodProtection", "Lines", 0);
-	flood_seconds = Config.MainConfig.GetIntDefault("FloodProtection", "Seconds", 0);
-	flood_message = Config.MainConfig.GetBoolDefault("FloodProtection", "SendMessage", false);
-	show_gm_in_who_list = Config.MainConfig.GetBoolDefault("Server", "ShowGMInWhoList", true);
-	gamemaster_startonGMIsland = Config.MainConfig.GetBoolDefault("GameMaster", "StartOnGMIsland", true);
-	gamemaster_disableachievements = Config.MainConfig.GetBoolDefault( "GameMaster", "DisableAchievements", false );
 
 	if( optionalConfig.optional.levelCap > PLAYER_LEVEL_CAP )
 		optionalConfig.optional.levelCap = PLAYER_LEVEL_CAP;
@@ -1352,15 +1311,6 @@ void World::Rehash(bool load)
 	if( optionalConfig.optional.startingLevel > optionalConfig.optional.levelCap )
 		optionalConfig.optional.startingLevel = optionalConfig.optional.levelCap;
 
-	Arena_Season = Config.MainConfig.GetIntDefault("Arena", "Season", 1);
-	Arena_Progress = Config.MainConfig.GetIntDefault("Arena", "Progress", 1);
-
-	announce_tag = Config.MainConfig.GetStringDefault("Announce", "Tag", "Staff");
-	GMAdminTag = Config.MainConfig.GetBoolDefault("Announce", "GMAdminTag", false);
-	NameinAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinAnnounce", true);
-	NameinWAnnounce = Config.MainConfig.GetBoolDefault("Announce", "NameinWAnnounce", true);
-	announce_output = Config.MainConfig.GetBoolDefault("Announce", "ShowInConsole", true);
-	
 	AnnounceColorChooser( optionalConfig.announceColor.tag,
                           optionalConfig.announceColor.GMAdminTag,
 						  optionalConfig.announceColor.name,
@@ -1381,8 +1331,11 @@ void World::Rehash(bool load)
 	if( optionalConfig.commonScheduler.broadcastOrderMode > 1 )
 		optionalConfig.commonScheduler.broadcastOrderMode = 1;
 
-	if(!flood_lines || !flood_seconds)
-		flood_lines = flood_seconds = 0;
+	if( ( worldConfig.spamProtection.lines == 0 ) || ( worldConfig.spamProtection.seconds == 0 ) )
+	{
+		worldConfig.spamProtection.lines = 0;
+		worldConfig.spamProtection.seconds = 0;
+	}
 
 	if( optionalConfig.goldSettings.cap != 0 )
 		optionalConfig.goldSettings.cap *= 10000;
@@ -1390,79 +1343,13 @@ void World::Rehash(bool load)
 	if( optionalConfig.goldSettings.startingGold != 0 )
 		optionalConfig.goldSettings.startingGold *= 10000;
 
-	map_unload_time = Config.MainConfig.GetIntDefault("Server", "MapUnloadTime", MAP_CELL_DEFAULT_UNLOAD_TIME);
-	if(map_unload_time == 0)
-	{
-		LOG_ERROR("MapUnloadTime is set to 0. This will NEVER unload MapCells!!! Overriding it to default value of %u", MAP_CELL_DEFAULT_UNLOAD_TIME);
-		map_unload_time = MAP_CELL_DEFAULT_UNLOAD_TIME;
-	}
+	if( worldConfig.instanceHandling.dailyHeroicResetHour > 23 )
+		worldConfig.instanceHandling.dailyHeroicResetHour = 23;
 
-	antihack_teleport = Config.MainConfig.GetBoolDefault("AntiHack", "Teleport", true);
-	antihack_speed = Config.MainConfig.GetBoolDefault("AntiHack", "Speed", true);
-	antihack_flight = Config.MainConfig.GetBoolDefault("AntiHack", "Flight", true);
-	flyhack_threshold = Config.MainConfig.GetIntDefault("AntiHack", "FlightThreshold", 8);
-	no_antihack_on_gm = Config.MainConfig.GetBoolDefault("AntiHack", "DisableOnGM", true);
-	SpeedhackProtection = antihack_speed;
-	m_limitedNames = Config.MainConfig.GetBoolDefault("Server", "LimitedNames", true);
-	m_useAccountData = Config.MainConfig.GetBoolDefault("Server", "UseAccountData", false);
-
-	instance_TakeGroupLeaderID = Config.MainConfig.GetBoolDefault("InstanceHandling", "TakeGroupLeaderID", true);
-	instance_SlidingExpiration = Config.MainConfig.GetBoolDefault("InstanceHandling", "SlidingExpiration", false);
-	instance_DailyHeroicInstanceResetHour = Config.MainConfig.GetIntDefault("InstanceHandling", "DailyHeroicInstanceResetHour", 5);
-	// cebernic: wanna no attunement xD?
-	instance_CheckTriggerPrerequisites = Config.MainConfig.GetBoolDefault("InstanceHandling", "CheckTriggerPrerequisites", true);
-
-	bgsettings.AV_MIN = Config.MainConfig.GetIntDefault("Battleground", "AV_MIN", 10);
-	bgsettings.AV_MAX = Config.MainConfig.GetIntDefault("Battleground", "AV_MAX", 40);
-
-	bgsettings.AB_MIN = Config.MainConfig.GetIntDefault("Battleground", "AB_MIN", 4);
-	bgsettings.AB_MAX = Config.MainConfig.GetIntDefault("Battleground", "AB_MAX", 15);
-
-	bgsettings.WSG_MIN = Config.MainConfig.GetIntDefault("Battleground", "WSG_MIN", 2);
-	bgsettings.WSG_MAX = Config.MainConfig.GetIntDefault("Battleground", "WSG_MAX", 10);
-
-	bgsettings.EOTS_MIN = Config.MainConfig.GetIntDefault("Battleground", "EOTS_MIN", 4);
-	bgsettings.EOTS_MAX = Config.MainConfig.GetIntDefault("Battleground", "EOTS_MAX", 15);
-
-	bgsettings.SOTA_MIN = Config.MainConfig.GetIntDefault("Battleground", "SOTA_MIN", 10);
-	bgsettings.SOTA_MAX = Config.MainConfig.GetIntDefault("Battleground", "SOTA_MAX", 15);
-
-	bgsettings.IOC_MIN = Config.MainConfig.GetIntDefault("Battleground", "IOC_MIN", 10);
-	bgsettings.IOC_MAX = Config.MainConfig.GetIntDefault("Battleground", "IOC_MAX", 15);
-
-	// damage/hp/mp cap settings
-	m_limits.enable = Config.MainConfig.GetBoolDefault("Limits", "Enable", true);
-	m_limits.autoattackDamageCap = (uint32)Config.MainConfig.GetIntDefault("Limits", "AutoAttackDmg", 10000);
-	m_limits.spellDamageCap = (uint32)Config.MainConfig.GetIntDefault("Limits", "SpellDmg", 30000);
-	m_limits.healthCap = (uint32)Config.MainConfig.GetIntDefault("Limits", "Health", 80000);
-	m_limits.manaCap = (uint32)Config.MainConfig.GetIntDefault("Limits", "Mana", 80000);
-	m_limits.disconnect = Config.MainConfig.GetBoolDefault("Limits", "Disconnect", false);
-	m_limits.broadcast = Config.MainConfig.GetBoolDefault("Limits", "BroadcastGMs", true);
-
-	if(instance_DailyHeroicInstanceResetHour < 0)
-		instance_DailyHeroicInstanceResetHour = 0;
-	if(instance_DailyHeroicInstanceResetHour > 23)
-		instance_DailyHeroicInstanceResetHour = 23;
-
-	// ======================================
-	m_movementCompressInterval = Config.MainConfig.GetIntDefault("Movement", "FlushInterval", 1000);
-	m_movementCompressRate = Config.MainConfig.GetIntDefault("Movement", "CompressRate", 1);
-
-	m_movementCompressThresholdCreatures = Config.MainConfig.GetFloatDefault("Movement", "CompressThresholdCreatures", 15.0f);
-	m_movementCompressThresholdCreatures *= m_movementCompressThresholdCreatures;
-
-	m_movementCompressThreshold = Config.MainConfig.GetFloatDefault("Movement", "CompressThreshold", 25.0f);
-	m_movementCompressThreshold *= m_movementCompressThreshold;		// square it to avoid sqrt() on checks
-	// ======================================
-
-	if(m_banTable != NULL)
-		free(m_banTable);
-
-	m_banTable = NULL;
-	string s = Config.MainConfig.GetStringDefault("Server", "BanTable", "");
-	if(!s.empty())
-		m_banTable = strdup(s.c_str());
-
+	// square it to avoid sqrt() on checks
+	worldConfig.movement.compressionThresholdCreatures *= worldConfig.movement.compressionThresholdCreatures;
+	worldConfig.movement.compressionThreshold *= worldConfig.movement.compressionThreshold;
+	
 	if(load)
 		Channel::LoadConfSettings();
 }

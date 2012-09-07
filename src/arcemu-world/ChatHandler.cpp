@@ -88,18 +88,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 	}
 
 	// Flood protection
-	if(lang != -1 && !GetPermissionCount() && sWorld.flood_lines != 0)
+	if(lang != -1 && !GetPermissionCount() && sWorld.getWorldConfig().spamProtection.lines != 0)
 	{
 		/* flood detection, wheeee! */
 		if(UNIXTIME >= floodTime)
 		{
 			floodLines = 0;
-			floodTime = UNIXTIME + sWorld.flood_seconds;
+			floodTime = UNIXTIME + sWorld.getWorldConfig().spamProtection.seconds;
 		}
 
-		if((++floodLines) > sWorld.flood_lines)
+		if((++floodLines) > sWorld.getWorldConfig().spamProtection.lines)
 		{
-			if(sWorld.flood_message)
+			if( sWorld.getWorldConfig().spamProtection.sendMessage )
 				_player->BroadcastMessage("Your message has triggered serverside flood protection. You can speak again in %u seconds.", floodTime - UNIXTIME);
 
 			return;
@@ -602,16 +602,16 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
 		return;
 	}
 
-	if(!GetPermissionCount() && sWorld.flood_lines)
+	if(!GetPermissionCount() && sWorld.getWorldConfig().spamProtection.lines )
 	{
 		/* flood detection, wheeee! */
 		if(UNIXTIME >= floodTime)
 		{
 			floodLines = 0;
-			floodTime = UNIXTIME + sWorld.flood_seconds;
+			floodTime = UNIXTIME + sWorld.getWorldConfig().spamProtection.seconds;
 		}
 
-		if((++floodLines) > sWorld.flood_lines)
+		if((++floodLines) > sWorld.getWorldConfig().spamProtection.lines )
 		{
 			return;
 		}

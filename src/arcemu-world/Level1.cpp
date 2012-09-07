@@ -66,15 +66,15 @@ bool ChatHandler::HandleAnnounceCommand(const char* args, WorldSession* m_sessio
 	string input2;
 	input2 = sWorld.ann_tagcolor;
 	input2 += "[";
-	input2 += sWorld.announce_tag;
+	input2 += sWorld.getWorldConfig().announce.tag;
 	input2 += "]";
 	input2 += sWorld.ann_gmtagcolor;
-	if(sWorld.GMAdminTag)
+	if( sWorld.getWorldConfig().announce.GMAdminTag )
 	{
 		if(m_session->CanUseCommand('z')) input2 += "<Admin>";
 		else if(m_session->GetPermissionCount()) input2 += "<GM>";
 	}
-	if(sWorld.NameinAnnounce)
+	if( sWorld.getWorldConfig().announce.nameInAnnounce )
 	{
 		input2 += "|r" + sWorld.ann_namecolor + "|Hplayer:";
 		input2 += m_session->GetPlayer()->GetName();
@@ -82,7 +82,8 @@ bool ChatHandler::HandleAnnounceCommand(const char* args, WorldSession* m_sessio
 		input2 += m_session->GetPlayer()->GetName();
 		input2 += "]|h:|r " + sWorld.ann_msgcolor;
 	}
-	else if(!sWorld.NameinAnnounce) {input2 += ": "; input2 += sWorld.ann_msgcolor;}
+	else if(!sWorld.getWorldConfig().announce.nameInAnnounce){input2 += ": "; input2 += sWorld.ann_msgcolor;}
+
 	snprintf((char*)msg, 1024, "%s%s", input2.c_str(), args);
 	sWorld.SendWorldText(msg); // send message
 	sGMLog.writefromsession(m_session, "used announce command, [%s]", args);
@@ -113,21 +114,21 @@ bool ChatHandler::HandleWAnnounceCommand(const char* args, WorldSession* m_sessi
 	string input3;
 	input3 = sWorld.ann_tagcolor;
 	input3 += "[";
-	input3 += sWorld.announce_tag;
+	input3 += sWorld.getWorldConfig().announce.tag;
 	input3 += "]";
 	input3 += sWorld.ann_gmtagcolor;
-	if(sWorld.GMAdminTag)
+	if(sWorld.getWorldConfig().announce.GMAdminTag)
 	{
 		if(m_session->CanUseCommand('z')) input3 += "<Admin>";
 		else if(m_session->GetPermissionCount()) input3 += "<GM>";
 	}
-	if(sWorld.NameinWAnnounce)
+	if(sWorld.getWorldConfig().announce.nameInWsAnnounce)
 	{
 		input3 += "|r" + sWorld.ann_namecolor + "[";
 		input3 += m_session->GetPlayer()->GetName();
 		input3 += "]:|r " + sWorld.ann_msgcolor;
 	}
-	else if(!sWorld.NameinWAnnounce) {input3 += ": "; input3 += sWorld.ann_msgcolor;}
+	else if(!sWorld.getWorldConfig().announce.nameInWsAnnounce) {input3 += ": "; input3 += sWorld.ann_msgcolor;}
 	snprintf((char*)pAnnounce, 1024, "%s%s", input3.c_str(), args);
 
 	sWorld.SendWorldWideScreenText(pAnnounce); // send message

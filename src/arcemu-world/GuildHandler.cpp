@@ -1020,7 +1020,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 		Charter* gc = _player->m_charters[CHARTER_TYPE_GUILD];
 		if(gc == 0)
 			return;
-		if(gc->SignatureCount < 9 && Config.MainConfig.GetBoolDefault("Server", "RequireAllSignatures", false))
+		if(gc->SignatureCount < 9 && sWorld.getWorldConfig().server.requireAllSignatures )
 		{
 			Guild::SendTurnInPetitionResult(this, ERR_PETITION_NOT_ENOUGH_SIGNATURES);
 			return;
@@ -1073,7 +1073,7 @@ void WorldSession::HandleCharterTurnInCharter(WorldPacket & recv_data)
 			return;
 		}
 
-		if(pCharter->SignatureCount < pCharter->GetNumberOfSlotsByType() && Config.MainConfig.GetBoolDefault("Server", "RequireAllSignatures", false))
+		if(pCharter->SignatureCount < pCharter->GetNumberOfSlotsByType() && sWorld.getWorldConfig().server.requireAllSignatures )
 		{
 			Guild::SendTurnInPetitionResult(this, ERR_PETITION_NOT_ENOUGH_SIGNATURES);
 			return;

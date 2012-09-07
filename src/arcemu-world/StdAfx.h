@@ -88,11 +88,9 @@ template< class T, class U > T TO(U u) { return static_cast< T >(u); }
 
 extern SERVER_DECL SessionLogWriter* Anticheat_Log;
 extern SERVER_DECL SessionLogWriter* GMCommand_Log;
-extern SERVER_DECL SessionLogWriter* Player_Log;
 
 #define sCheatLog (*Anticheat_Log)
 #define sGMLog (*GMCommand_Log)
-#define sPlrLog (*Player_Log)
 
 #include <zlib.h>
 

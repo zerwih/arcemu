@@ -200,7 +200,7 @@ void CCollideInterface::ActivateTile(uint32 mapId, uint32 tileX, uint32 tileY)
 	m_loadLock.Acquire();
 	if(m_tilesLoaded[mapId][tileX][tileY] == 0)
 	{
-		mgr->loadMap(sWorld.vMapPath.c_str(), mapId, tileX, tileY);
+		mgr->loadMap( sWorld.getWorldConfig().terrain.vmapPath.c_str(), mapId, tileX, tileY);
 		LoadNavMeshTile(mapId, tileX, tileY);
 	}
 	++m_tilesLoaded[mapId][tileX][tileY];

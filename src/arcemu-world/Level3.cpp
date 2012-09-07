@@ -510,9 +510,9 @@ bool ChatHandler::HandleBanCharacterCommand(const char* args, WorldSession* m_se
 	char msg[200];
 	snprintf(msg, 200, "%sGM: %s has been banned by %s for %s. Reason: %s", MSG_COLOR_RED, pCharacter, m_session->GetPlayer()->GetName(), BanTime ? ConvertTimeStampToString(BanTime).c_str() : "ever", (pReason == NULL) ? "No reason." : pReason);
 	sWorld.SendWorldText(msg, NULL);
-	if(sWorld.m_banTable && pInfo)
+	if(!sWorld.getWorldConfig().server.banTable.empty() && pInfo)
 	{
-		CharacterDatabase.Execute("INSERT INTO %s VALUES('%s', '%s', %u, %u, '%s')", sWorld.m_banTable, m_session->GetPlayer()->GetName(), pInfo->name, (uint32)UNIXTIME, (uint32)UNIXTIME + BanTime, (pReason == NULL) ? "No reason." : CharacterDatabase.EscapeString(string(pReason)).c_str());
+		CharacterDatabase.Execute("INSERT INTO %s VALUES('%s', '%s', %u, %u, '%s')", sWorld.getWorldConfig().server.banTable.c_str(), m_session->GetPlayer()->GetName(), pInfo->name, (uint32)UNIXTIME, (uint32)UNIXTIME + BanTime, (pReason == NULL) ? "No reason." : CharacterDatabase.EscapeString(string(pReason)).c_str());
 	}
 
 	if(pPlayer)
@@ -3963,7 +3963,7 @@ bool ChatHandler::HandleShowSkills(const char* args, WorldSession* m_session)
 
 bool ChatHandler::HandleCollisionTestIndoor(const char* args, WorldSession* m_session)
 {
-	if(sWorld.Collision)
+	if(sWorld.getWorldConfig().server.collision)
 	{
 		Player* plr = m_session->GetPlayer();
 		const LocationVector & loc = plr->GetPosition();
@@ -3980,7 +3980,7 @@ bool ChatHandler::HandleCollisionTestIndoor(const char* args, WorldSession* m_se
 
 bool ChatHandler::HandleCollisionTestLOS(const char* args, WorldSession* m_session)
 {
-	if(sWorld.Collision)
+	if(sWorld.getWorldConfig().server.collision)
 	{
 		Object* pObj = NULL;
 		Creature* pCreature = getSelectedCreature(m_session, false);
@@ -4024,7 +4024,7 @@ bool ChatHandler::HandleGetDeathState(const char* args, WorldSession* m_session)
 
 bool ChatHandler::HandleCollisionGetHeight(const char* args, WorldSession* m_session)
 {
-	if(sWorld.Collision)
+	if(sWorld.getWorldConfig().server.collision)
 	{
 		Player* plr = m_session->GetPlayer();
 		float radius = 5.0f;

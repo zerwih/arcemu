@@ -1872,7 +1872,7 @@ void MapMgr::RemoveForcedCell(MapCell* c)
 
 float MapMgr::GetFirstZWithCPZ(float x, float y, float z)
 {
-	if(!sWorld.Collision)
+	if(!sWorld.getWorldConfig().server.collision)
 		return NO_WMO_HEIGHT;
 
 	float posZ = NO_WMO_HEIGHT;

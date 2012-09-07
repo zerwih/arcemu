@@ -71,9 +71,12 @@ void WorldStatesHandler::BuildInitWorldStatesForZone( uint32 zone, uint32 area, 
 	}
 
 	data << uint32( 3191 );
-	data << uint32( sWorld.Arena_Season );
+	data << uint32( sWorld.getWorldConfig().arena.season  );
 	data << uint32( 3901 );
-	data << uint32( sWorld.Arena_Progress );
+	if( sWorld.getWorldConfig().arena.inProgress )
+		data << uint32( 1 );
+	else
+		data << uint32( 0 );
 }
 
 void WorldStatesHandler::InitWorldStates( std::multimap< uint32,WorldState > *states ){

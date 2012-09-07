@@ -112,7 +112,8 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket & recv_data)
 	recv_data >> guid;
 	if(guid == _player->GetGUID())
 	{
-		if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->GetPlayerStatus() != TRANSFER_PENDING)
+		if(sWorld.getWorldConfig().hackDetection.teleport &&
+			!(HasGMPermissions() && sWorld.getWorldConfig().hackDetection.disableOnGM ) && _player->GetPlayerStatus() != TRANSFER_PENDING)
 		{
 			/* we're obviously cheating */
 			sCheatLog.writefromsession(this, "Used teleport hack, disconnecting.");
@@ -120,7 +121,8 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket & recv_data)
 			return;
 		}
 
-		if(sWorld.antihack_teleport && !(HasGMPermissions() && sWorld.no_antihack_on_gm) && _player->m_position.Distance2DSq(_player->m_sentTeleportPosition) > 625.0f)	/* 25.0f*25.0f */
+		if( sWorld.getWorldConfig().hackDetection.teleport &&
+			!(HasGMPermissions() && sWorld.getWorldConfig().hackDetection.disableOnGM ) && _player->m_position.Distance2DSq(_player->m_sentTeleportPosition) > 625.0f)	/* 25.0f*25.0f */
 		{
 			/* cheating.... :( */
 			sCheatLog.writefromsession(this, "Used teleport hack {2}, disconnecting.");
@@ -153,7 +155,7 @@ void _HandleBreathing(MovementInfo & movement_info, Player* _player, WorldSessio
 {
 
 	// no water breathing is required
-	if(!sWorld.BreathingEnabled || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
+	if( !sWorld.getWorldConfig().server.enableBreathing  || _player->FlyCheat || _player->m_bUnlimitedBreath || !_player->isAlive() || _player->GodModeCheat)
 	{
 		// player is flagged as in water
 		if(_player->m_UnderwaterState & UNDERWATERSTATE_SWIMMING)
@@ -438,12 +440,12 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 		}
 	} */
 
-	if(!(HasGMPermissions() && sWorld.no_antihack_on_gm) && !_player->GetCharmedUnitGUID())
+	if(!(HasGMPermissions() && sWorld.getWorldConfig().hackDetection.disableOnGM ) && !_player->GetCharmedUnitGUID())
 	{
 		/************************************************************************/
 		/* Anti-Teleport                                                        */
 		/************************************************************************/
-		if(sWorld.antihack_teleport && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 3025.0f
+		if(sWorld.getWorldConfig().hackDetection.teleport && _player->m_position.Distance2DSq(movement_info.x, movement_info.y) > 3025.0f
 		        && _player->m_runSpeed < 50.0f && !_player->transporter_info.guid)
 		{
 			sCheatLog.writefromsession(this, "Disconnected for teleport hacking. Player speed: %f, Distance traveled: %f", _player->m_runSpeed, sqrt(_player->m_position.Distance2DSq(movement_info.x, movement_info.y)));
@@ -453,7 +455,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 	}
 
 	//update the detector
-	if(sWorld.antihack_speed && !_player->GetTaxiState() && _player->transporter_info.guid == 0 && !_player->GetSession()->GetPermissionCount())
+	if(sWorld.getWorldConfig().hackDetection.speed && !_player->GetTaxiState() && _player->transporter_info.guid == 0 && !_player->GetSession()->GetPermissionCount())
 	{
 		// simplified: just take the fastest speed. less chance of fuckups too
 		float speed = (_player->flying_aura) ? _player->m_flySpeed : (_player->m_swimSpeed > _player-> m_runSpeed) ? _player->m_swimSpeed : _player->m_runSpeed;

@@ -846,13 +846,13 @@ uint32 CBattlegroundManager::GetMinimumPlayers(uint32 dbcIndex)
 	switch(dbcIndex)
 	{
 		case BATTLEGROUND_ALTERAC_VALLEY:
-			return sWorld.bgsettings.AV_MIN;
+			return sWorld.getWorldConfig().battlegrounds.AV_MIN;
 		case BATTLEGROUND_WARSONG_GULCH:
-			return sWorld.bgsettings.WSG_MIN;
+			return sWorld.getWorldConfig().battlegrounds.WSG_MIN;
 		case BATTLEGROUND_ARATHI_BASIN:
-			return sWorld.bgsettings.AB_MIN;
+			return sWorld.getWorldConfig().battlegrounds.AB_MIN;
 		case BATTLEGROUND_EYE_OF_THE_STORM:
-			return sWorld.bgsettings.EOTS_MIN;
+			return sWorld.getWorldConfig().battlegrounds.EOTS_MIN;
 		case BATTLEGROUND_ARENA_2V2:
 			return 2;
 		case BATTLEGROUND_ARENA_3V3:
@@ -860,9 +860,9 @@ uint32 CBattlegroundManager::GetMinimumPlayers(uint32 dbcIndex)
 		case BATTLEGROUND_ARENA_5V5:
 			return 5;
 		case BATTLEGROUND_STRAND_OF_THE_ANCIENT:
-			return sWorld.bgsettings.SOTA_MIN;
+			return sWorld.getWorldConfig().battlegrounds.SOTA_MIN;
 		case BATTLEGROUND_ISLE_OF_CONQUEST:
-			return sWorld.bgsettings.IOC_MIN;
+			return sWorld.getWorldConfig().battlegrounds.IOC_MIN;
 		default:
 			return 1;
 	}
@@ -874,13 +874,13 @@ uint32 CBattlegroundManager::GetMaximumPlayers(uint32 dbcIndex)
 	switch(dbcIndex)
 	{
 		case BATTLEGROUND_ALTERAC_VALLEY:
-			return sWorld.bgsettings.AV_MAX;
+			return sWorld.getWorldConfig().battlegrounds.AV_MAX;
 		case BATTLEGROUND_WARSONG_GULCH:
-			return sWorld.bgsettings.WSG_MAX;
+			return sWorld.getWorldConfig().battlegrounds.WSG_MAX;
 		case BATTLEGROUND_ARATHI_BASIN:
-			return sWorld.bgsettings.AB_MAX;
+			return sWorld.getWorldConfig().battlegrounds.AB_MAX;
 		case BATTLEGROUND_EYE_OF_THE_STORM:
-			return sWorld.bgsettings.EOTS_MAX;
+			return sWorld.getWorldConfig().battlegrounds.EOTS_MAX;
 		case BATTLEGROUND_ARENA_2V2:
 			return 2;
 		case BATTLEGROUND_ARENA_3V3:
@@ -888,9 +888,9 @@ uint32 CBattlegroundManager::GetMaximumPlayers(uint32 dbcIndex)
 		case BATTLEGROUND_ARENA_5V5:
 			return 5;
 		case BATTLEGROUND_STRAND_OF_THE_ANCIENT:
-			return sWorld.bgsettings.SOTA_MAX;
+			return sWorld.getWorldConfig().battlegrounds.SOTA_MAX;
 		case BATTLEGROUND_ISLE_OF_CONQUEST:
-			return sWorld.bgsettings.IOC_MAX;
+			return sWorld.getWorldConfig().battlegrounds.IOC_MAX;
 		default:
 			return 1;
 	}

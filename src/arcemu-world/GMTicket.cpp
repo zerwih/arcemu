@@ -79,7 +79,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket & recv_data)
 	SendPacket(&data);
 
 	// send message indicating new ticket
-	Channel* chn = channelmgr.GetChannel(sWorld.getGmClientChannel().c_str(), GetPlayer());
+	Channel* chn = channelmgr.GetChannel( sWorld.getWorldConfig().gmClient.channel.c_str(), GetPlayer());
 	if(chn)
 	{
 		std::stringstream ss;
@@ -152,7 +152,7 @@ void WorldSession::HandleGMTicketDeleteOpcode(WorldPacket & recv_data)
 	SendPacket(&data);
 
 	// send message to gm_sync_chan
-	Channel* chn = channelmgr.GetChannel(sWorld.getGmClientChannel().c_str(), GetPlayer());
+	Channel* chn = channelmgr.GetChannel( sWorld.getWorldConfig().gmClient.channel.c_str(), GetPlayer());
 	if(chn && ticket != NULL)
 	{
 		std::stringstream ss;

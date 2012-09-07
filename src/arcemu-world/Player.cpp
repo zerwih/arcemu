@@ -993,7 +993,7 @@ void Player::Update(uint32 p_time)
 			m_pvpTimer -= p_time;
 	}
 
-	if(sWorld.Collision)
+	if( sWorld.getWorldConfig().server.collision )
 	{
 		if(mstime >= m_indoorCheckTimer)
 		{
@@ -1413,7 +1413,7 @@ void Player::_EventExploration()
 	{
 		if(m_isResting)
 		{
-			if(sWorld.Collision)
+			if( sWorld.getWorldConfig().server.collision )
 			{
 				const LocationVector & loc = GetPosition();
 				if(!CollideInterface.IsIndoor(GetMapId(), loc.x, loc.y, loc.z + 2.0f))
@@ -2526,7 +2526,7 @@ void Player::SaveToDB(bool bNewCharacter /* =false */)
 
 	ss << xpfield << "'" << ", '";
 
-	bool saveData = Config.MainConfig.GetBoolDefault("Server", "SaveExtendedCharData", false);
+	bool saveData = sWorld.getWorldConfig().server.saveExtendedCharData;
 	if(saveData)
 	{
 		for(uint32 offset = OBJECT_END; offset < PLAYER_END; offset++)
@@ -5354,12 +5354,14 @@ void Player::UpdateStats()
 
 	if(res < hp)
 		res = hp;
-	if(sWorld.m_limits.enable && (sWorld.m_limits.healthCap > 0) && (res > sWorld.m_limits.healthCap) && GetSession()->GetPermissionCount() <= 0)   //hacker?
+	if( sWorld.getWorldConfig().limits.enabled &&
+		( sWorld.getWorldConfig().limits.hp > 0) &&
+		(res > sWorld.getWorldConfig().limits.hp ) && GetSession()->GetPermissionCount() <= 0)   //hacker?
 	{
 		char logmsg[256];
-		snprintf(logmsg, 256, "has over %u health (%i)", sWorld.m_limits.healthCap, res);
+		snprintf(logmsg, 256, "has over %u health (%i)", sWorld.getWorldConfig().limits.hp, res);
 		sCheatLog.writefromsession(GetSession(), logmsg);
-		if(sWorld.m_limits.broadcast) // send info to online GM
+		if( sWorld.getWorldConfig().limits.report ) // send info to online GM
 		{
 			string gm_ann = MSG_COLOR_GREEN;
 			gm_ann += "|Hplayer:";
@@ -5371,13 +5373,13 @@ void Player::UpdateStats()
 			gm_ann += logmsg;
 			sWorld.SendGMWorldText(gm_ann.c_str());
 		}
-		if(sWorld.m_limits.disconnect)
+		if( sWorld.getWorldConfig().limits.disconnect )
 		{
 			GetSession()->Disconnect();
 		}
 		else // no disconnect, set it to the cap instead
 		{
-			res = sWorld.m_limits.healthCap;
+			res = sWorld.getWorldConfig().limits.hp;
 		}
 	}
 	SetUInt32Value(UNIT_FIELD_MAXHEALTH, res);
@@ -5403,12 +5405,14 @@ void Player::UpdateStats()
 		res = mana + bonus + manadelta;
 		if(res < mana)
 			res = mana;
-		if(sWorld.m_limits.enable && (sWorld.m_limits.manaCap > 0) && (res > sWorld.m_limits.manaCap) && GetSession()->GetPermissionCount() <= 0)   //hacker?
+		if( sWorld.getWorldConfig().limits.enabled &&
+			( sWorld.getWorldConfig().limits.mana > 0) &&
+			(res > sWorld.getWorldConfig().limits.mana ) && GetSession()->GetPermissionCount() <= 0)   //hacker?
 		{
 			char logmsg[256];
-			snprintf(logmsg, 256, "has over %u mana (%i)", sWorld.m_limits.manaCap, res);
+			snprintf(logmsg, 256, "has over %u mana (%i)", sWorld.getWorldConfig().limits.mana, res);
 			sCheatLog.writefromsession(GetSession(), logmsg);
-			if(sWorld.m_limits.broadcast) // send info to online GM
+			if( sWorld.getWorldConfig().limits.report ) // send info to online GM
 			{
 				string gm_ann = MSG_COLOR_GREEN;
 				gm_ann += "|Hplayer:";
@@ -5420,13 +5424,13 @@ void Player::UpdateStats()
 				gm_ann += logmsg;
 				sWorld.SendGMWorldText(gm_ann.c_str());
 			}
-			if(sWorld.m_limits.disconnect)
+			if( sWorld.getWorldConfig().limits.disconnect )
 			{
 				GetSession()->Disconnect();
 			}
 			else // no disconnect, set it to the cap instead
 			{
-				res = sWorld.m_limits.manaCap;
+				res = sWorld.getWorldConfig().limits.mana;
 			}
 		}
 		SetMaxPower(POWER_TYPE_MANA, res);
@@ -5991,7 +5995,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit* target, bool autoshot)
 		return SPELL_FAILED_TARGETS_DEAD;
 
 	// Check if in line of sight (need collision detection).
-	if(sWorld.Collision)
+	if( sWorld.getWorldConfig().server.collision )
 	{
 		if(GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(), GetPositionNC(), target->GetPositionNC()))
 			return SPELL_FAILED_LINE_OF_SIGHT;
@@ -6043,7 +6047,7 @@ int32 Player::CanShootRangedWeapon(uint32 spellid, Unit* target, bool autoshot)
 	if(spellid != SPELL_RANGED_WAND)  //no min limit for wands
 		if(minrange > dist)
 			fail = SPELL_FAILED_TOO_CLOSE;
-	if(sWorld.Collision && GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(), GetPositionNC(), target->GetPositionNC()))
+	if( sWorld.getWorldConfig().server.collision && GetMapId() == target->GetMapId() && !CollideInterface.CheckLOS(GetMapId(), GetPositionNC(), target->GetPositionNC()))
 		fail = SPELL_FAILED_LINE_OF_SIGHT ;
 	if(dist > maxr)
 	{
@@ -7416,7 +7420,7 @@ void Player::ProcessPendingUpdates()
 
 		// compress update packet
 		// while we said 350 before, I'm gonna make it 500 :D
-		if(c < (size_t)sWorld.compression_threshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
+		if(c < (size_t)sWorld.getWorldConfig().server.compressionThreshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
 		{
 			// send uncompressed packet -> because we failed
 			m_session->OutPacket(SMSG_UPDATE_OBJECT, (uint16)c, update_buffer);
@@ -7440,7 +7444,7 @@ void Player::ProcessPendingUpdates()
 
 		// compress update packet
 		// while we said 350 before, I'm gonna make it 500 :D
-		if(c < (size_t)sWorld.compression_threshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
+		if(c < (size_t)sWorld.getWorldConfig().server.compressionThreshold || !CompressAndSendUpdateBuffer((uint32)c, update_buffer))
 		{
 			// send uncompressed packet -> because we failed
 			m_session->OutPacket(SMSG_UPDATE_OBJECT, (uint16)c, update_buffer);
@@ -8570,7 +8574,7 @@ void Player::UpdatePvPArea()
 			RemoveSanctuaryFlag();
 
 			//contested territory
-			if(sWorld.GetRealmType() == REALM_PVP)
+			if(sWorld.getWorldConfig().server.realmType == REALM_PVP)
 			{
 				//automatically sets pvp flag on contested territories.
 				if(!IsPvPFlagged())
@@ -8579,7 +8583,7 @@ void Player::UpdatePvPArea()
 					StopPvPTimer();
 			}
 
-			if(sWorld.GetRealmType() == REALM_PVE)
+			if(sWorld.getWorldConfig().server.realmType == REALM_PVE)
 			{
 				if(HasFlag(PLAYER_FLAGS, PLAYER_FLAG_PVP_TOGGLE))
 				{
@@ -8646,7 +8650,7 @@ void Player::LoginPvPSetup()
 
 void Player::PvPToggle()
 {
-	if(sWorld.GetRealmType() == REALM_PVE)
+	if(sWorld.getWorldConfig().server.realmType == REALM_PVE)
 	{
 		if(m_pvpTimer > 0)
 		{
@@ -8702,7 +8706,7 @@ void Player::PvPToggle()
 		return;
 	}
 #else
-	else if(sWorld.GetRealmType() == REALM_PVP)
+	else if(sWorld.getWorldConfig().server.realmType == REALM_PVP)
 	{
 		AreaTable* at = dbcArea.LookupEntryForced(m_AreaID);
 		if(at == NULL)
@@ -11068,7 +11072,9 @@ void Player::_LoadPlayerCooldowns(QueryResult* result)
 
 void Player::_FlyhackCheck()
 {
-	if(!sWorld.antihack_flight || transporter_info.guid != 0 || GetTaxiState() || (sWorld.no_antihack_on_gm && GetSession()->HasGMPermissions()))
+	if(!sWorld.getWorldConfig().hackDetection.flight ||
+		transporter_info.guid != 0 || GetTaxiState() ||
+		( sWorld.getWorldConfig().hackDetection.disableOnGM && GetSession()->HasGMPermissions()))
 		return;
 	return;
 	//disabled
@@ -12448,39 +12454,39 @@ void Player::SendMessageToSet(WorldPacket* data, bool bToSelf, bool myteam_only)
 
 uint32 Player::CheckDamageLimits(uint32 dmg, uint32 spellid)
 {
-	if((spellid != 0) && (sWorld.m_limits.spellDamageCap > 0))
+	if((spellid != 0) && ( sWorld.getWorldConfig().limits.spellDmg > 0))
 	{
-		if(dmg > sWorld.m_limits.spellDamageCap)
+		if(dmg > sWorld.getWorldConfig().limits.spellDmg )
 		{
 			std::stringstream dmglog;
 			dmglog << "Dealt " << dmg << " with spell " << spellid;
 
 			sCheatLog.writefromsession(m_session, dmglog.str().c_str());
 
-			if(sWorld.m_limits.broadcast != 0)
+			if(sWorld.getWorldConfig().limits.report != 0)
 				sWorld.SendDamageLimitTextToGM(GetName(), dmglog.str().c_str());
 
-			if(sWorld.m_limits.disconnect != 0)
+			if( sWorld.getWorldConfig().limits.disconnect != 0)
 				m_session->Disconnect();
 
-			dmg = sWorld.m_limits.spellDamageCap;
+			dmg = sWorld.getWorldConfig().limits.spellDmg;
 		}
 	}
 
-	else if((sWorld.m_limits.autoattackDamageCap > 0) && (dmg > sWorld.m_limits.autoattackDamageCap))
+	else if(( sWorld.getWorldConfig().limits.autoAttackDmg > 0 ) && (dmg > sWorld.getWorldConfig().limits.autoAttackDmg))
 	{
 		std::stringstream dmglog;
 
 		dmglog << "Dealt " << dmg << " with auto attack";
 		sCheatLog.writefromsession(m_session, dmglog.str().c_str());
 
-		if(sWorld.m_limits.broadcast != 0)
+		if( sWorld.getWorldConfig().limits.report != 0)
 			sWorld.SendDamageLimitTextToGM(GetName(), dmglog.str().c_str());
 
-		if(sWorld.m_limits.disconnect != 0)
+		if( sWorld.getWorldConfig().limits.disconnect != 0)
 			m_session->Disconnect();
 
-		dmg = sWorld.m_limits.autoattackDamageCap;
+		dmg = sWorld.getWorldConfig().limits.autoAttackDmg;
 	}
 
 	return dmg;
@@ -12499,7 +12505,7 @@ void Player::DealDamage(Unit* pVictim, uint32 damage, uint32 targetEvent, uint32
 
 	if(this != pVictim)
 	{
-		if(!GetSession()->HasPermissions() && sWorld.m_limits.enable != 0)
+		if(!GetSession()->HasPermissions() && sWorld.getWorldConfig().limits.enabled != 0)
 			damage = CheckDamageLimits(damage, spellId);
 
 		CombatStatus.OnDamageDealt(pVictim);

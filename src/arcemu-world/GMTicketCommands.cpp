@@ -20,13 +20,14 @@
 
 #include "StdAfx.h"
 #define  SENDSURVEY "\x03"
+
 #ifdef GM_TICKET_MY_MASTER_COMPATIBLE
 
 bool ChatHandler::HandleGMTicketListCommand(const char* args, WorldSession* m_session)
 {
 	Player* cplr = m_session->GetPlayer();
 
-	Channel* chn = channelmgr.GetChannel(sWorld.getGmClientChannel().c_str(), cplr);
+	Channel* chn = channelmgr.GetChannel( sWorld.getWorldConfig().gmClient.channel.c_str(), cplr);
 	if(!chn)
 		return false;
 
@@ -64,7 +65,7 @@ bool ChatHandler::HandleGMTicketGetByIdCommand(const char* args, WorldSession* m
 		return false;
 
 	Player* cplr = m_session->GetPlayer();
-	Channel* chn = channelmgr.GetChannel(sWorld.getGmClientChannel().c_str(), cplr);
+	Channel* chn = channelmgr.GetChannel( sWorld.getWorldConfig().gmClient.channel.c_str(), cplr);
 	if(!chn)
 		return false;
 
@@ -118,7 +119,7 @@ bool ChatHandler::HandleGMTicketRemoveByIdCommand(const char* args, WorldSession
 		return false;
 
 	Player* cplr = m_session->GetPlayer();
-	Channel* chn = channelmgr.GetChannel(sWorld.getGmClientChannel().c_str(), cplr);
+	Channel* chn = channelmgr.GetChannel( sWorld.getWorldConfig().gmClient.channel.c_str(), cplr);
 	if(!chn)
 		return false;
 

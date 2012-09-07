@@ -1322,7 +1322,7 @@ bool Object::IsWithinLOS(LocationVector location)
 	LocationVector location2;
 	location2 = GetPosition();
 
-	if(sWorld.Collision)
+	if( sWorld.getWorldConfig().server.collision )
 	{
 		return CollideInterface.CheckLOS(GetMapId(), location2.x, location2.y, location2.z + 2.0f, location.x, location.y, location.z + 2.0f);
 	}

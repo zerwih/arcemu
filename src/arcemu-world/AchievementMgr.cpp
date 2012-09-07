@@ -561,7 +561,7 @@ void AchievementMgr::CheckAllAchievementCriteria()
 */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, int32 miscvalue1, int32 miscvalue2, uint32 time)
 {
-	if( m_player->GetSession()->HasGMPermissions() && sWorld.gamemaster_disableachievements )
+	if( m_player->GetSession()->HasGMPermissions() && sWorld.getWorldConfig().gm.disableAchievements )
 		return;
 	
 	uint64 selectedGUID;
@@ -1232,7 +1232,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, in
 */
 void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type)
 {
-	if( m_player->GetSession()->HasGMPermissions() && sWorld.gamemaster_disableachievements )
+	if( m_player->GetSession()->HasGMPermissions() && sWorld.getWorldConfig().gm.disableAchievements )
 		return;
 
 	AchievementCriteriaEntryList const & achievementCriteriaList = objmgr.GetAchievementCriteriaByType(type);

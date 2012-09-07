@@ -21,6 +21,7 @@
 #include "StdAfx.h"
 #include "RealmsConfigParser.h"
 #include "OptionalConfigParser.h"
+#include "WorldConfigParser.h"
 
 #define BANNER "ArcEmu %s %s/%s-%s-%s :: World Server"
 
@@ -45,7 +46,6 @@ SERVER_DECL Database* Database_World;
 // mainserv defines
 SERVER_DECL SessionLogWriter* GMCommand_Log;
 SERVER_DECL SessionLogWriter* Anticheat_Log;
-SERVER_DECL SessionLogWriter* Player_Log;
 
 // threads
 extern DayWatcherThread* dw;
@@ -96,7 +96,7 @@ struct Addr
 
 #define DEF_VALUE_NOT_SET 0xDEADBEEF
 
-static const char* default_config_file = CONFDIR "/world.conf";
+static const char* default_config_file = CONFDIR "/world.conf.xml";
 static const char* default_optional_config_file = CONFDIR "/optional.conf.xml";
 static const char* default_realm_config_file = CONFDIR "/realms.conf.xml";
 
@@ -172,10 +172,12 @@ bool Master::Run(int argc, char** argv)
 		return true;
 	}
 
-	if( do_check_conf )
+	if( do_check_conf  )
 	{
 		Log.Notice("Config", "Checking config file: %s", config_file);
-		if(Config.MainConfig.SetSource(config_file, true))
+		
+		WorldConfigParser worldConfigParser;
+		if( worldConfigParser.parseFile( config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
 			Log.Error("Config", "Encountered one or more errors.");
@@ -215,11 +217,13 @@ bool Master::Run(int argc, char** argv)
 	uint32 LoadingTime = getMSTime();
 
 	Log.Success("Config", "Loading Config Files...");
-	if(Config.MainConfig.SetSource(config_file))
-		Log.Notice("Config", ">> " CONFDIR "/world.conf loaded");
+	
+	WorldConfigParser worldConfigParser;
+	if( worldConfigParser.parseFile( config_file ) )
+		Log.Notice("Config", ">> " CONFDIR "/world.conf.xml loaded");
 	else
 	{
-		sLog.Error("Config", ">> error occurred loading " CONFDIR "/world.conf");
+		sLog.Error("Config", ">> error occurred loading " CONFDIR "/world.conf.xml");
 		sLog.Close();
 		return false;
 	}
@@ -246,7 +250,7 @@ bool Master::Run(int argc, char** argv)
 	}
 
 #if !defined(WIN32) && defined(__DEBUG__)
-	if(Config.MainConfig.GetIntDefault("LogLevel", "DisableCrashdumpReport", 0) == 0)
+	if( !sWorld.getWorldConfig().log.noCrashReport )
 	{
 		char cmd[1024];
 		char banner[1024];
@@ -257,7 +261,7 @@ bool Master::Run(int argc, char** argv)
 	unlink("arcemu.uptime");
 #endif
 
-	if(!_StartDB())
+	if(!_StartDB( worldConfigParser.getWorldConfigData() ))
 	{
 		Database::CleanupLibs();
 		sLog.Close();
@@ -283,14 +287,14 @@ bool Master::Run(int argc, char** argv)
 	new EventMgr;
 	new World;
 	sWorld.setOptionalConfig( optionalConfigParser.getData() );
+	sWorld.setWorldConfig( worldConfigParser.getWorldConfigData() );
 
 	// optional time stamp in logs
-	bool useTimeStamp = Config.MainConfig.GetBoolDefault("log", "TimeStamp", false);
+	bool useTimeStamp = sWorld.getWorldConfig().log.useTimeStamp;
 
 	// open cheat log file
 	Anticheat_Log = new SessionLogWriter(FormatOutputString("logs", "cheaters", useTimeStamp).c_str(), false);
 	GMCommand_Log = new SessionLogWriter(FormatOutputString("logs", "gmcommand", useTimeStamp).c_str(), false);
-	Player_Log = new SessionLogWriter(FormatOutputString("logs", "players", useTimeStamp).c_str(), false);
 
 	/* load the config file */
 	sWorld.Rehash(false);
@@ -302,8 +306,8 @@ bool Master::Run(int argc, char** argv)
 	// Initialize Opcode Table
 	WorldSession::InitPacketHandlerTable();
 
-	string host = Config.MainConfig.GetStringDefault("Listen", "Host", DEFAULT_HOST);
-	int wsport = Config.MainConfig.GetIntDefault("Listen", "WorldServerPort", DEFAULT_WORLDSERVER_PORT);
+	std::string host = sWorld.getWorldConfig().host.address;
+	int wsport = sWorld.getWorldConfig().host.port;
 
 	new ScriptMgr;
 
@@ -345,7 +349,7 @@ bool Master::Run(int argc, char** argv)
 
 	sScriptMgr.LoadScripts();
 
-	if(Config.MainConfig.GetBoolDefault("Startup", "EnableSpellIDDump", false))
+	if( sWorld.getWorldConfig().startup.enableSpellIdDump )
 		sScriptMgr.DumpUnimplementedSpells();
 
 	LoadingTime = getMSTime() - LoadingTime;
@@ -558,7 +562,6 @@ bool Master::Run(int argc, char** argv)
 
 	delete GMCommand_Log;
 	delete Anticheat_Log;
-	delete Player_Log;
 
 	// remove pid
 	remove("arcemu.pid");
@@ -646,52 +649,40 @@ bool Master::CheckDBVersion()
 	return true;
 }
 
-bool Master::_StartDB()
+bool Master::_StartDB( const WorldConfigData &worldConfig )
 {
 	Database_World = NULL;
 	Database_Character = NULL;
 	string hostname, username, password, database;
 	int port = 0;
 
-	bool result = Config.MainConfig.GetString("WorldDatabase", "Username", &username);
-	Config.MainConfig.GetString("WorldDatabase", "Password", &password);
-	result = !result ? result : Config.MainConfig.GetString("WorldDatabase", "Hostname", &hostname);
-	result = !result ? result : Config.MainConfig.GetString("WorldDatabase", "Name", &database);
-	result = !result ? result : Config.MainConfig.GetInt("WorldDatabase", "Port", &port);
+	username = worldConfig.worldDB.username;
+	password = worldConfig.worldDB.password;
+	hostname = worldConfig.worldDB.hostname;
+	database = worldConfig.worldDB.database;
+	port     = worldConfig.worldDB.port;
 
 	Database_World = Database::CreateDatabaseInterface();
 
-	if(result == false)
-	{
-		Log.Error("sql", "One or more parameters were missing from WorldDatabase directive.");
-		return false;
-	}
-
 	// Initialize it
 	if(!WorldDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
-	                             password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault("WorldDatabase", "ConnectionCount", 3), 16384))
+	                             password.c_str(), database.c_str(), 3, 16384))
 	{
 		Log.Error("sql", "Main database initialization failed. Exiting.");
 		return false;
 	}
 
-	result = Config.MainConfig.GetString("CharacterDatabase", "Username", &username);
-	Config.MainConfig.GetString("CharacterDatabase", "Password", &password);
-	result = !result ? result : Config.MainConfig.GetString("CharacterDatabase", "Hostname", &hostname);
-	result = !result ? result : Config.MainConfig.GetString("CharacterDatabase", "Name", &database);
-	result = !result ? result : Config.MainConfig.GetInt("CharacterDatabase", "Port", &port);
+	username = worldConfig.characterDB.username;
+	password = worldConfig.characterDB.password;
+	hostname = worldConfig.characterDB.hostname;
+	database = worldConfig.characterDB.database;
+	port     = worldConfig.characterDB.port;
 
 	Database_Character = Database::CreateDatabaseInterface();
 
-	if(result == false)
-	{
-		Log.Error("sql", "One or more parameters were missing from Database directive.");
-		return false;
-	}
-
 	// Initialize it
 	if(!CharacterDatabase.Initialize(hostname.c_str(), (unsigned int)port, username.c_str(),
-	                                 password.c_str(), database.c_str(), Config.MainConfig.GetIntDefault("CharacterDatabase", "ConnectionCount", 5), 16384))
+	                                 password.c_str(), database.c_str(), 5, 16384))
 	{
 		Log.Error("sql", "Main database initialization failed. Exiting.");
 		return false;

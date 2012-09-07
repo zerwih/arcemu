@@ -707,7 +707,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
 		if(!plr->GetSession() || !plr->IsInWorld())
 			continue;
 
-		if(!sWorld.show_gm_in_who_list && !HasGMPermissions())
+		if(!sWorld.getWorldConfig().server.showGMInWhoList && !HasGMPermissions())
 		{
 			if(plr->GetSession()->HasGMPermissions())
 				continue;
@@ -1082,7 +1082,7 @@ void WorldSession::HandleUpdateAccountData(WorldPacket & recv_data)
 	LOG_DETAIL("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
 
 	uint32 uiID;
-	if(!sWorld.m_useAccountData)
+	if(!sWorld.getWorldConfig().server.useAccountData)
 		return;
 
 	recv_data >> uiID;
@@ -1174,7 +1174,7 @@ void WorldSession::HandleRequestAccountData(WorldPacket & recv_data)
 	LOG_DETAIL("WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
 
 	uint32 id;
-	if(!sWorld.m_useAccountData)
+	if(!sWorld.getWorldConfig().server.useAccountData)
 		return;
 	recv_data >> id;
 

@@ -482,7 +482,7 @@ void Spell::FillAllTargetsInArea(uint32 i, float srcx, float srcy, float srcz, f
 		}
 		if(IsInrange(srcx, srcy, srcz, (*itr), r))
 		{
-			if(sWorld.Collision)
+			if( sWorld.getWorldConfig().server.collision )
 			{
 				if(m_caster->GetMapId() == (*itr)->GetMapId() && !CollideInterface.CheckLOS(m_caster->GetMapId(), m_caster->GetPositionNC(), (*itr)->GetPositionNC()))
 					continue;
@@ -545,7 +545,7 @@ void Spell::FillAllFriendlyInArea(uint32 i, float srcx, float srcy, float srcz, 
 
 		if(IsInrange(srcx, srcy, srcz, (*itr), r))
 		{
-			if(sWorld.Collision)
+			if( sWorld.getWorldConfig().server.collision )
 			{
 				if(m_caster->GetMapId() == (*itr)->GetMapId() && !CollideInterface.CheckLOS(m_caster->GetMapId(), m_caster->GetPositionNC(), (*itr)->GetPositionNC()))
 					continue;
@@ -3205,7 +3205,7 @@ uint8 Spell::CanCast(bool tolerate)
 		/**
 		 *	Indoor/Outdoor check
 		 */
-		if(sWorld.Collision)
+		if( sWorld.getWorldConfig().server.collision )
 		{
 			if(GetProto()->MechanicsType == MECHANIC_MOUNTED)
 			{
@@ -3881,7 +3881,7 @@ uint8 Spell::CanCast(bool tolerate)
 						return SPELL_FAILED_NO_AMMO;
 				}
 
-				if(sWorld.Collision)
+				if( sWorld.getWorldConfig().server.collision )
 				{
 					if(p_caster->GetMapId() == target->GetMapId() && !p_caster->GetMapMgr()->InLineOfSight(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ() + 2, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2))
 						return SPELL_FAILED_LINE_OF_SIGHT;

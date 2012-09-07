@@ -180,7 +180,7 @@ void LocalizationMgr::Reload(bool first)
 	/************************************************************************/
 	/* Read Language Bindings From Config                                   */
 	/************************************************************************/
-	string ls = Config.MainConfig.GetStringDefault("Localization", "LocaleBindings", "");
+	std::string ls = sWorld.getWorldConfig().localization.localeBindings;
 	vector<string> tbindings = StrSplit(ls, " ");
 	for(vector<string>::iterator ztr = tbindings.begin(); ztr != tbindings.end(); ++ztr)
 	{
