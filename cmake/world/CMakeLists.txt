@@ -76,7 +76,8 @@ SET(sources
 	NPCHandler.cpp 
 	Object.cpp 
 	ObjectMgr.cpp 
-	Opcodes.cpp 
+	Opcodes.cpp
+	OptionalConfigParser.cpp
 	Pet.cpp 
 	PetHandler.cpp 
 	Player.cpp 
@@ -87,6 +88,7 @@ SET(sources
 	QuestMgr.cpp 
 	QuestCommands.cpp 
 	RaidHandler.cpp 
+	RealmsConfigParser.cpp
 	RecallCommands.cpp 
 	ReputationHandler.cpp 
 	ScriptMgr.cpp 
@@ -112,6 +114,7 @@ SET(sources
 	WayPoints.cpp 
 	WeatherMgr.cpp 
 	World.cpp 
+	WorldConfigParser.cpp
 	WorldCreator.cpp 
 	WorldSession.cpp 
 	WorldSocket.cpp 
@@ -225,6 +228,8 @@ SET( headers
 	ObjectMgr.h
 	ObjectStorage.h
 	Opcodes.h
+	OptionalConfig.h
+	OptionalConfigParser.h
 	Paladin.h
 	Pet.h
 	Player.h
@@ -233,6 +238,8 @@ SET( headers
 	Priest.h
 	Quest.h
 	QuestMgr.h
+	RealmsConfig.h
+	RealmsConfigParser.h
 	Rogue.h
 	ScriptMgr.h
 	ScriptSetup.h
@@ -265,6 +272,8 @@ SET( headers
 	Entities/Summons/WildSummon.h
 	WordFilter.h
 	World.h
+	WorldConfig.h
+	WorldConfigParser.h
 	WorldCreator.h
 	WorldRunnable.h
 	WorldSession.h

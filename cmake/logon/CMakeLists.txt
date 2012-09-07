@@ -5,6 +5,7 @@ SET( sources
   AuthSocket.cpp
   AutoPatcher.cpp
   LogonCommServer.cpp
+  LogonConfigParser.cpp
   LogonConsole.cpp
   LogonOpcodes.cpp
   LogonStdAfx.cpp
@@ -16,6 +17,8 @@ SET( sources
 	AuthStructs.h
 	AutoPatcher.h
 	LogonCommServer.h
+	LogonConfig.h
+	LogonConfigParser.h
 	LogonConsole.h
 	LogonOpcodes.h
 	LogonStdAfx.h
