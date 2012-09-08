@@ -14,6 +14,7 @@ public:
 	bool parseFile( const std::string &name );
 	const LogonConfigData& getData() const{ return data; }
 	void setRequiredVersion( const std::string &s ){ requiredVersion = s; }
+	const char* getLastError() const;
 
 private:
 	bool isConfig( _xmlNode *node );
@@ -25,6 +26,11 @@ private:
 
 	LogonConfigData data;
 	std::string requiredVersion;
+	unsigned long lastError;
+
+	bool dbPartDone;
+	bool hostPartDone;
+	bool securityPartDone;
 };
 
 #endif

@@ -170,6 +170,7 @@ bool rehash2()
 	if( !configParser.parseFile( config_file ) )
 	{
 		LOG_ERROR("Config file could not be loaded.");
+		LOG_ERROR("ERROR: %s",configParser.getLastError() );
 		return false;
 	}
 	configFile = configParser.getData();
@@ -306,7 +307,10 @@ void LogonServer::Run(int argc, char** argv)
 		if( parser.parseFile( "configs/logon.conf.xml" ) )
 			LOG_BASIC("  Passed without errors.");
 		else
+		{
 			LOG_BASIC("  Encountered one or more errors.");
+			LOG_BASIC("ERROR: %s", parser.getLastError() );
+		}
 
 		sLog.Close();
 		return;
