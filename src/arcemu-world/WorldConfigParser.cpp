@@ -47,56 +47,55 @@ namespace
 				return false;
 		}
 	}
+
+	enum WorldErrors
+	{
+		ERR_ALL_OK,
+		ERR_CANNOT_OPEN_FILE,
+		ERR_NOT_A_CONFIG_FILE,
+		ERR_NOT_WORLD_CONFIG,
+		ERR_WRONG_VERSION,
+		ERR_WDB_NO_HOST,
+		ERR_WDB_NO_USER,
+		ERR_WDB_NO_PASS,
+		ERR_WDB_NO_DB,
+		ERR_CDB_NO_HOST,
+		ERR_CDB_NO_USER,
+		ERR_CDB_NO_PASS,
+		ERR_CDB_NO_DB,
+		ERR_HOST_NO_ADDRESS,
+		ERR_HOST_NO_PORT,
+		ERR_SEC_NO_PASS,
+		ERR_NO_WDB_SETTINGS,
+		ERR_NO_CDB_SETTINGS,
+		ERR_NO_HOST_SETTINGS,
+		ERR_MAX_ERROR
+	};
+
+	const char* errorStrings[] = 
+	{
+		"No errors",
+		"Cannot open file",
+		"Not a config file",
+		"Not a world config file",
+		"Wrong version of config file",
+		"World database, couldn't load hostname",
+		"World database, couldn't load username",
+		"World database, couldn't load password",
+		"World database, couldn't load database name",	
+		"Character database, couldn't load hostname",
+		"Character database, couldn't load username",
+		"Character database, couldn't load password",
+		"Character database, couldn't load database name",
+		"Host, couldn't load address",
+		"Host, couldn't load port",
+		"Security, couldn't load remote password",
+		"Couldn't load world database connection settings",
+		"Couldn't load character database connection settings",
+		"Couldn't load host settings"
+	};
+
 }
-
-
-enum WorldErrors
-{
-	ERR_ALL_OK,
-	ERR_CANNOT_OPEN_FILE,
-	ERR_NOT_A_CONFIG_FILE,
-	ERR_NOT_WORLD_CONFIG,
-	ERR_WRONG_VERSION,
-	ERR_WDB_NO_HOST,
-	ERR_WDB_NO_USER,
-	ERR_WDB_NO_PASS,
-	ERR_WDB_NO_DB,
-	ERR_CDB_NO_HOST,
-	ERR_CDB_NO_USER,
-	ERR_CDB_NO_PASS,
-	ERR_CDB_NO_DB,
-	ERR_HOST_NO_ADDRESS,
-	ERR_HOST_NO_PORT,
-	ERR_SEC_NO_PASS,
-	ERR_NO_WDB_SETTINGS,
-	ERR_NO_CDB_SETTINGS,
-	ERR_NO_HOST_SETTINGS,
-	ERR_MAX_ERROR
-};
-
-const char* errorStrings[] = 
-{
-	"No errors",
-	"Cannot open file",
-	"Not a config file",
-	"Not a world config file",
-	"Wrong version of config file",
-	"World database, couldn't load hostname",
-	"World database, couldn't load username",
-	"World database, couldn't load password",
-	"World database, couldn't load database name",	
-	"Character database, couldn't load hostname",
-	"Character database, couldn't load username",
-	"Character database, couldn't load password",
-	"Character database, couldn't load database name",
-	"Host, couldn't load address",
-	"Host, couldn't load port",
-	"Security, couldn't load remote password",
-	"Couldn't load world database connection settings",
-	"Couldn't load character database connection settings",
-	"Couldn't load host settings"
-};
-
 
 WorldConfigParser::WorldConfigParser()
 {

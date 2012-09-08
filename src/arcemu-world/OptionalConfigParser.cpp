@@ -2,37 +2,72 @@
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
-
-bool fromString( std::string s )
+namespace
 {
-	if( s == "true" )
-		return true;
 
-	if( s[0] == '1' )
-		return true;
+	bool fromString( std::string s )
+	{
+		if( s == "true" )
+			return true;
 
-	return false;
+		if( s[0] == '1' )
+			return true;
+
+		return false;
+	}
+
+	#define PCHAR_CAST (char*)
+
+	enum OptionalConfigErrors
+	{
+		ERR_ALL_OK,
+		ERR_CANNOT_OPEN_FILE,
+		ERR_NOT_A_CONFIG_FILE,
+		ERR_NOT_OPTIONAL_CONF,
+		ERR_WRONG_VERSION,
+		ERR_MAX_ERRORS
+	};
+
+	const char* errorStrings[] =
+	{
+		"No errors",
+		"Cannot open file",
+		"Not a config file",
+		"Not an optional config file",
+		"Wrong version"
+	};
+
 }
-
-#define PCHAR_CAST (char*)
 
 OptionalConfigParser::OptionalConfigParser()
 {
+	lastError = ERR_ALL_OK;
 }
 
 OptionalConfigParser::~OptionalConfigParser()
 {
 }
 
+const char* OptionalConfigParser::getLastError() const
+{
+	return errorStrings[ lastError ];
+}
+
 bool OptionalConfigParser::parseFile( const std::string &name )
 {
 	xmlDocPtr document = xmlParseFile( name.c_str() );
 	if( document == NULL )
+	{
+		lastError = ERR_CANNOT_OPEN_FILE;
 		return false;
+	}
 
 	xmlNodePtr root = xmlDocGetRootElement( document );
 	if( root == NULL )
+	{
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
+	}
 
 	if( !isConfig( root ) )
 	{
@@ -87,15 +122,27 @@ bool OptionalConfigParser::isConfig( _xmlNode *node )
 	xmlChar *prop = NULL;
 	prop = xmlGetProp( node, BAD_CAST "type" );
 	if( prop == NULL )
+	{
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
+	}
 	if( xmlStrcmp( prop, BAD_CAST "optional" ) != 0 )
+	{
+		lastError = ERR_NOT_OPTIONAL_CONF;
 		return false;
+	}
 
 	prop = xmlGetProp( node, BAD_CAST "version" );
 	if( prop == NULL )
+	{
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
+	}
 	if( xmlStrcmp( prop, BAD_CAST requiredVersion.c_str() ) != 0 )
+	{
+		lastError = ERR_WRONG_VERSION;
 		return false;
+	}
 
 	return true;
 }

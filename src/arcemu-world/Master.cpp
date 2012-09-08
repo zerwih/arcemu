@@ -205,7 +205,10 @@ bool Master::Run(int argc, char** argv)
 		if( optionalConfigParser.parseFile( optional_config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
+		{
 			Log.Error("Config", "Encountered one or more errors.");
+			LOG_ERROR( "ERROR: %s", optionalConfigParser.getLastError() );
+		}
 
 		sLog.Close();
 		return true;
@@ -246,6 +249,7 @@ bool Master::Run(int argc, char** argv)
 	else
 	{
 		sLog.Error("Config", ">> error occurred loading " CONFDIR "/optional.conf.xml");
+		LOG_ERROR( "ERROR: %s", optionalConfigParser.getLastError() );
 		sLog.Close();
 		return false;
 	}

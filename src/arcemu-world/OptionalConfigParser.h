@@ -16,6 +16,7 @@ public:
 	const OptionalConfigData& getData() const{ return data; }
 	bool isConfig( _xmlNode *node );
 	void setRequiredVersion( const std::string &s ){ requiredVersion = s; }
+	const char* getLastError() const;
 
 private:
 	bool parseOptional( _xmlNode *node );
@@ -29,6 +30,7 @@ private:
 
 	OptionalConfigData data;
 	std::string requiredVersion;
+	unsigned long lastError;
 };
 
 #endif
