@@ -196,7 +196,10 @@ bool Master::Run(int argc, char** argv)
 		if( realmsConfigParser.parseFile( realm_config_file )  )
 			Log.Success("Config", "Passed without errors.");
 		else
+		{
 			Log.Error("Config", "Encountered one or more errors.");
+			LOG_ERROR( "ERROR: %s", realmsConfigParser.getLastError() );
+		}
 
 		Log.Notice("Config", "Checking config file:: %s", optional_config_file);
 		
@@ -261,6 +264,7 @@ bool Master::Run(int argc, char** argv)
 	else
 	{
 		sLog.Error("Config", ">> error occurred loading " CONFDIR "/realms.conf.xml");
+		LOG_ERROR( "ERROR: %s", realmsConfigParser.getLastError() );
 		sLog.Close();
 		return false;
 	}
