@@ -112,6 +112,7 @@ set(PCRE_INCLUDE_DIRS "" CACHE INTERNAL "PCRE include dirs.")
 mark_as_advanced(ZLIB_LIBRARIES PCRE_LIBRARIES PCRE_INCLUDE_DIRS)
 
 set(GLOBAL_INCLUDE_DIRS 
+${ROOT_PATH}/src/config
 ${ROOT_PATH}/src/arcemu-shared
 ${ROOT_PATH}/src/arcemu-world
 ${ROOT_PATH}/src/arcemu-logonserver
@@ -158,7 +159,7 @@ if(WIN32)
 		else()
 			SET( EXTRA_LIBS ${EXTRA_LIBS} libmysql_release_x64.lib )
 		endif()
-		SET( EXTRA_LIBS ${EXTRA_LIBS} libxml2_win64.lib )
+		SET( LIBXML2_LIBRARIES libxml2_win64.lib)
 	else(IS_64BIT )
 		SET( EXTRA_LIBS libeay32_win32.lib )
 		if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -166,7 +167,7 @@ if(WIN32)
 		else()
 			SET( EXTRA_LIBS ${EXTRA_LIBS} libmysql_release_win32.lib )
 		endif()
-		SET( EXTRA_LIBS ${EXTRA_LIBS} libxml2_win32.lib )
+		SET( LIBXML2_LIBRARIES libxml2_win32.lib)
 	endif()
 	#Needed for socket stuff and crash handler
 	SET(EXTRA_LIBS ${EXTRA_LIBS} ws2_32.lib dbghelp.lib )
@@ -201,6 +202,7 @@ add_subdirectory(g3dlite)
 add_subdirectory(vmaplib)
 add_subdirectory(recast)
 add_subdirectory(detour)
+add_subdirectory(config)
 add_subdirectory(shared)
 add_subdirectory(logon)
 add_subdirectory(world)

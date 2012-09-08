@@ -5,7 +5,6 @@ SET( sources
   AuthSocket.cpp
   AutoPatcher.cpp
   LogonCommServer.cpp
-  LogonConfigParser.cpp
   LogonConsole.cpp
   LogonOpcodes.cpp
   LogonStdAfx.cpp
@@ -17,8 +16,6 @@ SET( sources
 	AuthStructs.h
 	AutoPatcher.h
 	LogonCommServer.h
-	LogonConfig.h
-	LogonConfigParser.h
 	LogonConsole.h
 	LogonOpcodes.h
 	LogonStdAfx.h
@@ -47,7 +44,7 @@ IF( CMAKE_GENERATOR MATCHES Visual*)
 	ADD_NATIVE_PRECOMPILED_HEADER(${PROJECT_NAME} LogonStdAfx.h ${prefix}/LogonStdAfx.cpp)
 ENDIF()
 #Link our shared lib.
-target_link_libraries( ${PROJECT_NAME} shared ${ZLIB_LIBRARIES} ${PCRE_LIBRARIES} ${LIBXML2_LIBRARIES} )
+target_link_libraries( ${PROJECT_NAME} shared config ${ZLIB_LIBRARIES} ${PCRE_LIBRARIES} )
 #Provide make install rules.
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION .)
 
