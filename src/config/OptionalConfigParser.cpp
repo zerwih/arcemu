@@ -1,23 +1,10 @@
 #include "OptionalConfigParser.h"
+#include "StringParsing.h"
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
 namespace
 {
-
-	bool fromString( std::string s )
-	{
-		if( s == "true" )
-			return true;
-
-		if( s[0] == '1' )
-			return true;
-
-		return false;
-	}
-
-	#define PCHAR_CAST (char*)
-
 	enum OptionalConfigErrors
 	{
 		ERR_ALL_OK,
@@ -172,19 +159,19 @@ bool OptionalConfigParser::parseOptional( _xmlNode *node )
 	if( prop == NULL )
 		data.optional.allowTBC = true;
 	else
-		data.optional.allowTBC = fromString( PCHAR_CAST prop );
+		data.optional.allowTBC = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "anti_master_loot_ninja" );
 	if( prop == NULL )
 		data.optional.antiMasterLootNinja = false;
 	else
-		data.optional.antiMasterLootNinja = fromString( PCHAR_CAST prop );
+		data.optional.antiMasterLootNinja = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "additional_fun" );
 	if( prop == NULL )
 		data.optional.additionalFun = false;
 	else
-		data.optional.additionalFun = fromString( PCHAR_CAST prop );
+		data.optional.additionalFun = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "dk_starting_talents" );
 	if( prop == NULL )
@@ -210,43 +197,43 @@ bool OptionalConfigParser::parseInterfaction( _xmlNode *node )
 	if( prop == NULL )
 		data.interfaction.chat = false;
 	else
-		data.interfaction.chat = fromString( PCHAR_CAST prop );
+		data.interfaction.chat = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "group" );
 	if( prop == NULL )
 		data.interfaction.group = false;
 	else
-		data.interfaction.group = fromString( PCHAR_CAST prop );
+		data.interfaction.group = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "guild" );
 	if( prop == NULL )
 		data.interfaction.guild = false;
 	else
-		data.interfaction.guild = fromString( PCHAR_CAST prop );
+		data.interfaction.guild = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "trade" );
 	if( prop == NULL )
 		data.interfaction.trade = false;
 	else
-		data.interfaction.trade = fromString( PCHAR_CAST prop );
+		data.interfaction.trade = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "friends" );
 	if( prop == NULL )
 		data.interfaction.friends = false;
 	else
-		data.interfaction.friends = fromString( PCHAR_CAST prop );
+		data.interfaction.friends = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "misc" );
 	if( prop == NULL )
 		data.interfaction.misc = false;
 	else
-		data.interfaction.misc = fromString( PCHAR_CAST prop );
+		data.interfaction.misc = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "cross_over_characters" );
 	if( prop == NULL )
 		data.interfaction.crossoverChars = true;
 	else
-		data.interfaction.crossoverChars = fromString( PCHAR_CAST prop );
+		data.interfaction.crossoverChars = toBool( PCHAR_CAST prop );
 
 	return true;
 }
@@ -290,14 +277,14 @@ bool OptionalConfigParser::parseExtra( _xmlNode *node )
 	if( prop == NULL )
 		data.extra.instant80 = false;
 	else
-		data.extra.instant80 = fromString( PCHAR_CAST prop );
+		data.extra.instant80 = toBool( PCHAR_CAST prop );
 
 
 	prop = xmlGetProp( node, BAD_CAST "portals" );
 	if( prop == NULL )
 		data.extra.portals = false;
 	else
-		data.extra.portals = fromString( PCHAR_CAST prop );
+		data.extra.portals = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "pvp_token_id" );
 	if( prop == NULL )
@@ -316,14 +303,14 @@ bool OptionalConfigParser::parseGM( _xmlNode *node )
 	if( prop == NULL )
 		data.gm.listOnlyActive = false;
 	else
-		data.gm.listOnlyActive = fromString( PCHAR_CAST prop );
+		data.gm.listOnlyActive = toBool( PCHAR_CAST prop );
 
 
 	prop = xmlGetProp( node, BAD_CAST "hide_permissions" );
 	if( prop == NULL )
 		data.gm.hidePermissions = false;
 	else
-		data.gm.hidePermissions = fromString( PCHAR_CAST prop );
+		data.gm.hidePermissions = toBool( PCHAR_CAST prop );
 
 
 	return true;
@@ -337,7 +324,7 @@ bool OptionalConfigParser::parseCommonScheduler( _xmlNode *node )
 	if( prop == NULL )
 		data.commonScheduler.autoBroadcast = false;
 	else
-		data.commonScheduler.autoBroadcast = fromString( PCHAR_CAST prop );
+		data.commonScheduler.autoBroadcast = toBool( PCHAR_CAST prop );
 
 
 	prop = xmlGetProp( node, BAD_CAST "broadcast_interval" );
@@ -369,14 +356,14 @@ bool OptionalConfigParser::parseClassOptions( _xmlNode *node )
 	if( prop == NULL )
 		data.classOptions.DKPrerequisites = true;
 	else
-		data.classOptions.DKPrerequisites = fromString( PCHAR_CAST prop );
+		data.classOptions.DKPrerequisites = toBool( PCHAR_CAST prop );
 
 
 	prop = xmlGetProp( node, BAD_CAST "death_knight_limit" );
 	if( prop == NULL )
 		data.classOptions.DKLimit = true;
 	else
-		data.classOptions.DKLimit = fromString( PCHAR_CAST prop );
+		data.classOptions.DKLimit = toBool( PCHAR_CAST prop );
 
 
 	return true;
@@ -396,7 +383,7 @@ bool OptionalConfigParser::parseGoldSettings( _xmlNode *node )
 	if( prop == NULL )
 		data.goldSettings.enableCap = true;
 	else
-		data.goldSettings.enableCap = fromString( PCHAR_CAST prop );
+		data.goldSettings.enableCap = toBool( PCHAR_CAST prop );
 
 	prop = xmlGetProp( node, BAD_CAST "cap" );
 	if( prop == NULL )
