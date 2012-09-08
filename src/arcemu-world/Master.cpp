@@ -184,7 +184,10 @@ bool Master::Run(int argc, char** argv)
 		if( worldConfigParser.parseFile( config_file ) )
 			Log.Success("Config", "Passed without errors.");
 		else
+		{
 			Log.Error("Config", "Encountered one or more errors.");
+			LOG_ERROR( "ERROR: %", worldConfigParser.getLastError() );
+		}
 
 		Log.Notice("Config", "Checking config file: %s", realm_config_file);
 		
@@ -231,6 +234,7 @@ bool Master::Run(int argc, char** argv)
 	else
 	{
 		sLog.Error("Config", ">> error occurred loading " CONFDIR "/world.conf.xml");
+		LOG_ERROR( "ERROR: %s", worldConfigParser.getLastError() );
 		sLog.Close();
 		return false;
 	}

@@ -50,24 +50,85 @@ namespace
 }
 
 
+enum WorldErrors
+{
+	ERR_ALL_OK,
+	ERR_CANNOT_OPEN_FILE,
+	ERR_NOT_A_CONFIG_FILE,
+	ERR_NOT_WORLD_CONFIG,
+	ERR_WRONG_VERSION,
+	ERR_WDB_NO_HOST,
+	ERR_WDB_NO_USER,
+	ERR_WDB_NO_PASS,
+	ERR_WDB_NO_DB,
+	ERR_CDB_NO_HOST,
+	ERR_CDB_NO_USER,
+	ERR_CDB_NO_PASS,
+	ERR_CDB_NO_DB,
+	ERR_HOST_NO_ADDRESS,
+	ERR_HOST_NO_PORT,
+	ERR_SEC_NO_PASS,
+	ERR_NO_WDB_SETTINGS,
+	ERR_NO_CDB_SETTINGS,
+	ERR_NO_HOST_SETTINGS,
+	ERR_MAX_ERROR
+};
+
+const char* errorStrings[] = 
+{
+	"No errors",
+	"Cannot open file",
+	"Not a config file",
+	"Not a world config file",
+	"Wrong version of config file",
+	"World database, couldn't load hostname",
+	"World database, couldn't load username",
+	"World database, couldn't load password",
+	"World database, couldn't load database name",	
+	"Character database, couldn't load hostname",
+	"Character database, couldn't load username",
+	"Character database, couldn't load password",
+	"Character database, couldn't load database name",
+	"Host, couldn't load address",
+	"Host, couldn't load port",
+	"Security, couldn't load remote password",
+	"Couldn't load world database connection settings",
+	"Couldn't load character database connection settings",
+	"Couldn't load host settings"
+};
+
+
 WorldConfigParser::WorldConfigParser()
 {
+	lastError        = ERR_ALL_OK;
+	worldDBPartDone  = false;
+	charDBPartDone   = false;
+	hostPartDone     = false;
 }
 
 WorldConfigParser::~WorldConfigParser()
 {
 }
 
+const char* WorldConfigParser::getLastError() const
+{
+	return errorStrings[ lastError ];
+}
+
 bool WorldConfigParser::parseFile( const std::string &name )
 {
 	xmlDocPtr document = xmlParseFile( name.c_str() );
 	if( document == NULL )
+	{
+		lastError = ERR_CANNOT_OPEN_FILE;
 		return false;
+	}
 
 	xmlNodePtr root = xmlDocGetRootElement( document );
 	if( root == NULL )
 	{
 		xmlFreeDoc( document );
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
 	}
 
@@ -163,6 +224,28 @@ bool WorldConfigParser::parseFile( const std::string &name )
 	}
 
 	xmlFreeDoc( document );
+
+	if( !ok )
+		return false;
+
+	if( !worldDBPartDone )
+	{
+		ok = false;
+		lastError = ERR_NO_WDB_SETTINGS;
+	}
+	else
+	if( !charDBPartDone )
+	{
+		ok = false;
+		lastError = ERR_NO_CDB_SETTINGS;
+	}
+	else
+	if( !hostPartDone )
+	{
+		ok = false;
+		lastError = ERR_NO_HOST_SETTINGS;
+	}
+
 	if( ok )
 		return true;
 	else
@@ -175,15 +258,27 @@ bool WorldConfigParser::isConfig( _xmlNode *node )
 
 	prop = xmlGetProp( node, BAD_CAST "type" );
 	if( prop == NULL )
+	{
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
+	}
 	if( xmlStrcmp( prop, BAD_CAST "world" ) != 0 )
+	{
+		lastError = ERR_NOT_WORLD_CONFIG;
 		return false;
+	}
 
 	prop = xmlGetProp( node, BAD_CAST "version" );
 	if( prop == NULL )
+	{
+		lastError = ERR_NOT_A_CONFIG_FILE;
 		return false;
-	if( xmlStrcmp( prop, BAD_CAST "1" ) != 0 )
+	}
+	if( xmlStrcmp( prop, BAD_CAST requiredVersion.c_str() ) != 0 )
+	{
+		lastError = ERR_WRONG_VERSION;
 		return false;
+	}
 
 	return true;
 }
@@ -193,29 +288,43 @@ bool WorldConfigParser::parseWorldDBStuff( _xmlNode *node )
 	xmlChar *prop = NULL;
 	prop = xmlGetProp( node, BAD_CAST "hostname" );
 	if( prop == NULL )
+	{
+		lastError = ERR_WDB_NO_HOST;
 		return false;
+	}
 	data.worldDB.hostname = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "username" );
 	if( prop == NULL )
+	{
+		lastError = ERR_WDB_NO_USER;
 		return false;
+	}
 	data.worldDB.username = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "password" );
 	if( prop == NULL )
+	{
+		lastError = ERR_WDB_NO_PASS;
 		return false;
+	}
 	data.worldDB.password = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "database" );
 	if( prop == NULL )
+	{
+		lastError = ERR_WDB_NO_DB;
 		return false;
+	}
 	data.worldDB.database = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "port" );
 	if( prop == NULL )
-		return false;
-	data.worldDB.port = toUShort( PCHAR_CAST prop );
+		data.worldDB.port = 3306;
+	else
+		data.worldDB.port = toUShort( PCHAR_CAST prop );
 	
+	worldDBPartDone = true;
 	return true;
 }
 
@@ -224,29 +333,43 @@ bool WorldConfigParser::parseCharDBStuff( _xmlNode *node )
 	xmlChar *prop = NULL;
 	prop = xmlGetProp( node, BAD_CAST "hostname" );
 	if( prop == NULL )
+	{
+		lastError = ERR_CDB_NO_HOST;
 		return false;
+	}
 	data.characterDB.hostname = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "username" );
 	if( prop == NULL )
+	{
+		lastError = ERR_CDB_NO_USER;
 		return false;
+	}
 	data.characterDB.username = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "password" );
 	if( prop == NULL )
+	{
+		lastError = ERR_CDB_NO_PASS;
 		return false;
+	}
 	data.characterDB.password = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "database" );
 	if( prop == NULL )
+	{
+		lastError = ERR_CDB_NO_DB;
 		return false;
+	}
 	data.characterDB.database = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "port" );
 	if( prop == NULL )
-		return false;
-	data.characterDB.port = toUShort( PCHAR_CAST prop );
+		data.characterDB.port = 3306;
+	else
+		data.characterDB.port = toUShort( PCHAR_CAST prop );
 	
+	charDBPartDone = true;
 	return true;
 }
 
@@ -256,14 +379,21 @@ bool WorldConfigParser::parseHostStuff( _xmlNode *node )
 
 	prop = xmlGetProp( node, BAD_CAST "world_address" );
 	if( prop == NULL )
+	{
+		lastError = ERR_HOST_NO_ADDRESS;
 		return false;
+	}
 	data.host.address = PCHAR_CAST prop;
 
 	prop = xmlGetProp( node, BAD_CAST "world_port" );
 	if( prop == NULL )
+	{
+		lastError = ERR_HOST_NO_PORT;
 		return false;
+	}
 	data.host.port = toUShort( PCHAR_CAST prop );
 
+	hostPartDone = true;
 	return true;
 }
 

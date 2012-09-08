@@ -16,6 +16,7 @@ public:
 
 	const WorldConfigData& getWorldConfigData() const{ return data; }
 	void setRequiredVersion( const std::string &s ){ requiredVersion = s; }
+	const char* getLastError() const;
 
 private:
 	bool parseWorldDBStuff( _xmlNode *node );
@@ -47,6 +48,11 @@ private:
 
 	WorldConfigData data;
 	std::string requiredVersion;
+	unsigned long lastError;
+
+	bool worldDBPartDone;
+	bool charDBPartDone;
+	bool hostPartDone;
 };
 
 #endif

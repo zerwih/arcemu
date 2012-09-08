@@ -167,6 +167,7 @@ bool rehash2()
 {
 	char* config_file = (char*)CONFDIR "/logon.conf.xml";
 	LogonConfigParser configParser;
+	configParser.setRequiredVersion( REQ_LOGON_CFG_VER );
 	if( !configParser.parseFile( config_file ) )
 	{
 		LOG_ERROR("Config file could not be loaded.");

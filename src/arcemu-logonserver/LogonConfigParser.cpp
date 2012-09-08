@@ -263,7 +263,7 @@ bool LogonConfigParser::parseHostPart( _xmlNode *node )
 	}
 	data.host.is_port = static_cast< unsigned int >( atoi( reinterpret_cast< char* >( prop ) ) );
 
-	hostPartDone = false;
+	hostPartDone = true;
 	return true;
 }
 
