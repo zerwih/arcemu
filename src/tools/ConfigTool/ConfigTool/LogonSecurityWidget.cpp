@@ -18,36 +18,16 @@
  *
  */
 
-#include "LogonTabWidget.h"
-#include "LogonDBWidget.h"
-#include "LogonHostWidget.h"
-#include "LogonLogWidget.h"
-#include "LogonRatesWidget.h"
+
 #include "LogonSecurityWidget.h"
 
-LogonTabWidget::LogonTabWidget( QWidget *parent ) :
+LogonSecurityWidget::LogonSecurityWidget( QWidget *parent ) :
 QWidget( parent )
 {
 	setupUi( this );
-
-	stackedWidget->addWidget( new LogonDBWidget() );
-	stackedWidget->addWidget( new LogonHostWidget() );
-	stackedWidget->addWidget( new LogonLogWidget() );
-	stackedWidget->addWidget( new LogonRatesWidget() );
-	stackedWidget->addWidget( new LogonSecurityWidget() );
-
-
-	connect( listWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( onListRowChanged( int ) ) );
 }
 
-LogonTabWidget::~LogonTabWidget()
+LogonSecurityWidget::~LogonSecurityWidget()
 {
 }
 
-void LogonTabWidget::onListRowChanged( int row )
-{
-	if( row >= stackedWidget->count() )
-		return;
-
-	stackedWidget->setCurrentIndex( row );
-}
