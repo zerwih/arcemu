@@ -18,34 +18,19 @@
  *
  */
 
-#include "LogonTabWidget.h"
-#include "LogonDBWidget.h"
-#include "LogonHostWidget.h"
-#include "LogonLogWidget.h"
-#include "LogonRatesWidget.h"
+#ifndef LOGONRATESWIDGET_H
+#define LOGONRATESWIDGET_H
 
-LogonTabWidget::LogonTabWidget( QWidget *parent ) :
-QWidget( parent )
+#include "ui_LogonRatesWidget.h"
+
+class LogonRatesWidget : public QWidget, public Ui::LogonRatesWidget
 {
-	setupUi( this );
+	Q_OBJECT
+public:
+	LogonRatesWidget( QWidget *parent = NULL );
+	~LogonRatesWidget();
 
-	stackedWidget->addWidget( new LogonDBWidget() );
-	stackedWidget->addWidget( new LogonHostWidget() );
-	stackedWidget->addWidget( new LogonLogWidget() );
-	stackedWidget->addWidget( new LogonRatesWidget() );
+};
 
+#endif
 
-	connect( listWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( onListRowChanged( int ) ) );
-}
-
-LogonTabWidget::~LogonTabWidget()
-{
-}
-
-void LogonTabWidget::onListRowChanged( int row )
-{
-	if( row >= stackedWidget->count() )
-		return;
-
-	stackedWidget->setCurrentIndex( row );
-}
