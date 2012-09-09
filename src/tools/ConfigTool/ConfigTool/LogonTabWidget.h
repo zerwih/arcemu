@@ -31,8 +31,8 @@ public:
 	LogonTabWidget( QWidget *parent = NULL );
 	~LogonTabWidget();
 
-private:
-
+private Q_SLOTS:
+	void onListRowChanged( int row );
 };
 
 #endif
