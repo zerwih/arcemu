@@ -21,12 +21,14 @@
 #include "LogonTabWidget.h"
 #include "LogonDBWidget.h"
 #include "LogonHostWidget.h"
+#include "LogonLogWidget.h"
 
 LogonTabWidget::LogonTabWidget( QWidget *parent )
 {
 	setupUi( this );
 	stackedWidget->addWidget( new LogonDBWidget() );
 	stackedWidget->addWidget( new LogonHostWidget() );
+	stackedWidget->addWidget( new LogonLogWidget() );
 
 	connect( listWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( onListRowChanged( int ) ) );
 }
