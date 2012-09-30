@@ -1,6 +1,5 @@
 /*
  * ArcEmu MMORPG Server
- * Copyright (C) 2005-2007 Ascent Team <http://www.ascentemu.com/>
  * Copyright (C) 2008-2012 <http://www.ArcEmu.org/>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,27 +17,17 @@
  *
  */
 
-#include "ConfigToolWidget.h"
-#include "LogonTabWidget.h"
-#include "RealmsTabWidget.h"
+#ifndef REALMSTABWIDGET_H
+#define REALMSTABWIDGET_H
 
-ConfigToolWidget::ConfigToolWidget( QWidget *parent ) :
-QWidget( parent )
+#include "ui_RealmsTabWidget.h"
+
+class RealmsTabWidget : public QWidget, public Ui::RealmsTabWidget
 {
-	setupUi( this );
-	configTabWidget->addTab( new LogonTabWidget(), tr( "Logon Settings" ) );
-	configTabWidget->addTab( new RealmsTabWidget(), tr( "Realm Settings" ) );
-	connect( okButton, SIGNAL( clicked() ), this, SLOT( onClickOK() ) );
-	connect( cancelButton, SIGNAL( clicked() ), this, SLOT( close() ) );
-}
+	Q_OBJECT
+public:
+	RealmsTabWidget( QWidget *parent = NULL );
+	~RealmsTabWidget();
+};
 
-ConfigToolWidget::~ConfigToolWidget()
-{
-}
-
-void ConfigToolWidget::onClickOK()
-{
-	// We should be saving here or somethin'!
-	close();
-}
-
+#endif
