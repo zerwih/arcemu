@@ -17,29 +17,20 @@
  *
  */
 
-#include "RealmsTabWidget.h"
-#include "RealmsLogonWidget.h"
-#include "RealmsRealmsWidget.h"
+#ifndef REALMSREALMSWIDGET_H
+#define REALMSREALMSWIDGET_H
 
-RealmsTabWidget::RealmsTabWidget( QWidget *parent ) :
-QWidget( parent )
+#include "ui_RealmsRealmsWidget.h"
+
+class RealmsRealmsWidget : public QWidget, public Ui::RealmsRealmsWidget
 {
-	setupUi( this );
-	stackedWidget->addWidget( new RealmsLogonWidget() );
-	stackedWidget->addWidget( new RealmsRealmsWidget() );
-	connect( listWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( onListRowChanged( int ) ) );
-}
+	Q_OBJECT
+public:
+	RealmsRealmsWidget( QWidget *parent = NULL );
+	~RealmsRealmsWidget();
 
-RealmsTabWidget::~RealmsTabWidget()
-{
-}
+};
 
-void RealmsTabWidget::onListRowChanged( int row )
-{
-	if( row >= stackedWidget->count() )
-		return;
-
-	stackedWidget->setCurrentIndex( row );
-}
+#endif
 
 
