@@ -18,14 +18,26 @@
  */
 
 #include "RealmsTabWidget.h"
+#include "RealmsLogonWidget.h"
 
 RealmsTabWidget::RealmsTabWidget( QWidget *parent ) :
 QWidget( parent )
 {
 	setupUi( this );
+	stackedWidget->addWidget( new RealmsLogonWidget() );
+	connect( listWidget, SIGNAL( currentRowChanged( int ) ), this, SLOT( onListRowChanged( int ) ) );
 }
 
 RealmsTabWidget::~RealmsTabWidget()
 {
 }
+
+void RealmsTabWidget::onListRowChanged( int row )
+{
+	if( row >= stackedWidget->count() )
+		return;
+
+	stackedWidget->setCurrentIndex( row );
+}
+
 

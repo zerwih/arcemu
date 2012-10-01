@@ -17,21 +17,15 @@
  *
  */
 
-#ifndef REALMSTABWIDGET_H
-#define REALMSTABWIDGET_H
+#include "RealmsLogonWidget.h"
 
-#include "ui_RealmsTabWidget.h"
-
-class RealmsTabWidget : public QWidget, public Ui::RealmsTabWidget
+RealmsLogonWidget::RealmsLogonWidget( QWidget *parent ) :
+QWidget( parent )
 {
-	Q_OBJECT
-public:
-	RealmsTabWidget( QWidget *parent = NULL );
-	~RealmsTabWidget();
+	setupUi( this );
+}
 
-private Q_SLOTS:
-	void onListRowChanged( int row );
+RealmsLogonWidget::~RealmsLogonWidget()
+{
+}
 
-};
-
-#endif
