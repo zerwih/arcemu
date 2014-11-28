@@ -421,6 +421,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
 		}
 	}
 
+	//Disable a creation of DK on the server
+	if (Config.OptionalConfig.GetBoolDefault("ClassOptions","DeathKnightEnabled", false) && (class_ == DEATHKNIGHT) )
+	{
+		OutPacket(SMSG_CHAR_CREATE, 0,CHAR_CREATE_DISABLED);
+		return;
+	}
+
 	//Check if player has a level 55 or higher character on this realm and allow him to create DK.
 	//This check can be turned off in optional.conf
 	if(Config.OptionalConfig.GetBoolDefault("ClassOptions" , "DeathKnightPreReq" , false) && !has_level_55_char
